@@ -60,6 +60,20 @@ impl DateTime {
         let systime = SystemTime::from(self) - d;
         Self::from(systime)
     }
+
+    pub fn unix_timestamp(self) -> i64 {
+        let s = SystemTime::from(self)
+            .duration_since(UNIX_EPOCH)
+            .expect("all times should be after the epoch");
+        return s.as_secs() as i64;
+    }
+
+    pub fn unix_timestamp_micro(self) -> i64 {
+        let s = SystemTime::from(self)
+            .duration_since(UNIX_EPOCH)
+            .expect("all times should be after the epoch");
+        return s.as_millis() as i64;
+    }
 }
 
 impl Add<Duration> for DateTime {
@@ -77,7 +91,6 @@ impl Sub<Duration> for DateTime {
         self.sub(rhs)
     }
 }
-
 
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
@@ -322,5 +335,18 @@ mod tests {
         let added = d + Duration::from_secs(1);
         println!("{},{}", d, added);
         assert_eq!(d.add(Duration::from_secs(1)), added);
+    }
+
+    #[test]
+    fn test_unix_timestamp() {
+        let d = DateTime::now().unix_timestamp();
+        println!("unix:{}", d);
+        let d = DateTime::utc().unix_timestamp();
+        println!("unix:{}", d);
+
+        let d = DateTime::now().unix_timestamp_micro();
+        println!("unix:{}", d);
+        let d = DateTime::utc().unix_timestamp_micro();
+        println!("unix:{}", d);
     }
 }
