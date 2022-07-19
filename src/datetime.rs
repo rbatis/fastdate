@@ -14,7 +14,7 @@ pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_ut
 
 /// offset with utc 0.zone
 pub fn offset_sec() -> i32 {
-     GLOBAL_OFFSET.deref().clone()
+    GLOBAL_OFFSET.deref().clone()
 }
 
 /// Log timestamp type.
@@ -57,11 +57,12 @@ impl DateTime {
     }
 
     /// set offset
-    pub fn set_offset(self, offset:i64) -> DateTime {
+    pub fn set_offset(self, offset: i32) -> DateTime {
+        let time: SystemTime = self.into();
         if offset > 0 {
-            Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
+            Self::from(time + Duration::from_secs(offset as u64))
         } else {
-            Self::from(SystemTime::now() - Duration::from_secs(offset as u64))
+            Self::from(time - Duration::from_secs(offset as u64))
         }
     }
 
@@ -347,7 +348,7 @@ impl<'de> Deserialize<'de> for DateTime {
 mod tests {
     use std::str::FromStr;
     use std::time::Duration;
-    use crate::DateTime;
+    use crate::{DateTime, offset_sec};
 
     #[test]
     fn test_other_space() {
@@ -375,6 +376,12 @@ mod tests {
         let added = d + Duration::from_secs(1);
         println!("{},{}", d, added);
         assert_eq!(d.add(Duration::from_secs(1)), added);
+    }
+
+    #[test]
+    fn test_offset() {
+        let utc = DateTime::from_str("2022-12-12 12:12:12.000000").unwrap();
+        assert_eq!(format!("{}",utc.set_offset(1)), "2022-12-12 12:12:13.000000");
     }
 
     #[test]
