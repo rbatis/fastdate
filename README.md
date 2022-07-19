@@ -1,7 +1,7 @@
 # fastdate
 fastdate
 
-this date cartes is very fast(including parse(),now(),now_local(),display <= 50ns)
+this date cartes is very fast(including from_str(),now(),utc(),display(),format!() <= 50ns)
 
 ```log
 test bench_add            ... bench:          21 ns/iter (+/- 1)
