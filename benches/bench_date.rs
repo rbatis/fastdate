@@ -42,7 +42,7 @@ fn bench_date_display(b: &mut Bencher) {
     let now=   DateTime::now_local();
     b.iter(|| {
         std::hint::black_box({
-            now.to_string();
+            format!("{}",now);
         });
     });
 }
