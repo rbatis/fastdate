@@ -13,7 +13,7 @@ use crate::sys::Timespec;
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
 
 /// offset with utc 0.zone
-pub fn offset() -> i32 {
+pub fn offset_sec() -> i32 {
      GLOBAL_OFFSET.deref().clone()
 }
 
