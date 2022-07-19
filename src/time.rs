@@ -31,7 +31,7 @@ impl Time{
 
             match bytes.get_unchecked(offset + 2) {
                 b':' => (),
-                _ => return Err(Error::E("InvalidCharTimeSep".to_string())),
+                _ =>  ()//return Err(Error::E("InvalidCharTimeSep".to_string())),
             }
             let m1 = get_digit_unchecked!(bytes, offset + 3, "InvalidCharMinute");
             let m2 = get_digit_unchecked!(bytes, offset + 4, "InvalidCharMinute");
@@ -47,47 +47,44 @@ impl Time{
         }
         let mut length: usize = 5;
 
-        let (second, microsecond) = match bytes.get(offset + 5) {
-            Some(b':') => {
-                let s1 = get_digit!(bytes, offset + 6, "InvalidCharSecond");
-                let s2 = get_digit!(bytes, offset + 7, "InvalidCharSecond");
-                let second = s1 * 10 + s2;
-                if second > 59 {
-                    return Err(Error::E("OutOfRangeSecond".to_string()));
-                }
-                length = 8;
-
-                let mut microsecond = 0;
-                let frac_sep = bytes.get(offset + 8).copied();
-                if frac_sep == Some(b'.') || frac_sep == Some(b',') {
-                    length = 9;
-                    let mut i: usize = 0;
-                    loop {
-                        match bytes.get(offset + length + i) {
-                            Some(c) if (b'0'..=b'9').contains(c) => {
-                                microsecond *= 10;
-                                microsecond += (c - b'0') as u32;
-                            }
-                            _ => {
-                                break;
-                            }
-                        }
-                        i += 1;
-                        if i > 6 {
-                            return Err(Error::E("SecondFractionTooLong".to_string()));
-                        }
-                    }
-                    if i == 0 {
-                        return Err(Error::E("SecondFractionMissing".to_string()));
-                    }
-                    if i < 6 {
-                        microsecond *= 10_u32.pow(6 - i as u32);
-                    }
-                    length += i;
-                }
-                (second, microsecond)
+        let (second, microsecond) = {
+            let s1 = get_digit!(bytes, offset + 6, "InvalidCharSecond");
+            let s2 = get_digit!(bytes, offset + 7, "InvalidCharSecond");
+            let second = s1 * 10 + s2;
+            if second > 59 {
+                return Err(Error::E("OutOfRangeSecond".to_string()));
             }
-            _ => (0, 0),
+            length = 8;
+
+            let mut microsecond = 0;
+            let frac_sep = bytes.get(offset + 8).copied();
+            if frac_sep == Some(b'.') || frac_sep == Some(b',') {
+                length = 9;
+                let mut i: usize = 0;
+                loop {
+                    match bytes.get(offset + length + i) {
+                        Some(c) if (b'0'..=b'9').contains(c) => {
+                            microsecond *= 10;
+                            microsecond += (c - b'0') as u32;
+                        }
+                        _ => {
+                            break;
+                        }
+                    }
+                    i += 1;
+                    if i > 6 {
+                        return Err(Error::E("SecondFractionTooLong".to_string()));
+                    }
+                }
+                if i == 0 {
+                    return Err(Error::E("SecondFractionMissing".to_string()));
+                }
+                if i < 6 {
+                    microsecond *= 10_u32.pow(6 - i as u32);
+                }
+                length += i;
+            }
+            (second, microsecond)
         };
         let t = Self {
             micro: microsecond,

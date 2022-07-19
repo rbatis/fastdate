@@ -214,13 +214,12 @@ impl FromStr for DateTime {
             date.year = d.year;
             date.mon = d.mon;
             date.day = d.day;
-            if bytes.len() >= 20 {
-                let (t, _) = Time::parse_bytes_partial(&bytes, 11)?;
-                date.hour = t.hour;
-                date.min = t.min;
-                date.sec = t.sec;
-                date.micro = t.micro;
-            }
+
+            let (t, _) = Time::parse_bytes_partial(&bytes, 11)?;
+            date.hour = t.hour;
+            date.min = t.min;
+            date.sec = t.sec;
+            date.micro = t.micro;
         }
         Ok(date)
     }
@@ -296,6 +295,13 @@ mod tests {
     use std::str::FromStr;
     use std::time::Duration;
     use crate::DateTime;
+
+    #[test]
+    fn test_other_space() {
+        let d = DateTime::from_str("1234_12_13_11_12_13.123456").unwrap();
+        println!("{}", d);
+        assert_eq!("1234-12-13 11:12:13.123456".to_string(), d.to_string());
+    }
 
     #[test]
     fn test_date() {

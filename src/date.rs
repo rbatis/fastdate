@@ -38,7 +38,7 @@ impl Date{
 
             match bytes.get_unchecked(4) {
                 b'-' => (),
-                _ => return Err(Error::E("InvalidCharDateSep".to_string())),
+                _ => ()//return Err(Error::E("InvalidCharDateSep".to_string())),
             }
 
             let m1 = get_digit_unchecked!(bytes, 5, "InvalidCharMonth");
@@ -47,7 +47,7 @@ impl Date{
 
             match bytes.get_unchecked(7) {
                 b'-' => (),
-                _ => return Err(Error::E("InvalidCharDateSep".to_string())),
+                _ => ()//return Err(Error::E("InvalidCharDateSep".to_string())),
             }
 
             let d1 = get_digit_unchecked!(bytes, 8, "InvalidCharDay");
