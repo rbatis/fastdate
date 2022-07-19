@@ -18,10 +18,10 @@ fn bench_date_parse(b: &mut Bencher) {
 
 //test bench_date_now   ... bench:          40 ns/iter (+/- 1)
 #[bench]
-fn bench_date_now(b: &mut Bencher) {
+fn bench_date_utc(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::now();
+            DateTime::utc();
         });
     });
 }
@@ -31,7 +31,7 @@ fn bench_date_now(b: &mut Bencher) {
 fn bench_date_now_local(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::now_local();
+            DateTime::now();
         });
     });
 }
@@ -39,7 +39,7 @@ fn bench_date_now_local(b: &mut Bencher) {
 //test bench_date_display    ... bench:          40 ns/iter (+/- 1)
 #[bench]
 fn bench_date_display(b: &mut Bencher) {
-    let now=   DateTime::now_local();
+    let now=   DateTime::now();
     b.iter(|| {
         std::hint::black_box({
             format!("{}",now);

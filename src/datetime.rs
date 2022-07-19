@@ -37,11 +37,11 @@ pub struct DateTime {
 
 impl DateTime {
     ///utc time
-    pub fn now() -> Self {
+    pub fn utc() -> Self {
         Self::from(SystemTime::now())
     }
     ///local zone time
-    pub fn now_local() -> Self {
+    pub fn now() -> Self {
         let offset = GLOBAL_OFFSET.deref().clone();
         if offset > 0 {
             Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
@@ -304,7 +304,7 @@ mod tests {
 
     #[test]
     fn test_date_utc() {
-        let d = DateTime::now_local();
+        let d = DateTime::now();
         println!("{}", d);
     }
 }
