@@ -14,10 +14,11 @@ test bench_date_utc       ... bench:          39 ns/iter (+/- 0)
 ```rust
 use fastdate::DateTime;
 fn main(){
-    //now
+    //now with local time zone
     DateTime::now();
-    //local now with local time zone
-    DateTime::now_local();
+    //utc time now
+    DateTime::utc();
+    
     //from str
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
     //to_string()
