@@ -20,5 +20,7 @@ fn main(){
     DateTime::now_local();
     //from str
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
+    //to_string()
+    let s = datetime.to_string();//1234-12-13 11:12:13.123456
 }
 ```
