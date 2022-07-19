@@ -45,5 +45,12 @@ fn main(){
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
     //to_string()
     let s = datetime.to_string();//1234-12-13 11:12:13.123456
+    //unix
+    let timestamp = DateTime::now().unix_timestamp();
+    let new_time = DateTime::from_timestamp(timestamp);
+    let timestamp = DateTime::now().unix_timestamp_millis();
+    let new_time = DateTime::from_timestamp_millis(timestamp);
+    let timestamp = DateTime::now().unix_timestamp_nano();
+    let new_time = DateTime::from_timestamp_nano(timestamp);
 }
 ```
