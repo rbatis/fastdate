@@ -61,6 +61,7 @@ impl DateTime {
         Self::from(systime)
     }
 
+    /// unix_timestamp sec
     pub fn unix_timestamp(self) -> i64 {
         let s = SystemTime::from(self)
             .duration_since(UNIX_EPOCH)
@@ -68,6 +69,7 @@ impl DateTime {
         return s.as_secs() as i64;
     }
 
+    ///unix_timestamp ms
     pub fn unix_timestamp_micro(self) -> i64 {
         let s = SystemTime::from(self)
             .duration_since(UNIX_EPOCH)
