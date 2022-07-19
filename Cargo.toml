@@ -11,3 +11,4 @@ repository = "https://github.com/rbatis/fastdate"
 [dependencies]
 libc = "0.2"
 once_cell = "1.13.0"
+serde = "1"

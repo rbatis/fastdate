@@ -4,7 +4,7 @@ use std::ops::Deref;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use once_cell::sync::Lazy;
-
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::error::Error as Error;
 use crate::sys::Timespec;
 
@@ -275,6 +275,20 @@ fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
+
+impl Serialize for DateTime {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str(&format!("{}", self))
+    }
+}
+
+impl<'de> Deserialize<'de> for DateTime {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        use serde::de::Error;
+        let s = String::deserialize(deserializer)?;
+        DateTime::from_str(&s).map_err(|e| D::Error::custom(e))
+    }
+}
 
 #[cfg(test)]
 mod tests {
