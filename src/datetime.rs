@@ -197,7 +197,7 @@ impl From<DateTime> for SystemTime {
 impl FromStr for DateTime {
     type Err = Error;
 
-    /// from RFC3339Nano = "2006-01-02T15:04:05.000000"
+    /// from RFC3339Nano = "0000-00-00 00:00:00.000000"
     fn from_str(s: &str) -> Result<DateTime, Error> {
         //"0000-00-00 00:00:00.000000";
         let mut date = DateTime {
@@ -223,50 +223,6 @@ impl FromStr for DateTime {
                 date.micro = t.micro;
             }
         }
-        // if bytes.len() > 20 {
-        //     if let Ok(year) = std::str::from_utf8(&bytes[0..4])
-        //         .unwrap_or_default()
-        //         .parse::<u16>()
-        //     {
-        //         date.year = year;
-        //     }
-        //     if let Ok(mon) = std::str::from_utf8(&bytes[5..7])
-        //         .unwrap_or_default()
-        //         .parse::<u8>()
-        //     {
-        //         date.mon = mon;
-        //     }
-        //     if let Ok(day) = std::str::from_utf8(&bytes[8..10])
-        //         .unwrap_or_default()
-        //         .parse::<u8>()
-        //     {
-        //         date.day = day;
-        //     }
-        //     if let Ok(hour) = std::str::from_utf8(&bytes[11..13])
-        //         .unwrap_or_default()
-        //         .parse::<u8>()
-        //     {
-        //         date.hour = hour;
-        //     }
-        //     if let Ok(min) = std::str::from_utf8(&bytes[14..16])
-        //         .unwrap_or_default()
-        //         .parse::<u8>()
-        //     {
-        //         date.min = min;
-        //     }
-        //     if let Ok(sec) = std::str::from_utf8(&bytes[17..19])
-        //         .unwrap_or_default()
-        //         .parse::<u8>()
-        //     {
-        //         date.sec = sec;
-        //     }
-        //     if let Ok(ns) = std::str::from_utf8(&bytes[20..26])
-        //         .unwrap_or_default()
-        //         .parse::<u32>()
-        //     {
-        //         date.micro = ns;
-        //     }
-        // }
         Ok(date)
     }
 }
