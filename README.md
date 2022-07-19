@@ -1,5 +1,5 @@
 # fastdate
-fastdate
+fastdate of Any RFC3339Micro
 
 this date cartes is very fast(<= 50ns) including 
 * from_str()
@@ -16,6 +16,15 @@ test bench_date_now_local ... bench:          40 ns/iter (+/- 1)
 test bench_date_parse     ... bench:          11 ns/iter (+/- 0)
 test bench_date_utc       ... bench:          39 ns/iter (+/- 1)
 test bench_eq             ... bench:           0 ns/iter (+/- 0)
+```
+
+* it can from_str for any RFC3339
+for example:
+```log
+1234_12_13_11_12_13.123456
+1234-12-13T11:12:13
+1234-12-13 11:12:13.123456
+1234-12-13T11:12:13.123456
 ```
 
 * how use?
