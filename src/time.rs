@@ -46,7 +46,6 @@ impl Time{
             return Err(Error::E("OutOfRangeMinute".to_string()));
         }
         let mut length: usize = 5;
-
         let (second, microsecond) = {
             let s1 = get_digit!(bytes, offset + 6, "InvalidCharSecond");
             let s2 = get_digit!(bytes, offset + 7, "InvalidCharSecond");
