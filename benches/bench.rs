@@ -68,3 +68,13 @@ fn bench_eq(b: &mut Bencher) {
         });
     });
 }
+
+#[bench]
+fn bench_set_offset(b: &mut Bencher) {
+    let now = DateTime::utc();
+    b.iter(|| {
+        std::hint::black_box({
+            let _=now.set_offset(8*3600);
+        });
+    });
+}

@@ -57,12 +57,12 @@ impl DateTime {
     }
 
     /// set offset
-    pub fn set_offset(self, offset: i32) -> DateTime {
+    pub fn set_offset(self, offset_sec: i32) -> DateTime {
         let time: SystemTime = self.into();
-        if offset > 0 {
-            Self::from(time + Duration::from_secs(offset as u64))
+        if offset_sec > 0 {
+            Self::from(time + Duration::from_secs(offset_sec as u64))
         } else {
-            Self::from(time - Duration::from_secs(offset as u64))
+            Self::from(time - Duration::from_secs(offset_sec as u64))
         }
     }
 
@@ -381,7 +381,7 @@ mod tests {
     #[test]
     fn test_offset() {
         let utc = DateTime::from_str("2022-12-12 12:12:12.000000").unwrap();
-        assert_eq!(format!("{}",utc.set_offset(1)), "2022-12-12 12:12:13.000000");
+        assert_eq!(format!("{}", utc.set_offset(1)), "2022-12-12 12:12:13.000000");
     }
 
     #[test]

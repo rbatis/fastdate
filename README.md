@@ -8,14 +8,16 @@ this date cartes is very fast(<= 50ns) including
 * to_string()/format!()
 * eq()
 * add()/sub()
+* set_offset()
 
 ```log
-test bench_add            ... bench:          21 ns/iter (+/- 1)
+test bench_add            ... bench:          21 ns/iter (+/- 0)
 test bench_date_display   ... bench:          44 ns/iter (+/- 0)
 test bench_date_now_local ... bench:          40 ns/iter (+/- 1)
-test bench_date_parse     ... bench:          11 ns/iter (+/- 0)
-test bench_date_utc       ... bench:          39 ns/iter (+/- 1)
+test bench_date_parse     ... bench:          10 ns/iter (+/- 0)
+test bench_date_utc       ... bench:          39 ns/iter (+/- 0)
 test bench_eq             ... bench:           0 ns/iter (+/- 0)
+test bench_set_offset     ... bench:          21 ns/iter (+/- 0)
 ```
 
 * it can from_str for any RFC3339
