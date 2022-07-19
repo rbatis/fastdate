@@ -5,6 +5,7 @@ use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use crate::{Date, Time};
 use crate::error::Error as Error;
 use crate::sys::Timespec;
 
@@ -177,50 +178,63 @@ impl FromStr for DateTime {
             year: 0,
         };
         let bytes = s.as_bytes();
-        if bytes.len() > 4 {
-            if let Ok(year) = std::str::from_utf8(&bytes[0..4])
-                .unwrap_or_default()
-                .parse::<u16>()
-            {
-                date.year = year;
-            }
-            if let Ok(mon) = std::str::from_utf8(&bytes[5..7])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.mon = mon;
-            }
-            if let Ok(day) = std::str::from_utf8(&bytes[8..10])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.day = day;
-            }
-            if let Ok(hour) = std::str::from_utf8(&bytes[11..13])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.hour = hour;
-            }
-            if let Ok(min) = std::str::from_utf8(&bytes[14..16])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.min = min;
-            }
-            if let Ok(sec) = std::str::from_utf8(&bytes[17..19])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.sec = sec;
-            }
-            if let Ok(ns) = std::str::from_utf8(&bytes[20..26])
-                .unwrap_or_default()
-                .parse::<u32>()
-            {
-                date.micro = ns;
+        if bytes.len() >= 10 {
+            let d = Date::parse_bytes_partial(&bytes)?;
+            date.year = d.year;
+            date.mon = d.mon;
+            date.day = d.day;
+            if bytes.len() >= 20 {
+                let (t, _) = Time::parse_bytes_partial(&bytes, 11)?;
+                date.hour = t.hour;
+                date.min = t.min;
+                date.sec = t.sec;
+                date.micro = t.micro;
             }
         }
+        // if bytes.len() > 20 {
+        //     if let Ok(year) = std::str::from_utf8(&bytes[0..4])
+        //         .unwrap_or_default()
+        //         .parse::<u16>()
+        //     {
+        //         date.year = year;
+        //     }
+        //     if let Ok(mon) = std::str::from_utf8(&bytes[5..7])
+        //         .unwrap_or_default()
+        //         .parse::<u8>()
+        //     {
+        //         date.mon = mon;
+        //     }
+        //     if let Ok(day) = std::str::from_utf8(&bytes[8..10])
+        //         .unwrap_or_default()
+        //         .parse::<u8>()
+        //     {
+        //         date.day = day;
+        //     }
+        //     if let Ok(hour) = std::str::from_utf8(&bytes[11..13])
+        //         .unwrap_or_default()
+        //         .parse::<u8>()
+        //     {
+        //         date.hour = hour;
+        //     }
+        //     if let Ok(min) = std::str::from_utf8(&bytes[14..16])
+        //         .unwrap_or_default()
+        //         .parse::<u8>()
+        //     {
+        //         date.min = min;
+        //     }
+        //     if let Ok(sec) = std::str::from_utf8(&bytes[17..19])
+        //         .unwrap_or_default()
+        //         .parse::<u8>()
+        //     {
+        //         date.sec = sec;
+        //     }
+        //     if let Ok(ns) = std::str::from_utf8(&bytes[20..26])
+        //         .unwrap_or_default()
+        //         .parse::<u32>()
+        //     {
+        //         date.micro = ns;
+        //     }
+        // }
         Ok(date)
     }
 }

@@ -2,7 +2,7 @@ use std::cmp;
 use std::fmt::{self, Display, Formatter, Pointer};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use crate::DateTime;
+use crate::{DateTime, get_digit_unchecked};
 
 use crate::error::Error as Error;
 
@@ -22,6 +22,68 @@ pub struct Date {
     pub year: u16,
 }
 
+impl Date{
+    /// Parse a date from bytes, no check is performed for extract characters at the end of the string
+    pub(crate) fn parse_bytes_partial(bytes: &[u8]) -> Result<Self, Error> {
+        if bytes.len() < 10 {
+            return Err(Error::E("TooShort".to_string()));
+        }
+        let year: u16;
+        let month: u8;
+        let day: u8;
+        unsafe {
+            let y1 = get_digit_unchecked!(bytes, 0, "InvalidCharYear") as u16;
+            let y2 = get_digit_unchecked!(bytes, 1, "InvalidCharYear") as u16;
+            let y3 = get_digit_unchecked!(bytes, 2, "InvalidCharYear") as u16;
+            let y4 = get_digit_unchecked!(bytes, 3, "InvalidCharYear") as u16;
+            year = y1 * 1000 + y2 * 100 + y3 * 10 + y4;
+
+            match bytes.get_unchecked(4) {
+                b'-' => (),
+                _ => return Err(Error::E("InvalidCharDateSep".to_string())),
+            }
+
+            let m1 = get_digit_unchecked!(bytes, 5, "InvalidCharMonth");
+            let m2 = get_digit_unchecked!(bytes, 6, "InvalidCharMonth");
+            month = m1 * 10 + m2;
+
+            match bytes.get_unchecked(7) {
+                b'-' => (),
+                _ => return Err(Error::E("InvalidCharDateSep".to_string())),
+            }
+
+            let d1 = get_digit_unchecked!(bytes, 8, "InvalidCharDay");
+            let d2 = get_digit_unchecked!(bytes, 9, "InvalidCharDay");
+            day = d1 * 10 + d2;
+        }
+
+        // calculate the maximum number of days in the month, accounting for leap years in the
+        // gregorian calendar
+        let max_days = match month {
+            1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+            4 | 6 | 9 | 11 => 30,
+            2 => {
+                if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) {
+                    29
+                } else {
+                    28
+                }
+            }
+            _ => return Err(Error::E("OutOfRangeMonth".to_string())),
+        };
+
+        if day < 1 || day > max_days {
+            return Err(Error::E("OutOfRangeDay".to_string()));
+        }
+
+        Ok(Self {
+            day,
+            mon: month,
+            year
+        })
+    }
+}
+
 impl From<DateTime> for Date{
     fn from(arg: DateTime) -> Self {
         Date{
@@ -36,34 +98,9 @@ impl FromStr for Date {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        //"0000-00-00 00:00:00.000000";
-        let mut date = Date {
-            day: 0,
-            mon: 0,
-            year: 0,
-        };
-        let bytes = s.as_bytes();
-        if bytes.len() >= 10 {
-            if let Ok(year) = std::str::from_utf8(&bytes[0..4])
-                .unwrap_or_default()
-                .parse::<u16>()
-            {
-                date.year = year;
-            }
-            if let Ok(mon) = std::str::from_utf8(&bytes[5..7])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.mon = mon;
-            }
-            if let Ok(day) = std::str::from_utf8(&bytes[8..10])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.day = day;
-            }
-        }
-        Ok(date)
+        //"0000-00-00";
+        let d=Date::parse_bytes_partial(s.as_bytes())?;
+        Ok(d)
     }
 }
 

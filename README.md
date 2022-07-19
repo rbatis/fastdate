@@ -4,10 +4,10 @@ fastdate
 this date cartes is very fast(including parse(),now(),now_local(),display <= 50ns)
 
 ```log
-test bench_date_display   ... bench:          45 ns/iter (+/- 1)
-test bench_date_now_local ... bench:          40 ns/iter (+/- 1)
-test bench_date_parse     ... bench:          35 ns/iter (+/- 2)
-test bench_date_utc       ... bench:          40 ns/iter (+/- 1)
+test bench_date_display   ... bench:          45 ns/iter (+/- 2)
+test bench_date_now_local ... bench:          40 ns/iter (+/- 0)
+test bench_date_parse     ... bench:          11 ns/iter (+/- 0)
+test bench_date_utc       ... bench:          39 ns/iter (+/- 0)
 ```
 
 * how use?

@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter, Write};
 use std::str::FromStr;
-use crate::DateTime;
+use crate::{DateTime, get_digit, get_digit_unchecked};
 use crate::error::Error;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
@@ -13,6 +13,90 @@ pub struct Time {
     pub min: u8,
     /// 0...23
     pub hour: u8,
+}
+
+impl Time{
+    /// Parse a time from bytes with a starting index, no check is performed for extract characters at
+    /// the end of the string
+    pub(crate) fn parse_bytes_partial(bytes: &[u8], offset: usize) -> Result<(Self, usize), Error> {
+        if bytes.len() - offset < 5 {
+            return Err(Error::E("TooShort".to_string()));
+        }
+        let hour: u8;
+        let minute: u8;
+        unsafe {
+            let h1 = get_digit_unchecked!(bytes, offset, "InvalidCharHour");
+            let h2 = get_digit_unchecked!(bytes, offset + 1, "InvalidCharHour");
+            hour = h1 * 10 + h2;
+
+            match bytes.get_unchecked(offset + 2) {
+                b':' => (),
+                _ => return Err(Error::E("InvalidCharTimeSep".to_string())),
+            }
+            let m1 = get_digit_unchecked!(bytes, offset + 3, "InvalidCharMinute");
+            let m2 = get_digit_unchecked!(bytes, offset + 4, "InvalidCharMinute");
+            minute = m1 * 10 + m2;
+        }
+
+        if hour > 23 {
+            return Err(Error::E("OutOfRangeHour".to_string()));
+        }
+
+        if minute > 59 {
+            return Err(Error::E("OutOfRangeMinute".to_string()));
+        }
+        let mut length: usize = 5;
+
+        let (second, microsecond) = match bytes.get(offset + 5) {
+            Some(b':') => {
+                let s1 = get_digit!(bytes, offset + 6, "InvalidCharSecond");
+                let s2 = get_digit!(bytes, offset + 7, "InvalidCharSecond");
+                let second = s1 * 10 + s2;
+                if second > 59 {
+                    return Err(Error::E("OutOfRangeSecond".to_string()));
+                }
+                length = 8;
+
+                let mut microsecond = 0;
+                let frac_sep = bytes.get(offset + 8).copied();
+                if frac_sep == Some(b'.') || frac_sep == Some(b',') {
+                    length = 9;
+                    let mut i: usize = 0;
+                    loop {
+                        match bytes.get(offset + length + i) {
+                            Some(c) if (b'0'..=b'9').contains(c) => {
+                                microsecond *= 10;
+                                microsecond += (c - b'0') as u32;
+                            }
+                            _ => {
+                                break;
+                            }
+                        }
+                        i += 1;
+                        if i > 6 {
+                            return Err(Error::E("SecondFractionTooLong".to_string()));
+                        }
+                    }
+                    if i == 0 {
+                        return Err(Error::E("SecondFractionMissing".to_string()));
+                    }
+                    if i < 6 {
+                        microsecond *= 10_u32.pow(6 - i as u32);
+                    }
+                    length += i;
+                }
+                (second, microsecond)
+            }
+            _ => (0, 0),
+        };
+        let t = Self {
+            micro: microsecond,
+            sec: second,
+            min: minute,
+            hour
+        };
+        Ok((t, length))
+    }
 }
 
 impl From<DateTime> for Time{
@@ -30,45 +114,11 @@ impl From<DateTime> for Time{
 impl FromStr for Time {
     type Err = Error;
 
-    /// from RFC3339Micro = "2006-01-02T15:04:05.999999"
+    /// from RFC3339Micro = "15:04:05.999999"
     fn from_str(s: &str) -> Result<Time, Error> {
         //"00:00:00.000000";
-        let mut date = Time {
-            micro: 0,
-            sec: 0,
-            min: 0,
-            hour: 0,
-        };
-        let bytes = s.as_bytes();
-        if bytes.len() > 8 {
-            if let Ok(hour) = std::str::from_utf8(&bytes[0..2])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.hour = hour;
-            }
-            if let Ok(min) = std::str::from_utf8(&bytes[3..5])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.min = min;
-            }
-            if let Ok(sec) = std::str::from_utf8(&bytes[6..8])
-                .unwrap_or_default()
-                .parse::<u8>()
-            {
-                date.sec = sec;
-            }
-            if bytes.len() > 9 {
-                if let Ok(ns) = std::str::from_utf8(&bytes[9..bytes.len()])
-                    .unwrap_or_default()
-                    .parse::<u32>()
-                {
-                    date.micro = ns;
-                }
-            }
-        }
-        Ok(date)
+        let (t,_)=Time::parse_bytes_partial(s.as_bytes(),0)?;
+        Ok(t)
     }
 }
 
