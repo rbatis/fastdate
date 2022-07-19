@@ -16,6 +16,5 @@ serde = "1"
 libc = "0.2"
 
 [target.'cfg(windows)'.dependencies]
-miow = "0.3"
 winapi = { version = "0.3", features = ["std", "minwinbase", "minwindef", "timezoneapi"] }
 
