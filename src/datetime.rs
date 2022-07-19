@@ -62,7 +62,7 @@ impl DateTime {
     }
 }
 
-impl Add<Duration> for DateTime{
+impl Add<Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: Duration) -> Self::Output {
@@ -70,7 +70,7 @@ impl Add<Duration> for DateTime{
     }
 }
 
-impl Sub<Duration> for DateTime{
+impl Sub<Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: Duration) -> Self::Output {
@@ -197,7 +197,7 @@ impl From<DateTime> for SystemTime {
 impl FromStr for DateTime {
     type Err = Error;
 
-    /// from RFC3339Nano = "2006-01-02T15:04:05.999999999"
+    /// from RFC3339Nano = "2006-01-02T15:04:05.000000"
     fn from_str(s: &str) -> Result<DateTime, Error> {
         //"0000-00-00 00:00:00.000000";
         let mut date = DateTime {
