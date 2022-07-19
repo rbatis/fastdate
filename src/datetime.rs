@@ -99,6 +99,22 @@ impl DateTime {
             .expect("all times should be after the epoch");
         return s.as_nanos();
     }
+
+    ///from timestamp sec
+    pub fn from_timestamp(sec: i64) -> DateTime {
+        let v = UNIX_EPOCH + Duration::from_secs(sec as u64);
+        Self::from(v)
+    }
+    ///from timestamp sec
+    pub fn from_timestamp_millis(ms: i64) -> DateTime {
+        let v = UNIX_EPOCH + Duration::from_millis(ms as u64);
+        Self::from(v)
+    }
+    ///from timestamp sec
+    pub fn from_timestamp_nano(nano: u128) -> DateTime {
+        let v = UNIX_EPOCH + Duration::from_nanos(nano as u64);
+        Self::from(v)
+    }
 }
 
 impl Add<Duration> for DateTime {
@@ -382,6 +398,32 @@ mod tests {
     fn test_offset() {
         let utc = DateTime::from_str("2022-12-12 12:12:12.000000").unwrap();
         assert_eq!(format!("{}", utc.set_offset(1)), "2022-12-12 12:12:13.000000");
+    }
+
+    #[test]
+    fn test_timestamp() {
+        let mut now = DateTime::utc();
+        now.micro = 0;
+        let timestamp = now.unix_timestamp();
+        let new_time = DateTime::from_timestamp(timestamp);
+        assert_eq!(now, new_time);
+    }
+
+    #[test]
+    fn test_timestamp_millis() {
+        let mut now = DateTime::utc();
+        now.micro=0;
+        let timestamp = now.unix_timestamp_millis();
+        let new_time = DateTime::from_timestamp_millis(timestamp);
+        assert_eq!(now, new_time);
+    }
+
+    #[test]
+    fn test_timestamp_nano() {
+        let mut now = DateTime::utc();
+        let timestamp = now.unix_timestamp_nano();
+        let new_time = DateTime::from_timestamp_nano(timestamp);
+        assert_eq!(now, new_time);
     }
 
     #[test]
