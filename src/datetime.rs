@@ -12,6 +12,11 @@ use crate::sys::Timespec;
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
 
+/// offset with utc 0.zone
+pub fn offset() -> i32 {
+     GLOBAL_OFFSET.deref().clone()
+}
+
 /// Log timestamp type.
 ///
 /// Parse using `FromStr` impl.
@@ -44,6 +49,15 @@ impl DateTime {
     ///local zone time
     pub fn now() -> Self {
         let offset = GLOBAL_OFFSET.deref().clone();
+        if offset > 0 {
+            Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
+        } else {
+            Self::from(SystemTime::now() - Duration::from_secs(offset as u64))
+        }
+    }
+
+    /// set offset
+    pub fn set_offset(self, offset:i64) -> DateTime {
         if offset > 0 {
             Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
         } else {
