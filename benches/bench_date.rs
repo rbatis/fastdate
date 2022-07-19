@@ -35,3 +35,14 @@ fn bench_date_now_local(b: &mut Bencher) {
         });
     });
 }
+
+//test bench_date_display    ... bench:          40 ns/iter (+/- 1)
+#[bench]
+fn bench_date_display(b: &mut Bencher) {
+    let now=   DateTime::now_local();
+    b.iter(|| {
+        std::hint::black_box({
+            now.to_string();
+        });
+    });
+}
