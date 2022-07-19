@@ -69,12 +69,20 @@ impl DateTime {
         return s.as_secs() as i64;
     }
 
-    ///unix_timestamp ms
-    pub fn unix_timestamp_micro(self) -> i64 {
+    ///unix_timestamp millis
+    pub fn unix_timestamp_millis(self) -> i64 {
         let s = SystemTime::from(self)
             .duration_since(UNIX_EPOCH)
             .expect("all times should be after the epoch");
         return s.as_millis() as i64;
+    }
+
+    ///unix_timestamp nano
+    pub fn unix_timestamp_nano(self) -> u128 {
+        let s = SystemTime::from(self)
+            .duration_since(UNIX_EPOCH)
+            .expect("all times should be after the epoch");
+        return s.as_nanos();
     }
 }
 
@@ -346,9 +354,14 @@ mod tests {
         let d = DateTime::utc().unix_timestamp();
         println!("unix:{}", d);
 
-        let d = DateTime::now().unix_timestamp_micro();
-        println!("unix:{}", d);
-        let d = DateTime::utc().unix_timestamp_micro();
-        println!("unix:{}", d);
+        let d = DateTime::now().unix_timestamp_millis();
+        println!("unix ms:{}", d);
+        let d = DateTime::utc().unix_timestamp_millis();
+        println!("unix ms:{}", d);
+
+        let d = DateTime::now().unix_timestamp_nano();
+        println!("unix nano:{}", d);
+        let d = DateTime::utc().unix_timestamp_nano();
+        println!("unix nano:{}", d);
     }
 }
