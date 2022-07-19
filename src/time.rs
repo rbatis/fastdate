@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Write};
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use crate::{DateTime, get_digit, get_digit_unchecked};
 use crate::error::Error;

@@ -1,5 +1,5 @@
 use std::cmp;
-use std::fmt::{self, Display, Formatter, Pointer};
+use std::fmt::{self, Display, Formatter};
 use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -199,7 +199,7 @@ impl FromStr for DateTime {
 
     /// from RFC3339Nano = "0000-00-00 00:00:00.000000"
     fn from_str(s: &str) -> Result<DateTime, Error> {
-        //"0000-00-00 00:00:00.000000";
+        let bytes = s.as_bytes();
         let mut date = DateTime {
             micro: 0,
             sec: 0,
@@ -209,7 +209,6 @@ impl FromStr for DateTime {
             mon: 0,
             year: 0,
         };
-        let bytes = s.as_bytes();
         if bytes.len() >= 10 {
             let d = Date::parse_bytes_partial(&bytes)?;
             date.year = d.year;

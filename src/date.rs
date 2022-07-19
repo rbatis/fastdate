@@ -1,7 +1,5 @@
-use std::cmp;
-use std::fmt::{self, Display, Formatter, Pointer};
+use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use crate::{DateTime, get_digit_unchecked};
 
 use crate::error::Error as Error;

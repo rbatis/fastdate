@@ -53,7 +53,7 @@ fn bench_add(b: &mut Bencher) {
     let now = DateTime::now();
     b.iter(|| {
         std::hint::black_box({
-            now + Duration::from_secs(24 * 3600);
+            let _= now + Duration::from_secs(24 * 3600);
         });
     });
 }
@@ -64,7 +64,7 @@ fn bench_eq(b: &mut Bencher) {
     let now2 = DateTime::now();
     b.iter(|| {
         std::hint::black_box({
-            now.eq(&now2);
+            let _=now.eq(&now2);
         });
     });
 }
