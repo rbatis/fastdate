@@ -1,6 +1,6 @@
 use std::cmp;
 use std::fmt::{self, Display, Formatter, Pointer};
-use std::ops::Deref;
+use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use once_cell::sync::Lazy;
@@ -49,6 +49,32 @@ impl DateTime {
         } else {
             Self::from(SystemTime::now() - Duration::from_secs(offset as u64))
         }
+    }
+
+    pub fn add(self, d: Duration) -> Self {
+        let systime = SystemTime::from(self) + d;
+        Self::from(systime)
+    }
+
+    pub fn sub(self, d: Duration) -> Self {
+        let systime = SystemTime::from(self) - d;
+        Self::from(systime)
+    }
+}
+
+impl Add<Duration> for DateTime{
+    type Output = DateTime;
+
+    fn add(self, rhs: Duration) -> Self::Output {
+        self.add(rhs)
+    }
+}
+
+impl Sub<Duration> for DateTime{
+    type Output = DateTime;
+
+    fn sub(self, rhs: Duration) -> Self::Output {
+        self.sub(rhs)
     }
 }
 
@@ -155,10 +181,16 @@ impl From<DateTime> for SystemTime {
             ydays += 1;
         }
         let days = (v.year as u64 - 1970) * 365 + leap_years as u64 + ydays;
-        UNIX_EPOCH
-            + Duration::from_secs(
+        let sec = Duration::from_secs(
             v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days * 86400,
-        )
+        );
+        if v.micro > 0 {
+            UNIX_EPOCH
+                + sec + Duration::from_micros(v.micro as u64)
+        } else {
+            UNIX_EPOCH
+                + sec - Duration::from_micros(v.micro as u64)
+        }
     }
 }
 
@@ -307,6 +339,7 @@ impl<'de> Deserialize<'de> for DateTime {
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
+    use std::time::Duration;
     use crate::DateTime;
 
     #[test]
@@ -320,5 +353,13 @@ mod tests {
     fn test_date_utc() {
         let d = DateTime::now();
         println!("{}", d);
+    }
+
+    #[test]
+    fn test_date_utc_add() {
+        let d = DateTime::now();
+        let added = d + Duration::from_secs(1);
+        println!("{},{}", d, added);
+        assert_eq!(d.add(Duration::from_secs(1)), added);
     }
 }

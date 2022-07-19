@@ -18,7 +18,10 @@ fn main(){
     DateTime::now();
     //utc time now
     DateTime::utc();
-    
+    // add
+    DateTime::now() + Duration::from_secs(1);
+    // sub
+    DateTime::now() - Duration::from_secs(1);
     //from str
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
     //to_string()
