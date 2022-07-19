@@ -53,7 +53,7 @@ fn bench_add(b: &mut Bencher) {
     let now = DateTime::now();
     b.iter(|| {
         std::hint::black_box({
-            let _= now + Duration::from_secs(24 * 3600);
+            let _ = now + Duration::from_secs(24 * 3600);
         });
     });
 }
@@ -64,7 +64,7 @@ fn bench_eq(b: &mut Bencher) {
     let now2 = DateTime::now();
     b.iter(|| {
         std::hint::black_box({
-            let _=now.eq(&now2);
+            let _ = now.eq(&now2);
         });
     });
 }
@@ -74,7 +74,17 @@ fn bench_set_offset(b: &mut Bencher) {
     let now = DateTime::utc();
     b.iter(|| {
         std::hint::black_box({
-            let _=now.set_offset(8*3600);
+            let _ = now.set_offset(8 * 3600);
+        });
+    });
+}
+
+#[bench]
+fn bench_timestamp(b: &mut Bencher) {
+    let now = DateTime::utc();
+    b.iter(|| {
+        std::hint::black_box({
+            let _ = now.unix_timestamp();
         });
     });
 }
