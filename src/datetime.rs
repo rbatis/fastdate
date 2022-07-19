@@ -102,6 +102,22 @@ impl Sub<Duration> for DateTime {
     }
 }
 
+impl Add<&Duration> for DateTime {
+    type Output = DateTime;
+
+    fn add(self, rhs: &Duration) -> Self::Output {
+        self.add(rhs.clone())
+    }
+}
+
+impl Sub<&Duration> for DateTime {
+    type Output = DateTime;
+
+    fn sub(self, rhs: &Duration) -> Self::Output {
+        self.sub(rhs.clone())
+    }
+}
+
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
         let dur = v
