@@ -43,6 +43,8 @@ fn main(){
     DateTime::now() - Duration::from_secs(1);
     //from str
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
+    //from str time zone
+    let datetime=DateTime::from_str("1234-12-13 11:12:13.123456+08:00");
     //to_string()
     let s = datetime.to_string();//1234-12-13 11:12:13.123456
     //unix
