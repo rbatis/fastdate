@@ -155,6 +155,17 @@ impl <'de>Deserialize<'de> for Time{
     }
 }
 
+impl From<&DateTime> for Time{
+    fn from(arg: &DateTime) -> Self {
+        Time{
+            micro: arg.micro,
+            sec: arg.sec,
+            min: arg.min,
+            hour: arg.hour
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;

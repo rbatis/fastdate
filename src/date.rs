@@ -134,6 +134,16 @@ impl<'de> Deserialize<'de> for Date {
     }
 }
 
+impl From<&DateTime> for Date{
+    fn from(arg: &DateTime) -> Self {
+        Date{
+            day: arg.day,
+            mon: arg.mon,
+            year: arg.year
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
