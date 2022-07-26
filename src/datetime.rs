@@ -285,11 +285,42 @@ impl FromStr for DateTime {
             date.mon = d.mon;
             date.day = d.day;
 
-            let (t, _) = Time::parse_bytes_partial(&bytes, 11)?;
+            let (t, offset) = Time::parse_bytes_partial(&bytes, 11)?;
             date.hour = t.hour;
             date.min = t.min;
             date.sec = t.sec;
             date.micro = t.micro;
+            let start = 11 + offset;
+            //+09:00
+            let mut offset_sec = 0;
+            if s.len() > start {
+                let remin_str = &s[start..];
+                let remin_bytes = remin_str.as_bytes();
+                if remin_str.len() == 3 {
+                    if remin_bytes[0] == b'+' {
+                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                    } else {
+                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                    }
+                } else if remin_str.len() == 6 {
+                    if remin_bytes[0] == b'+' {
+                        //hour
+                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        //min
+                        offset_sec += ((remin_bytes[4] - b'0') as i32 * 10 + (remin_bytes[5] - b'0') as i32) * 60;
+                    } else {
+                        //hour
+                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        //min
+                        offset_sec -= ((remin_bytes[4] - b'0') as i32 * 10 + (remin_bytes[5] - b'0') as i32) * 60;
+                    }
+                }
+            }
+            if offset_sec > 0 {
+                date = date.add(Duration::from_secs(offset_sec as u64));
+            } else if offset_sec < 0 {
+                date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
+            }
         }
         Ok(date)
     }
@@ -412,7 +443,7 @@ mod tests {
     #[test]
     fn test_timestamp_millis() {
         let mut now = DateTime::utc();
-        now.micro=0;
+        now.micro = 0;
         let timestamp = now.unix_timestamp_millis();
         let new_time = DateTime::from_timestamp_millis(timestamp);
         assert_eq!(now, new_time);
@@ -442,5 +473,11 @@ mod tests {
         println!("unix nano:{}", d);
         let d = DateTime::utc().unix_timestamp_nano();
         println!("unix nano:{}", d);
+    }
+
+    #[test]
+    fn test_offset_zone() {
+        let utc = DateTime::from_str("2022-12-12 00:00:00-08:00").unwrap();
+        println!("{}", utc);
     }
 }
