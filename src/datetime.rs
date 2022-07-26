@@ -379,7 +379,7 @@ fn is_leap_year(y: u16) -> bool {
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
-        serializer.serialize_str(&format!("{}", self))
+        serializer.serialize_str(&self.to_string())
     }
 }
 
@@ -395,7 +395,7 @@ impl<'de> Deserialize<'de> for DateTime {
 mod tests {
     use std::str::FromStr;
     use std::time::Duration;
-    use crate::{DateTime, offset_sec};
+    use crate::{DateTime};
 
     #[test]
     fn test_other_space() {
