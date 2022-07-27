@@ -461,7 +461,7 @@ mod tests {
 
     #[test]
     fn test_timestamp_nano() {
-        let mut now = DateTime::utc();
+        let now = DateTime::utc();
         let timestamp = now.unix_timestamp_nano();
         let new_time = DateTime::from_timestamp_nano(timestamp);
         assert_eq!(now, new_time);
