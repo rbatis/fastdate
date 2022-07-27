@@ -57,6 +57,10 @@ impl DateTime {
     }
 
     /// set offset
+    /// ```rust
+    /// let mut  dt = fastdate::DateTime::utc();
+    /// dt = dt.set_offset(fastdate::offset_sec());
+    /// ```
     pub fn set_offset(self, offset_sec: i32) -> DateTime {
         let time: SystemTime = self.into();
         if offset_sec > 0 {
@@ -331,6 +335,9 @@ impl FromStr for DateTime {
             } else if offset_sec < 0 {
                 date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
             }
+            if bytes[bytes.len() - 1] == 'Z' as u8 || bytes[bytes.len() - 1] == 'z' as u8 {
+                date.set_offset(crate::offset_sec());//append offset
+            }
         }
         Ok(date)
     }
@@ -507,5 +514,12 @@ mod tests {
         let date2 = DateTime::from_str("2022-12-12 01:00:00").unwrap();
         assert_eq!(date2.after(&date1), true);
         assert_eq!(date1.before(&date2), true);
+    }
+
+    #[test]
+    fn test_parse_z() {
+        let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
+        let date_offset = date.clone().set_offset(crate::offset_sec());
+        assert_eq!("2022-12-12 08:00:00.000000", date_offset.to_string());
     }
 }
