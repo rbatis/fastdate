@@ -311,13 +311,13 @@ impl FromStr for DateTime {
                 let remin_str = &s[start..];
                 let remin_bytes = remin_str.as_bytes();
                 if remin_str.len() == 3 {
-                    if remin_bytes[0] == b'+' {
+                    if remin_bytes[0] == b'+' || remin_bytes[0] == b'Z' {
                         offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                     } else if remin_bytes[0] == b'-' {
                         offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                     }
                 } else if remin_str.len() == 6 {
-                    if remin_bytes[0] == b'+' {
+                    if remin_bytes[0] == b'+' || remin_bytes[0] == b'Z' {
                         //hour
                         offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                         //min
@@ -335,7 +335,7 @@ impl FromStr for DateTime {
             } else if offset_sec < 0 {
                 date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
             }
-            if bytes[bytes.len() - 1] == 'Z' as u8 || bytes[bytes.len() - 1] == 'z' as u8 {
+            if bytes[bytes.len() - 1] == 'Z' as u8 {
                 date.set_offset(crate::offset_sec());//append offset
             }
         }
