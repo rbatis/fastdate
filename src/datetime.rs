@@ -153,30 +153,51 @@ impl DateTime {
         let mut v = 0;
         for x in format_bytes {
             if x == &('Y' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_year] = bytes[v];
                 idx_year += 1;
             }
             if x == &('M' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_mon] = bytes[v];
                 idx_mon += 1;
             }
             if x == &('D' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_day] = bytes[v];
                 idx_day += 1;
             }
             if x == &('h' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_hour] = bytes[v];
                 idx_hour += 1;
             }
             if x == &('m' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_min] = bytes[v];
                 idx_min += 1;
             }
             if x == &('s' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_sec] = bytes[v];
                 idx_sec += 1;
             }
             if x == &('0' as u8) {
+                if v >= bytes.len(){
+                    return Err(Error::from("wrong time format!"));
+                }
                 buf[idx_micro] = bytes[v];
                 idx_micro += 1;
             }
