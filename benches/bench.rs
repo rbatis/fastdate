@@ -7,12 +7,22 @@ use std::str::FromStr;
 use std::time::Duration;
 use test::Bencher;
 
-//test bench_date_parse ... bench:          35 ns/iter (+/- 1)
+//test bench_date_parse     ... bench:          11 ns/iter (+/- 0)
 #[bench]
 fn bench_date_parse(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::from_str("1234-12-13 11:12:13.123456").expect("TODO: panic message");
+            DateTime::from_str("1997-12-13 11:12:13.123456").expect("TODO: panic message");
+        });
+    });
+}
+
+//test bench_date_parse_z   ... bench:          41 ns/iter (+/- 2)
+#[bench]
+fn bench_date_parse_z(b: &mut Bencher) {
+    b.iter(|| {
+        std::hint::black_box({
+            DateTime::from_str("1997-12-13 11:12:13.123456Z").expect("TODO: panic message");
         });
     });
 }
