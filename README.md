@@ -45,6 +45,7 @@ fn main(){
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456");
     //from str time zone
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456+08:00");
+    let datetime=DateTime::from_str("1234-12-13 11:12:13.123456Z");
     //to_string()
     let s = datetime.to_string();//1234-12-13 11:12:13.123456
     //unix
