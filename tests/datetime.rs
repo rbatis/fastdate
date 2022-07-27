@@ -113,12 +113,19 @@ fn test_parse_z() {
 
 #[test]
 fn test_parse_format() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
-    println!("{}",date);
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456").unwrap();
+    println!("{}", date);
 }
 
 #[test]
 fn test_parse_format2() {
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
-    println!("{}",date);
+    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
+    println!("{}", date);
+}
+
+#[test]
+fn test_week() {
+    let date = DateTime::from_str("2022-07-27 00:27:11.000000").unwrap();
+    println!("week,{}", date.week_day());
+    assert_eq!(3,date.week_day());
 }
