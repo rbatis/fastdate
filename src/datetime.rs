@@ -206,8 +206,7 @@ impl DateTime {
         DateTime::from_str(std::str::from_utf8(&buf[..]).unwrap_or_default())
     }
 
-    ///sum weeek by
-    /// timestamp % 86400 # seconds from midnight
+    /// get week_day
     pub fn week_day(&self) -> u8 {
         let secs_since_epoch = self.unix_timestamp();
         /* 2000-03-01 (mod 400 year, immediately after feb29 */
