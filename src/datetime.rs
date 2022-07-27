@@ -309,7 +309,7 @@ impl FromStr for DateTime {
                 if remin_str.len() == 3 {
                     if remin_bytes[0] == b'+' {
                         offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
-                    } else {
+                    } else if remin_bytes[0] == b'-' {
                         offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                     }
                 } else if remin_str.len() == 6 {
@@ -318,7 +318,7 @@ impl FromStr for DateTime {
                         offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                         //min
                         offset_sec += ((remin_bytes[4] - b'0') as i32 * 10 + (remin_bytes[5] - b'0') as i32) * 60;
-                    } else {
+                    } else if remin_bytes[0] == b'-' {
                         //hour
                         offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
                         //min
@@ -389,7 +389,7 @@ fn is_leap_year(y: u16) -> bool {
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
-        serializer.serialize_str(&format!("{}", self))
+        serializer.serialize_str(&self.to_string())
     }
 }
 
@@ -405,7 +405,7 @@ impl<'de> Deserialize<'de> for DateTime {
 mod tests {
     use std::str::FromStr;
     use std::time::Duration;
-    use crate::{DateTime, offset_sec};
+    use crate::{Date, DateTime, Time};
 
     #[test]
     fn test_other_space() {
@@ -489,6 +489,16 @@ mod tests {
     fn test_offset_zone() {
         let utc = DateTime::from_str("2022-12-12 00:00:00-08:00").unwrap();
         println!("{}", utc);
+    }
+
+    #[test]
+    fn test_into() {
+        let utc = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
+        let date: Date = utc.into();
+        let time: Time = utc.into();
+        println!("{},{}", date, time);
+        assert_eq!("2022-12-12", date.to_string());
+        assert_eq!("08:00:00.000000", time.to_string());
     }
 
     #[test]

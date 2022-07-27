@@ -1,5 +1,6 @@
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::{DateTime, get_digit_unchecked};
 
 use crate::error::Error as Error;
@@ -20,7 +21,7 @@ pub struct Date {
     pub year: u16,
 }
 
-impl Date{
+impl Date {
     /// Parse a date from bytes, no check is performed for extract characters at the end of the string
     pub(crate) fn parse_bytes_partial(bytes: &[u8]) -> Result<Self, Error> {
         if bytes.len() < 10 {
@@ -77,17 +78,17 @@ impl Date{
         Ok(Self {
             day,
             mon: month,
-            year
+            year,
         })
     }
 }
 
-impl From<DateTime> for Date{
+impl From<DateTime> for Date {
     fn from(arg: DateTime) -> Self {
-        Date{
+        Date {
             day: arg.day,
             mon: arg.mon,
-            year: arg.year
+            year: arg.year,
         }
     }
 }
@@ -97,12 +98,12 @@ impl FromStr for Date {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         //"0000-00-00";
-        let d=Date::parse_bytes_partial(s.as_bytes())?;
+        let d = Date::parse_bytes_partial(s.as_bytes())?;
         Ok(d)
     }
 }
 
-impl Display for Date{
+impl Display for Date {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut buf: [u8; 10] = *b"0000-00-00";
 
@@ -117,6 +118,29 @@ impl Display for Date{
         buf[8] = b'0' + (self.day / 10) as u8;
         buf[9] = b'0' + (self.day % 10) as u8;
         f.write_str(std::str::from_utf8(&buf[..]).unwrap())
+    }
+}
+
+impl Serialize for Date {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for Date {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        use serde::de::Error;
+        Date::from_str(&String::deserialize(deserializer)?).map_err(|e| D::Error::custom(e.to_string()))
+    }
+}
+
+impl From<&DateTime> for Date{
+    fn from(arg: &DateTime) -> Self {
+        Date{
+            day: arg.day,
+            mon: arg.mon,
+            year: arg.year
+        }
     }
 }
 

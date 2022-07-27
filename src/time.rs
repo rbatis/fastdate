@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::{DateTime, get_digit, get_digit_unchecked};
 use crate::error::Error;
 
@@ -15,7 +16,7 @@ pub struct Time {
     pub hour: u8,
 }
 
-impl Time{
+impl Time {
     /// Parse a time from bytes with a starting index, no check is performed for extract characters at
     /// the end of the string
     pub(crate) fn parse_bytes_partial(bytes: &[u8], offset: usize) -> Result<(Self, usize), Error> {
@@ -31,7 +32,7 @@ impl Time{
 
             match bytes.get_unchecked(offset + 2) {
                 b':' => (),
-                _ =>  ()//return Err(Error::E("InvalidCharTimeSep".to_string())),
+                _ => ()//return Err(Error::E("InvalidCharTimeSep".to_string())),
             }
             let m1 = get_digit_unchecked!(bytes, offset + 3, "InvalidCharMinute");
             let m2 = get_digit_unchecked!(bytes, offset + 4, "InvalidCharMinute");
@@ -89,19 +90,19 @@ impl Time{
             micro: microsecond,
             sec: second,
             min: minute,
-            hour
+            hour,
         };
         Ok((t, length))
     }
 }
 
-impl From<DateTime> for Time{
+impl From<DateTime> for Time {
     fn from(arg: DateTime) -> Self {
-        Time{
+        Time {
             micro: arg.micro,
             sec: arg.sec,
             min: arg.min,
-            hour: arg.hour
+            hour: arg.hour,
         }
     }
 }
@@ -113,7 +114,7 @@ impl FromStr for Time {
     /// from RFC3339Micro = "15:04:05.999999"
     fn from_str(s: &str) -> Result<Time, Error> {
         //"00:00:00.000000";
-        let (t,_)=Time::parse_bytes_partial(s.as_bytes(),0)?;
+        let (t, _) = Time::parse_bytes_partial(s.as_bytes(), 0)?;
         Ok(t)
     }
 }
@@ -141,6 +142,30 @@ impl Display for Time {
     }
 }
 
+impl Serialize for Time{
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl <'de>Deserialize<'de> for Time{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+        use serde::de::Error;
+        Time::from_str(&String::deserialize(deserializer)?).map_err(|e| Error::custom(e.to_string()))
+    }
+}
+
+impl From<&DateTime> for Time{
+    fn from(arg: &DateTime) -> Self {
+        Time{
+            micro: arg.micro,
+            sec: arg.sec,
+            min: arg.min,
+            hour: arg.hour
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
@@ -160,6 +185,4 @@ mod tests {
         println!("{}", d);
         assert_eq!("11:12:13.001234".to_string(), d.to_string());
     }
-
-
 }
