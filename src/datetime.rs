@@ -76,6 +76,16 @@ impl DateTime {
         Self::from(systime)
     }
 
+    /// is self before on other?
+    pub fn before(&self, other: &DateTime) -> bool {
+        self < other
+    }
+
+    /// is self after on other?
+    pub fn after(&self, other: &DateTime) -> bool {
+        self > other
+    }
+
     /// unix_timestamp sec
     pub fn unix_timestamp(self) -> i64 {
         let s = SystemTime::from(self)
@@ -479,5 +489,13 @@ mod tests {
     fn test_offset_zone() {
         let utc = DateTime::from_str("2022-12-12 00:00:00-08:00").unwrap();
         println!("{}", utc);
+    }
+
+    #[test]
+    fn test_befor_after() {
+        let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
+        let date2 = DateTime::from_str("2022-12-12 01:00:00").unwrap();
+        assert_eq!(date2.after(&date1), true);
+        assert_eq!(date1.before(&date2), true);
     }
 }
