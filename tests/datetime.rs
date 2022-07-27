@@ -110,3 +110,15 @@ fn test_parse_z() {
     let date_offset = date.clone().set_offset(fastdate::offset_sec());
     assert_eq!("2022-12-12 08:00:00.000000", date_offset.to_string());
 }
+
+#[test]
+fn test_parse_format() {
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
+    println!("{}",date);
+}
+
+#[test]
+fn test_parse_format2() {
+    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    println!("{}",date);
+}

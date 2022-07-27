@@ -129,6 +129,61 @@ impl DateTime {
         let v = UNIX_EPOCH + Duration::from_nanos(nano as u64);
         Self::from(v)
     }
+
+    /// parse an string by format.
+    /// format str must be:
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
+    /// ```
+    /// or any position
+    /// ```rust
+    ///  fastdate::DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    /// ```
+    pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
+        let bytes = arg.as_bytes();
+        let mut buf: [u8; 26] = *b"0000-00-00 00:00:00.000000";
+        let format_bytes = format.as_bytes();
+        let mut idx_year = 0;
+        let mut idx_mon = 5;
+        let mut idx_day = 8;
+        let mut idx_hour = 11;
+        let mut idx_min = 14;
+        let mut idx_sec = 17;
+        let mut idx_micro = 20;
+        let mut v = 0;
+        for x in format_bytes {
+            if x == &('Y' as u8) {
+                buf[idx_year] = bytes[v];
+                idx_year += 1;
+            }
+            if x == &('M' as u8) {
+                buf[idx_mon] = bytes[v];
+                idx_mon += 1;
+            }
+            if x == &('D' as u8) {
+                buf[idx_day] = bytes[v];
+                idx_day += 1;
+            }
+            if x == &('h' as u8) {
+                buf[idx_hour] = bytes[v];
+                idx_hour += 1;
+            }
+            if x == &('m' as u8) {
+                buf[idx_min] = bytes[v];
+                idx_min += 1;
+            }
+            if x == &('s' as u8) {
+                buf[idx_sec] = bytes[v];
+                idx_sec += 1;
+            }
+            if x == &('0' as u8) {
+                buf[idx_micro] = bytes[v];
+                idx_micro += 1;
+            }
+            v += 1;
+        }
+        DateTime::from_str(std::str::from_utf8(&buf[..]).unwrap_or_default())
+    }
 }
 
 impl Add<Duration> for DateTime {
