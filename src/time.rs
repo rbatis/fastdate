@@ -97,17 +97,6 @@ impl Time {
     }
 }
 
-impl From<DateTime> for Time {
-    fn from(arg: DateTime) -> Self {
-        Time {
-            micro: arg.micro,
-            sec: arg.sec,
-            min: arg.min,
-            hour: arg.hour,
-        }
-    }
-}
-
 impl From<Duration> for Time {
     fn from(d: Duration) -> Self {
         let hour = (d.as_secs() / 3600) as u8;
@@ -177,8 +166,8 @@ impl<'de> Deserialize<'de> for Time {
     }
 }
 
-impl From<&DateTime> for Time {
-    fn from(arg: &DateTime) -> Self {
+impl From<DateTime> for Time {
+    fn from(arg: DateTime) -> Self {
         Time {
             micro: arg.micro,
             sec: arg.sec,
