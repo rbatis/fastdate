@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
+use std::time::Duration;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::{DateTime, get_digit, get_digit_unchecked};
 use crate::error::Error;
@@ -107,6 +108,27 @@ impl From<DateTime> for Time {
     }
 }
 
+impl From<Duration> for Time {
+    fn from(d: Duration) -> Self {
+        let hour = (d.as_secs() / 3600) as u8;
+        let min = (d.as_secs() / 60 - (hour as u64 * 60)) as u8;
+        let sec = (d.as_secs() - hour as u64 * 3600u64 - min as u64 * 60u64) as u8;
+        let micros = d.as_micros() - (hour as u128 * 3600000000) as u128 - (min as u128 * 60000000) as u128 - (sec as u128 * 1000000) as u128;
+        Self {
+            micro: micros as u32,
+            sec: sec,
+            min: min,
+            hour: hour,
+        }
+    }
+}
+
+impl From<Time> for Duration {
+    fn from(d: Time) -> Self {
+        Duration::from_secs(d.hour as u64 * 60 * 60) + Duration::from_secs(d.min as u64 * 60) + Duration::from_secs(d.sec as u64) + Duration::from_micros(d.micro as u64)
+    }
+}
+
 
 impl FromStr for Time {
     type Err = Error;
@@ -142,26 +164,26 @@ impl Display for Time {
     }
 }
 
-impl Serialize for Time{
+impl Serialize for Time {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         serializer.serialize_str(&self.to_string())
     }
 }
 
-impl <'de>Deserialize<'de> for Time{
+impl<'de> Deserialize<'de> for Time {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
         use serde::de::Error;
         Time::from_str(&String::deserialize(deserializer)?).map_err(|e| Error::custom(e.to_string()))
     }
 }
 
-impl From<&DateTime> for Time{
+impl From<&DateTime> for Time {
     fn from(arg: &DateTime) -> Self {
-        Time{
+        Time {
             micro: arg.micro,
             sec: arg.sec,
             min: arg.min,
-            hour: arg.hour
+            hour: arg.hour,
         }
     }
 }
@@ -169,6 +191,7 @@ impl From<&DateTime> for Time{
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
+    use std::time::Duration;
     use crate::Time;
 
     #[test]
@@ -184,5 +207,24 @@ mod tests {
         let d = Time::from_str("11:12:13.1234").unwrap();
         println!("{}", d);
         assert_eq!("11:12:13.001234".to_string(), d.to_string());
+    }
+
+    #[test]
+    fn test_from_micros() {
+        let d = Duration::from_micros(3 * 60 * 60 * 1000000 + 1);
+        let t = Time::from(d);
+        println!("{}", t);
+        assert_eq!(t.to_string(), "03:00:00.000001");
+    }
+
+    #[test]
+    fn test_from_time() {
+        let d = Duration::from(Time {
+            micro: 1,
+            sec: 1,
+            min: 1,
+            hour: 1,
+        });
+        println!("{}", d.as_micros());
     }
 }
