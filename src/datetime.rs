@@ -403,6 +403,34 @@ impl From<DateTime> for SystemTime {
     }
 }
 
+impl From<Date> for DateTime{
+    fn from(arg: Date) -> Self {
+        Self{
+            micro: 0,
+            sec: 0,
+            min: 0,
+            hour: 0,
+            day: arg.day,
+            mon: arg.mon,
+            year: arg.year
+        }
+    }
+}
+
+impl From<Time> for DateTime{
+    fn from(arg: Time) -> Self {
+        Self{
+            micro: arg.micro,
+            sec: arg.sec,
+            min: arg.min,
+            hour: arg.hour,
+            day: 0,
+            mon: 0,
+            year: 0
+        }
+    }
+}
+
 impl FromStr for DateTime {
     type Err = Error;
 

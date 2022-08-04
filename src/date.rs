@@ -99,16 +99,6 @@ impl Date {
     }
 }
 
-impl From<DateTime> for Date {
-    fn from(arg: DateTime) -> Self {
-        Date {
-            day: arg.day,
-            mon: arg.mon,
-            year: arg.year,
-        }
-    }
-}
-
 impl FromStr for Date {
     type Err = Error;
 
@@ -150,15 +140,16 @@ impl<'de> Deserialize<'de> for Date {
     }
 }
 
-impl From<&DateTime> for Date{
-    fn from(arg: &DateTime) -> Self {
-        Date{
+impl From<DateTime> for Date {
+    fn from(arg: DateTime) -> Self {
+        Date {
             day: arg.day,
             mon: arg.mon,
-            year: arg.year
+            year: arg.year,
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
