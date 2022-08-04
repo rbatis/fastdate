@@ -218,6 +218,42 @@ impl DateTime {
         };
         wday as u8
     }
+
+    /// 0...999999
+    pub fn set_micro(mut self, arg: u32) -> Self {
+        self.micro = arg;
+        self
+    }
+    /// 0...59
+    pub fn set_sec(mut self, arg: u8) -> Self {
+        self.sec = arg;
+        self
+    }
+    /// 0...59
+    pub fn set_min(mut self, arg: u8) -> Self {
+        self.min = arg;
+        self
+    }
+    /// 0...23
+    pub fn set_hour(mut self, arg: u8) -> Self {
+        self.hour = arg;
+        self
+    }
+    /// 1...31
+    pub fn set_day(mut self, arg: u8) -> Self {
+        self.day = arg;
+        self
+    }
+    /// 1...12
+    pub fn set_mon(mut self, arg: u8) -> Self {
+        self.mon = arg;
+        self
+    }
+    /// 1970...9999
+    pub fn set_year(mut self, arg: u16) -> Self {
+        self.year = arg;
+        self
+    }
 }
 
 impl Add<Duration> for DateTime {
