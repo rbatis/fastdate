@@ -403,30 +403,30 @@ impl From<DateTime> for SystemTime {
     }
 }
 
-impl From<Date> for DateTime{
+impl From<Date> for DateTime {
     fn from(arg: Date) -> Self {
-        Self{
+        Self {
             micro: 0,
             sec: 0,
             min: 0,
             hour: 0,
             day: arg.day,
             mon: arg.mon,
-            year: arg.year
+            year: arg.year,
         }
     }
 }
 
-impl From<Time> for DateTime{
+impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
-        Self{
+        Self {
             micro: arg.micro,
             sec: arg.sec,
             min: arg.min,
             hour: arg.hour,
             day: 0,
             mon: 0,
-            year: 0
+            year: 0,
         }
     }
 }
@@ -519,14 +519,21 @@ impl Display for DateTime {
         buf[17] = b'0' + (self.sec / 10) as u8;
         buf[18] = b'0' + (self.sec % 10) as u8;
 
-        buf[20] = b'0' + (self.micro / 100000 % 10) as u8;
-        buf[21] = b'0' + (self.micro / 10000 % 10) as u8;
-        buf[22] = b'0' + (self.micro / 1000 % 10) as u8;
-        buf[23] = b'0' + (self.micro / 100 % 10) as u8;
-        buf[24] = b'0' + (self.micro / 10 % 10) as u8;
-        buf[25] = b'0' + (self.micro % 10) as u8;
-
-        f.write_str(std::str::from_utf8(&buf[..]).unwrap())
+        if self.micro != 0 {
+            buf[20] = b'0' + (self.micro / 100000 % 10) as u8;
+            buf[21] = b'0' + (self.micro / 10000 % 10) as u8;
+            buf[22] = b'0' + (self.micro / 1000 % 10) as u8;
+            buf[23] = b'0' + (self.micro / 100 % 10) as u8;
+            buf[24] = b'0' + (self.micro / 10 % 10) as u8;
+            buf[25] = b'0' + (self.micro % 10) as u8;
+            f.write_str(std::str::from_utf8(&buf[..]).unwrap())
+        } else {
+            let mut buf_new: [u8; 19] = *b"0000-00-00 00:00:00";
+            for x in 0..buf_new.len() {
+                buf_new[x] = buf[x];
+            }
+            f.write_str(std::str::from_utf8(&buf_new[..]).unwrap())
+        }
     }
 }
 
