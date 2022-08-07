@@ -81,6 +81,22 @@ impl Date {
             year,
         })
     }
+
+    /// 1...31
+    pub fn set_day(mut self, arg: u8) -> Self {
+        self.day = arg;
+        self
+    }
+    /// 1...12
+    pub fn set_mon(mut self, arg: u8) -> Self {
+        self.mon = arg;
+        self
+    }
+    /// 1970...9999
+    pub fn set_year(mut self, arg: u16) -> Self {
+        self.year = arg;
+        self
+    }
 }
 
 impl FromStr for Date {

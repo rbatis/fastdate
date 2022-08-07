@@ -95,6 +95,27 @@ impl Time {
         };
         Ok((t, length))
     }
+
+    /// 0...999999
+    pub fn set_micro(mut self, arg: u32) -> Self {
+        self.micro = arg;
+        self
+    }
+    /// 0...59
+    pub fn set_sec(mut self, arg: u8) -> Self {
+        self.sec = arg;
+        self
+    }
+    /// 0...59
+    pub fn set_min(mut self, arg: u8) -> Self {
+        self.min = arg;
+        self
+    }
+    /// 0...23
+    pub fn set_hour(mut self, arg: u8) -> Self {
+        self.hour = arg;
+        self
+    }
 }
 
 impl From<Duration> for Time {

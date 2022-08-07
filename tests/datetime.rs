@@ -33,7 +33,7 @@ fn test_date_utc_add() {
 #[test]
 fn test_offset() {
     let utc = DateTime::from_str("2022-12-12 12:12:12.000000").unwrap();
-    assert_eq!(format!("{}", utc.set_offset(1)), "2022-12-12 12:12:13.000000");
+    assert_eq!(format!("{}", utc.set_offset(1)), "2022-12-12 12:12:13");
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn test_befor_after() {
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
     let date_offset = date.clone().set_offset(fastdate::offset_sec());
-    assert_eq!("2022-12-12 08:00:00.000000", date_offset.to_string());
+    assert_eq!("2022-12-12 08:00:00", date_offset.to_string());
 }
 
 #[test]

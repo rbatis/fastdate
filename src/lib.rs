@@ -1,5 +1,3 @@
-#![feature(mem_copy_fn)]
-
 pub mod sys;
 pub mod error;
 
