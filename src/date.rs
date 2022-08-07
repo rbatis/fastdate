@@ -142,8 +142,8 @@ mod tests {
 
     #[test]
     fn test_date() {
-        let d = Date::from_str("1234-12-13 11:12:13.123456").unwrap();
+        let d = Date::from_str("2022-12-13 11:12:13.123456").unwrap();
         println!("{}", d);
-        assert_eq!("1234-12-13".to_string(), d.to_string());
+        assert_eq!("2022-12-13".to_string(), d.to_string());
     }
 }
