@@ -1,6 +1,7 @@
+use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 use std::time::Duration;
-use fastdate::{Date, DateTime, Time};
+use fastdate::{Date, DateTime, GLOBAL_OFFSET, Time};
 
 #[test]
 fn test_other_space() {
@@ -109,6 +110,27 @@ fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
     let date_offset = date.clone().set_offset(fastdate::offset_sec());
     assert_eq!("2022-12-12 08:00:00", date_offset.to_string());
+}
+
+#[test]
+fn test_parse_z_add() {
+    let date = DateTime::from_str("2022-12-12 00:00:00.000000+09:00").unwrap();
+    let date_offset = date.clone();
+    assert_eq!("2022-12-12 09:00:00", date_offset.to_string());
+}
+
+#[test]
+fn test_parse_z_sub() {
+    let date = DateTime::from_str("2022-12-12 00:00:00.000000-09:00").unwrap();
+    let date_offset = date.clone();
+    assert_eq!("2022-12-11 15:00:00", date_offset.to_string());
+}
+
+#[test]
+fn test_set_offset_sub() {
+    let mut date = DateTime::from_str("2022-12-12 09:00:00").unwrap();
+    date=date.set_offset(-9*3600);
+    assert_eq!("2022-12-12 00:00:00", date.to_string());
 }
 
 #[test]

@@ -66,7 +66,7 @@ impl DateTime {
         if offset_sec > 0 {
             Self::from(time + Duration::from_secs(offset_sec as u64))
         } else {
-            Self::from(time - Duration::from_secs(offset_sec as u64))
+            Self::from(time - Duration::from_secs(offset_sec.abs() as u64))
         }
     }
 
