@@ -52,7 +52,7 @@ impl DateTime {
         if offset > 0 {
             Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
         } else {
-            Self::from(SystemTime::now() - Duration::from_secs(offset as u64))
+            Self::from(SystemTime::now() - Duration::from_secs(offset.abs() as u64))
         }
     }
 
