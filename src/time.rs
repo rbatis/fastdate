@@ -5,7 +5,7 @@ use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use std::time::Duration;
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Time {
     /// 0...999999
     pub micro: u32,

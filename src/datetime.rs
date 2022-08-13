@@ -23,7 +23,7 @@ pub fn offset_sec() -> i32 {
 /// Format using the `Display` trait.
 /// Convert timestamp into/from `SytemTime` to use.
 /// Supports comparsion and sorting.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct DateTime {
     /// 0...999999
     pub micro: u32,
@@ -91,24 +91,24 @@ impl DateTime {
     }
 
     /// unix_timestamp sec
-    pub fn unix_timestamp(self) -> i64 {
-        let s = SystemTime::from(self)
+    pub fn unix_timestamp(&self) -> i64 {
+        let s = SystemTime::from(self.clone())
             .duration_since(UNIX_EPOCH)
             .expect("all times should be after the epoch");
         return s.as_secs() as i64;
     }
 
     ///unix_timestamp millis
-    pub fn unix_timestamp_millis(self) -> i64 {
-        let s = SystemTime::from(self)
+    pub fn unix_timestamp_millis(&self) -> i64 {
+        let s = SystemTime::from(self.clone())
             .duration_since(UNIX_EPOCH)
             .expect("all times should be after the epoch");
         return s.as_millis() as i64;
     }
 
     ///unix_timestamp nano
-    pub fn unix_timestamp_nano(self) -> u128 {
-        let s = SystemTime::from(self)
+    pub fn unix_timestamp_nano(&self) -> u128 {
+        let s = SystemTime::from(self.clone())
             .duration_since(UNIX_EPOCH)
             .expect("all times should be after the epoch");
         return s.as_nanos();
@@ -508,7 +508,7 @@ impl FromStr for DateTime {
                 date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
             }
             if bytes[bytes.len() - 1] == 'Z' as u8 {
-                date.set_offset(crate::offset_sec()); //append offset
+                date = date.set_offset(crate::offset_sec()); //append offset
             }
         }
         Ok(date)
@@ -558,7 +558,7 @@ impl Display for DateTime {
 
 impl Ord for DateTime {
     fn cmp(&self, other: &DateTime) -> cmp::Ordering {
-        SystemTime::from(*self).cmp(&SystemTime::from(*other))
+        SystemTime::from(self.clone()).cmp(&SystemTime::from(other.clone()))
     }
 }
 

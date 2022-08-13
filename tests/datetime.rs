@@ -1,5 +1,4 @@
-use fastdate::{Date, DateTime, Time, GLOBAL_OFFSET};
-use std::ops::{Deref, DerefMut};
+use fastdate::{Date, DateTime, Time};
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -26,7 +25,7 @@ fn test_date_utc() {
 #[test]
 fn test_date_utc_add() {
     let d = DateTime::now();
-    let added = d + Duration::from_secs(1);
+    let added = d.clone() + Duration::from_secs(1);
     println!("{},{}", d, added);
     assert_eq!(d.add(Duration::from_secs(1)), added);
 }
@@ -90,7 +89,7 @@ fn test_offset_zone() {
 #[test]
 fn test_into() {
     let utc = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
-    let date: Date = utc.into();
+    let date: Date = utc.clone().into();
     let time: Time = utc.into();
     println!("{},{}", date, time);
     assert_eq!("2022-12-12", date.to_string());
@@ -108,8 +107,7 @@ fn test_befor_after() {
 #[test]
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
-    let date_offset = date.clone().set_offset(fastdate::offset_sec());
-    assert_eq!("2022-12-12 08:00:00", date_offset.to_string());
+    assert_eq!("2022-12-12 08:00:00", date.to_string());
 }
 
 #[test]

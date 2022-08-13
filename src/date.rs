@@ -11,7 +11,7 @@ use crate::error::Error;
 /// Format using the `Display` trait.
 /// Convert timestamp into/from `SytemTime` to use.
 /// Supports comparsion and sorting.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Date {
     /// 1...31
     pub day: u8,
