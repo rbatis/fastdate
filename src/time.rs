@@ -1,9 +1,9 @@
+use crate::error::Error;
+use crate::{get_digit, get_digit_unchecked, DateTime};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use std::time::Duration;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use crate::{DateTime, get_digit, get_digit_unchecked};
-use crate::error::Error;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Time {
@@ -33,7 +33,7 @@ impl Time {
 
             match bytes.get_unchecked(offset + 2) {
                 b':' => (),
-                _ => ()//return Err(Error::E("InvalidCharTimeSep".to_string())),
+                _ => (), //return Err(Error::E("InvalidCharTimeSep".to_string())),
             }
             let m1 = get_digit_unchecked!(bytes, offset + 3, "InvalidCharMinute");
             let m2 = get_digit_unchecked!(bytes, offset + 4, "InvalidCharMinute");
@@ -56,17 +56,16 @@ impl Time {
                 return Err(Error::E("OutOfRangeSecond".to_string()));
             }
             length = 8;
-
             let mut microsecond = 0;
             let frac_sep = bytes.get(offset + 8).copied();
+            let mut number_buf = *b"      ";
             if frac_sep == Some(b'.') || frac_sep == Some(b',') {
                 length = 9;
                 let mut i: usize = 0;
                 loop {
                     match bytes.get(offset + length + i) {
                         Some(c) if (b'0'..=b'9').contains(c) => {
-                            microsecond *= 10;
-                            microsecond += (c - b'0') as u32;
+                            number_buf[i] = *c;
                         }
                         _ => {
                             break;
@@ -80,10 +79,17 @@ impl Time {
                 if i == 0 {
                     return Err(Error::E("SecondFractionMissing".to_string()));
                 }
-                if i < 6 {
-                    microsecond *= 10_u32.pow(6 - i as u32);
-                }
                 length += i;
+            }
+            let mut i = 0;
+            for idx in 0..number_buf.len() {
+                let item = number_buf[number_buf.len() - 1 - idx];
+                if item != ' ' as u8 {
+                    //is number
+                    let v = (item - '0' as u8) as u32 * 10_u32.pow(i as u32);
+                    microsecond += v;
+                    i += 1;
+                }
             }
             (second, microsecond)
         };
@@ -123,7 +129,10 @@ impl From<Duration> for Time {
         let hour = (d.as_secs() / 3600) as u8;
         let min = (d.as_secs() / 60 - (hour as u64 * 60)) as u8;
         let sec = (d.as_secs() - hour as u64 * 3600u64 - min as u64 * 60u64) as u8;
-        let micros = d.as_micros() - (hour as u128 * 3600000000) as u128 - (min as u128 * 60000000) as u128 - (sec as u128 * 1000000) as u128;
+        let micros = d.as_micros()
+            - (hour as u128 * 3600000000) as u128
+            - (min as u128 * 60000000) as u128
+            - (sec as u128 * 1000000) as u128;
         Self {
             micro: micros as u32,
             sec: sec,
@@ -135,10 +144,12 @@ impl From<Duration> for Time {
 
 impl From<Time> for Duration {
     fn from(d: Time) -> Self {
-        Duration::from_secs(d.hour as u64 * 60 * 60) + Duration::from_secs(d.min as u64 * 60) + Duration::from_secs(d.sec as u64) + Duration::from_micros(d.micro as u64)
+        Duration::from_secs(d.hour as u64 * 60 * 60)
+            + Duration::from_secs(d.min as u64 * 60)
+            + Duration::from_secs(d.sec as u64)
+            + Duration::from_micros(d.micro as u64)
     }
 }
-
 
 impl FromStr for Time {
     type Err = Error;
@@ -175,15 +186,22 @@ impl Display for Time {
 }
 
 impl Serialize for Time {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
         serializer.serialize_str(&self.to_string())
     }
 }
 
 impl<'de> Deserialize<'de> for Time {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
         use serde::de::Error;
-        Time::from_str(&String::deserialize(deserializer)?).map_err(|e| Error::custom(e.to_string()))
+        Time::from_str(&String::deserialize(deserializer)?)
+            .map_err(|e| Error::custom(e.to_string()))
     }
 }
 
@@ -195,46 +213,5 @@ impl From<DateTime> for Time {
             min: arg.min,
             hour: arg.hour,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::str::FromStr;
-    use std::time::Duration;
-    use crate::Time;
-
-    #[test]
-    fn test_date() {
-        let d = Time::from_str("11:12:13.123456").unwrap();
-        println!("{}", d);
-        assert_eq!("11:12:13.123456".to_string(), d.to_string());
-
-        let d = Time::from_str("11:12:13.12345").unwrap();
-        println!("{}", d);
-        assert_eq!("11:12:13.012345".to_string(), d.to_string());
-
-        let d = Time::from_str("11:12:13.1234").unwrap();
-        println!("{}", d);
-        assert_eq!("11:12:13.001234".to_string(), d.to_string());
-    }
-
-    #[test]
-    fn test_from_micros() {
-        let d = Duration::from_micros(3 * 60 * 60 * 1000000 + 1);
-        let t = Time::from(d);
-        println!("{}", t);
-        assert_eq!(t.to_string(), "03:00:00.000001");
-    }
-
-    #[test]
-    fn test_from_time() {
-        let d = Duration::from(Time {
-            micro: 1,
-            sec: 1,
-            min: 1,
-            hour: 1,
-        });
-        println!("{}", d.as_micros());
     }
 }

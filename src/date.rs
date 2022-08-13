@@ -1,9 +1,9 @@
+use crate::{get_digit_unchecked, DateTime};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use crate::{DateTime, get_digit_unchecked};
 
-use crate::error::Error as Error;
+use crate::error::Error;
 
 /// Log timestamp type.
 ///
@@ -39,7 +39,7 @@ impl Date {
 
             match bytes.get_unchecked(4) {
                 b'-' => (),
-                _ => ()//return Err(Error::E("InvalidCharDateSep".to_string())),
+                _ => (), //return Err(Error::E("InvalidCharDateSep".to_string())),
             }
 
             let m1 = get_digit_unchecked!(bytes, 5, "InvalidCharMonth");
@@ -48,7 +48,7 @@ impl Date {
 
             match bytes.get_unchecked(7) {
                 b'-' => (),
-                _ => ()//return Err(Error::E("InvalidCharDateSep".to_string())),
+                _ => (), //return Err(Error::E("InvalidCharDateSep".to_string())),
             }
 
             let d1 = get_digit_unchecked!(bytes, 8, "InvalidCharDay");
@@ -128,15 +128,22 @@ impl Display for Date {
 }
 
 impl Serialize for Date {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         serializer.serialize_str(&self.to_string())
     }
 }
 
 impl<'de> Deserialize<'de> for Date {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
         use serde::de::Error;
-        Date::from_str(&String::deserialize(deserializer)?).map_err(|e| D::Error::custom(e.to_string()))
+        Date::from_str(&String::deserialize(deserializer)?)
+            .map_err(|e| D::Error::custom(e.to_string()))
     }
 }
 
@@ -147,27 +154,5 @@ impl From<DateTime> for Date {
             mon: arg.mon,
             year: arg.year,
         }
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use std::str::FromStr;
-    use crate::{Date, DateTime};
-
-    #[test]
-    fn test_date() {
-        let d = Date::from_str("2022-12-13 11:12:13.123456").unwrap();
-        println!("{}", d);
-        assert_eq!("2022-12-13".to_string(), d.to_string());
-    }
-
-    #[test]
-    fn test_ser() {
-        let d = DateTime::from_str("2022-12-13 11:12:13").unwrap();
-        println!("{}", d);
-        let v=serde_json::to_string(&d).unwrap();
-
     }
 }

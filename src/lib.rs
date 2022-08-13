@@ -1,13 +1,14 @@
-pub mod sys;
+#![allow(unused_assignments)]
+
 pub mod error;
+pub mod sys;
 
 mod date;
-mod time;
 mod datetime;
+mod time;
 pub use date::*;
-pub use time::*;
 pub use datetime::*;
-
+pub use time::*;
 
 // get a character from the bytes as as a decimal
 macro_rules! get_digit {

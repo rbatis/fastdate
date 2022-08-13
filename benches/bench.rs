@@ -32,7 +32,8 @@ fn bench_date_parse_z(b: &mut Bencher) {
 fn bench_date_parse_parse(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").expect("TODO: panic message");
+            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456")
+                .expect("TODO: panic message");
         });
     });
 }

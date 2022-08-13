@@ -18,7 +18,6 @@ impl From<std::string::String> for Error {
     }
 }
 
-
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
@@ -42,4 +41,3 @@ impl Default for Error {
         Error::E(String::new())
     }
 }
-

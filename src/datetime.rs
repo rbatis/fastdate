@@ -1,13 +1,13 @@
+use crate::error::Error;
+use crate::sys::Timespec;
+use crate::{Date, Time};
+use once_cell::sync::Lazy;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
 use std::fmt::{self, Display, Formatter};
 use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use once_cell::sync::Lazy;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use crate::{Date, Time};
-use crate::error::Error as Error;
-use crate::sys::Timespec;
 
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
@@ -288,6 +288,15 @@ impl Sub<&Duration> for DateTime {
     }
 }
 
+impl Sub<DateTime> for DateTime {
+    type Output = Duration;
+
+    fn sub(self, rhs: DateTime) -> Self::Output {
+        let nano = self.unix_timestamp_nano() - rhs.unix_timestamp_nano();
+        Duration::from_nanos(nano as u64)
+    }
+}
+
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
         let dur = v
@@ -394,11 +403,9 @@ impl From<DateTime> for SystemTime {
             v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days * 86400,
         );
         if v.micro > 0 {
-            UNIX_EPOCH
-                + sec + Duration::from_micros(v.micro as u64)
+            UNIX_EPOCH + sec + Duration::from_micros(v.micro as u64)
         } else {
-            UNIX_EPOCH
-                + sec - Duration::from_micros(v.micro as u64)
+            UNIX_EPOCH + sec - Duration::from_micros(v.micro as u64)
         }
     }
 }
@@ -465,21 +472,33 @@ impl FromStr for DateTime {
                 let remin_bytes = remin_str.as_bytes();
                 if remin_str.len() == 3 {
                     if remin_bytes[0] == b'+' || remin_bytes[0] == b'Z' {
-                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10
+                            + (remin_bytes[2] - b'0') as i32)
+                            * 3600;
                     } else if remin_bytes[0] == b'-' {
-                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10
+                            + (remin_bytes[2] - b'0') as i32)
+                            * 3600;
                     }
                 } else if remin_str.len() == 6 {
                     if remin_bytes[0] == b'+' || remin_bytes[0] == b'Z' {
                         //hour
-                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        offset_sec += ((remin_bytes[1] - b'0') as i32 * 10
+                            + (remin_bytes[2] - b'0') as i32)
+                            * 3600;
                         //min
-                        offset_sec += ((remin_bytes[4] - b'0') as i32 * 10 + (remin_bytes[5] - b'0') as i32) * 60;
+                        offset_sec += ((remin_bytes[4] - b'0') as i32 * 10
+                            + (remin_bytes[5] - b'0') as i32)
+                            * 60;
                     } else if remin_bytes[0] == b'-' {
                         //hour
-                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10 + (remin_bytes[2] - b'0') as i32) * 3600;
+                        offset_sec -= ((remin_bytes[1] - b'0') as i32 * 10
+                            + (remin_bytes[2] - b'0') as i32)
+                            * 3600;
                         //min
-                        offset_sec -= ((remin_bytes[4] - b'0') as i32 * 10 + (remin_bytes[5] - b'0') as i32) * 60;
+                        offset_sec -= ((remin_bytes[4] - b'0') as i32 * 10
+                            + (remin_bytes[5] - b'0') as i32)
+                            * 60;
                     }
                 }
             }
@@ -489,7 +508,7 @@ impl FromStr for DateTime {
                 date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
             }
             if bytes[bytes.len() - 1] == 'Z' as u8 {
-                date.set_offset(crate::offset_sec());//append offset
+                date.set_offset(crate::offset_sec()); //append offset
             }
         }
         Ok(date)
@@ -553,15 +572,20 @@ fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
-
 impl Serialize for DateTime {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         serializer.serialize_str(&self.to_string())
     }
 }
 
 impl<'de> Deserialize<'de> for DateTime {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
         DateTime::from_str(&s).map_err(|e| D::Error::custom(e))

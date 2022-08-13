@@ -1,7 +1,7 @@
+use fastdate::{Date, DateTime, Time, GLOBAL_OFFSET};
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 use std::time::Duration;
-use fastdate::{Date, DateTime, GLOBAL_OFFSET, Time};
 
 #[test]
 fn test_other_space() {
@@ -129,8 +129,16 @@ fn test_parse_z_sub() {
 #[test]
 fn test_set_offset_sub() {
     let mut date = DateTime::from_str("2022-12-12 09:00:00").unwrap();
-    date=date.set_offset(-9*3600);
+    date = date.set_offset(-9 * 3600);
     assert_eq!("2022-12-12 00:00:00", date.to_string());
+}
+
+#[test]
+fn test_time_sub_time() {
+    let date = DateTime::from_str("2022-12-12 00:00:00").unwrap();
+    let date2 = DateTime::from_str("2022-12-11 00:00:00").unwrap();
+    let sub = date - date2;
+    assert_eq!(86400, sub.as_secs());
 }
 
 #[test]
@@ -149,5 +157,5 @@ fn test_parse_format2() {
 fn test_week() {
     let date = DateTime::from_str("2022-07-27 00:27:11.000000").unwrap();
     println!("week,{}", date.week_day());
-    assert_eq!(3,date.week_day());
+    assert_eq!(3, date.week_day());
 }
