@@ -7,9 +7,9 @@ use std::str::FromStr;
 use std::time::Duration;
 use test::Bencher;
 
-//test bench_date_parse     ... bench:          11 ns/iter (+/- 0)
+//test bench_datetime_from_str     ... bench:          11 ns/iter (+/- 0)
 #[bench]
-fn bench_date_parse(b: &mut Bencher) {
+fn bench_datetime_from_str(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
             DateTime::from_str("1997-12-13 11:12:13.123456").expect("TODO: panic message");
@@ -17,9 +17,9 @@ fn bench_date_parse(b: &mut Bencher) {
     });
 }
 
-//test bench_date_parse_z   ... bench:          41 ns/iter (+/- 2)
+//test bench_date_from_str_iso_8601   ... bench:          41 ns/iter (+/- 2)
 #[bench]
-fn bench_date_parse_z(b: &mut Bencher) {
+fn bench_date_from_str_iso_8601(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
             DateTime::from_str("1997-12-13 11:12:13.123456Z").expect("TODO: panic message");
@@ -27,9 +27,19 @@ fn bench_date_parse_z(b: &mut Bencher) {
     });
 }
 
-//test bench_date_parse_parse ... bench:          58 ns/iter (+/- 1)
+//test bench_date_from_str_iso_8601_time   ... bench:          41 ns/iter (+/- 2)
 #[bench]
-fn bench_date_parse_parse(b: &mut Bencher) {
+fn bench_date_from_str_iso_8601_time(b: &mut Bencher) {
+    b.iter(|| {
+        std::hint::black_box({
+            DateTime::from_str("1997-12-13 11:12:13.123456+09").expect("TODO: panic message");
+        });
+    });
+}
+
+//test bench_date_parse_format ... bench:          58 ns/iter (+/- 1)
+#[bench]
+fn bench_date_parse_format(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
             DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456")
