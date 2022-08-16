@@ -39,13 +39,15 @@ test bench_set_offset                  ... bench:          25 ns/iter (+/- 4)
 test bench_timestamp                   ... bench:           8 ns/iter (+/- 0)
 ```
 
-* it can from_str for any RFC3339
+* it can from_str for any RFC3339,iso_8601
 for example:
 ```log
 1234_12_13_11_12_13.123456
 1234-12-13T11:12:13
 1234-12-13 11:12:13.123456
 1234-12-13T11:12:13.123456
+1234-12-13T11:12:13.123456Z
+1234-12-13 11:12:13.123456+09:00
 ```
 
 * how use?
