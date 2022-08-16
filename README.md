@@ -2,13 +2,28 @@
 fastdate of Any RFC3339Micro
 
 this date cartes is very fast(<= 50ns) including 
-* from_str()
+* from_str("2022-12-13 11:12:14.123456")
 * now()
 * utc()
+* week_day()
 * to_string()/format!()
-* eq()
+* eq()/==
 * add()/sub()
 * set_offset()
+* parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13")
+* unix_timestamp()
+* unix_timestamp_millis()
+* unix_timestamp_nano()
+* from_timestamp()
+* from_timestamp_millis()
+* from_timestamp_nano()
+* before(&date) -> bool
+* after(&date1) -> bool
+* from(v: SystemTime)
+* from(v: DateTime)
+* from(arg: Date)
+* from(arg: Time)
+* cmp(&self, other: &DateTime)/>/</>=/<= and more....
 
 ```log
 test bench_add                         ... bench:          22 ns/iter (+/- 4)
