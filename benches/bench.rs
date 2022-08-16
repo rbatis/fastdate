@@ -74,7 +74,7 @@ fn bench_add(b: &mut Bencher) {
     let now = DateTime::now();
     b.iter(|| {
         std::hint::black_box({
-            let _ = now + Duration::from_secs(24 * 3600);
+            let _ = now.clone() + Duration::from_secs(24 * 3600);
         });
     });
 }
@@ -95,7 +95,7 @@ fn bench_set_offset(b: &mut Bencher) {
     let now = DateTime::utc();
     b.iter(|| {
         std::hint::black_box({
-            let _ = now.set_offset(8 * 3600);
+            let _ = now.clone().set_offset(8 * 3600);
         });
     });
 }
