@@ -70,14 +70,14 @@ impl DateTime {
         }
     }
 
+    /// add Duration
     pub fn add(self, d: Duration) -> Self {
-        let systime = SystemTime::from(self) + d;
-        Self::from(systime)
+        Self::from(SystemTime::from(self) + d)
     }
 
+    /// sub Duration
     pub fn sub(self, d: Duration) -> Self {
-        let systime = SystemTime::from(self) - d;
-        Self::from(systime)
+        Self::from(SystemTime::from(self) - d)
     }
 
     /// is self before on other?
