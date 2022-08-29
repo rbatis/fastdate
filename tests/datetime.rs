@@ -157,3 +157,9 @@ fn test_week() {
     println!("week,{}", date.week_day());
     assert_eq!(3, date.week_day());
 }
+
+//TODO 2019-04-28 00:00:00.023333333
+#[test]
+fn test_nano() {
+    let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
+}
