@@ -158,8 +158,15 @@ fn test_week() {
     assert_eq!(3, date.week_day());
 }
 
-//TODO 2019-04-28 00:00:00.023333333
 #[test]
 fn test_nano() {
     let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
+    println!("{}",date1.to_string());
+    assert_eq!("2019-04-28 00:00:00.023333",date1.to_string());
+}
+
+#[test]
+fn test_nano_more_than() {
+    let date1 = DateTime::from_str("2019-04-28 00:00:00.0233333333");
+    assert_eq!(date1.err().unwrap().to_string(),"SecondFractionTooLong");
 }

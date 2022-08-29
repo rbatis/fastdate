@@ -22,7 +22,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
             Error::E(ref err) => {
-                write!(f, "Rbatis Error: {}", err)
+                write!(f, "{}", err)
             }
         };
     }

@@ -58,13 +58,16 @@ impl Time {
             length = 8;
             let mut microsecond = 0;
             let frac_sep = bytes.get(offset + 8).copied();
-            let mut number_buf = *b"      ";
+            let mut number_buf = *b"         ";
             if frac_sep == Some(b'.') || frac_sep == Some(b',') {
                 length = 9;
                 let mut i: usize = 0;
                 loop {
                     match bytes.get(offset + length + i) {
                         Some(c) if (b'0'..=b'9').contains(c) => {
+                            if i >= 9 {
+                                return Err(Error::E("SecondFractionTooLong".to_string()));
+                            }
                             number_buf[i] = *c;
                         }
                         _ => {
@@ -72,7 +75,7 @@ impl Time {
                         }
                     }
                     i += 1;
-                    if i > 6 {
+                    if i > 9 {
                         return Err(Error::E("SecondFractionTooLong".to_string()));
                     }
                 }
@@ -90,6 +93,9 @@ impl Time {
                     microsecond += v;
                     i += 1;
                 }
+            }
+            if microsecond > 999999 {
+                microsecond = microsecond / 1000;
             }
             (second, microsecond)
         };
