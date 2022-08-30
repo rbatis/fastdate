@@ -46,6 +46,15 @@ fn test_timestamp() {
 }
 
 #[test]
+fn test_timestamp_micros() {
+    let mut now = DateTime::utc();
+    now.micro = 0;
+    let timestamp = now.unix_timestamp_micros();
+    let new_time = DateTime::from_timestamp_micros(timestamp);
+    assert_eq!(now, new_time);
+}
+
+#[test]
 fn test_timestamp_millis() {
     let mut now = DateTime::utc();
     now.micro = 0;

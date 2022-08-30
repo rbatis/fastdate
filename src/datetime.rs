@@ -98,6 +98,14 @@ impl DateTime {
         return s.as_secs() as i64;
     }
 
+    ///unix_timestamp micros
+    pub fn unix_timestamp_micros(&self) -> i64 {
+        let s = SystemTime::from(self.clone())
+            .duration_since(UNIX_EPOCH)
+            .expect("all times should be after the epoch");
+        return s.as_micros() as i64;
+    }
+
     ///unix_timestamp millis
     pub fn unix_timestamp_millis(&self) -> i64 {
         let s = SystemTime::from(self.clone())
@@ -119,12 +127,17 @@ impl DateTime {
         let v = UNIX_EPOCH + Duration::from_secs(sec as u64);
         Self::from(v)
     }
-    ///from timestamp sec
+    ///from timestamp micros
+    pub fn from_timestamp_micros(micros: i64) -> DateTime {
+        let v = UNIX_EPOCH + Duration::from_micros(micros as u64);
+        Self::from(v)
+    }
+    ///from timestamp millis
     pub fn from_timestamp_millis(ms: i64) -> DateTime {
         let v = UNIX_EPOCH + Duration::from_millis(ms as u64);
         Self::from(v)
     }
-    ///from timestamp sec
+    ///from timestamp nano
     pub fn from_timestamp_nano(nano: u128) -> DateTime {
         let v = UNIX_EPOCH + Duration::from_nanos(nano as u64);
         Self::from(v)
