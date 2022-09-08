@@ -21,6 +21,17 @@ impl Time {
     /// Parse a time from bytes with a starting index, no check is performed for extract characters at
     /// the end of the string
     pub(crate) fn parse_bytes_partial(bytes: &[u8], offset: usize) -> Result<(Self, usize), Error> {
+        if bytes.len() < offset {
+            return Ok((
+                Self {
+                    micro: 0,
+                    sec: 0,
+                    min: 0,
+                    hour: 0,
+                },
+                0,
+            ));
+        }
         if bytes.len() - offset < 5 {
             return Err(Error::E("TooShort".to_string()));
         }
@@ -193,8 +204,8 @@ impl Display for Time {
 
 impl Serialize for Time {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -202,8 +213,8 @@ impl Serialize for Time {
 
 impl<'de> Deserialize<'de> for Time {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         use serde::de::Error;
         Time::from_str(&String::deserialize(deserializer)?)

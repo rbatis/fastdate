@@ -1,7 +1,6 @@
-
+use fastdate::Time;
 use std::str::FromStr;
 use std::time::Duration;
-use fastdate::Time;
 
 #[test]
 fn test_date_123456() {
