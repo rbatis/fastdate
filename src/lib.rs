@@ -41,14 +41,15 @@ pub trait DurationFrom {
 }
 
 impl DurationFrom for Duration {
+    #[inline]
     fn from_minute(minute: u64) -> Self {
         Duration::from_secs(minute * 60)
     }
-
+    #[inline]
     fn from_hour(hour: u64) -> Self {
         Duration::from_minute(hour * 60)
     }
-
+    #[inline]
     fn from_day(day: u64) -> Self {
         Duration::from_hour(day * 24)
     }
