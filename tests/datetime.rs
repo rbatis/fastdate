@@ -1,4 +1,4 @@
-use fastdate::{Date, DateTime, Time};
+use fastdate::{Date, DateTime, DurationFrom, Time};
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -184,4 +184,22 @@ fn test_nano_more_than() {
 fn test_parse_date() {
     let date = DateTime::from_str("2013-10-06").unwrap();
     assert_eq!(date.to_string(), "2013-10-06 00:00:00");
+}
+
+#[test]
+fn test_add_minute() {
+    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_minute(1));
+    assert_eq!(date.to_string(), "2013-10-06 00:01:00");
+}
+
+#[test]
+fn test_add_hour() {
+    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_hour(1));
+    assert_eq!(date.to_string(), "2013-10-06 01:00:00");
+}
+
+#[test]
+fn test_add_day() {
+    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_day(1));
+    assert_eq!(date.to_string(), "2013-10-07 00:00:00");
 }

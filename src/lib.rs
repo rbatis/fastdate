@@ -6,6 +6,8 @@ pub mod sys;
 mod date;
 mod datetime;
 mod time;
+
+use std::time::Duration;
 pub use date::*;
 pub use datetime::*;
 pub use time::*;
@@ -30,3 +32,25 @@ macro_rules! get_digit_unchecked {
     };
 }
 pub(crate) use get_digit_unchecked;
+
+
+pub trait DurationFrom {
+    fn from_minute(minute: u64) -> Self;
+    fn from_hour(hour: u64) -> Self;
+    fn from_day(day: u64) -> Self;
+}
+
+impl DurationFrom for Duration {
+    fn from_minute(minute: u64) -> Self {
+        Duration::from_secs(minute * 60)
+    }
+
+    fn from_hour(hour: u64) -> Self {
+        Duration::from_minute(hour * 60)
+    }
+
+    fn from_day(day: u64) -> Self {
+        Duration::from_hour(day * 24)
+    }
+}
+
