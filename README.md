@@ -26,16 +26,17 @@ this date cartes is very fast(<= 50ns) including
 * cmp(&self, other: &DateTime)/>/</>=/<= and more....
 
 ```log
-test bench_add                         ... bench:          22 ns/iter (+/- 4)
-test bench_date_display                ... bench:          40 ns/iter (+/- 1)
-test bench_date_from_str_iso_8601      ... bench:          42 ns/iter (+/- 1)
-test bench_date_from_str_iso_8601_time ... bench:          42 ns/iter (+/- 1)
-test bench_date_now_local              ... bench:          40 ns/iter (+/- 1)
-test bench_date_parse_format           ... bench:          61 ns/iter (+/- 4)
-test bench_date_utc                    ... bench:          40 ns/iter (+/- 1)
-test bench_datetime_from_str           ... bench:          13 ns/iter (+/- 0)
+test bench_add                         ... bench:          23 ns/iter (+/- 4)
+test bench_date_display                ... bench:          46 ns/iter (+/- 1)
+test bench_date_from_str_iso_8601      ... bench:          45 ns/iter (+/- 0)
+test bench_date_from_str_iso_8601_time ... bench:          43 ns/iter (+/- 1)
+test bench_date_now_local              ... bench:          40 ns/iter (+/- 0)
+test bench_date_parse_format           ... bench:          51 ns/iter (+/- 1)
+test bench_date_utc                    ... bench:          39 ns/iter (+/- 0)
+test bench_datetime_from_str           ... bench:          14 ns/iter (+/- 0)
 test bench_eq                          ... bench:           0 ns/iter (+/- 0)
-test bench_set_offset                  ... bench:          25 ns/iter (+/- 4)
+test bench_get_micro                   ... bench:           0 ns/iter (+/- 0)
+test bench_set_offset                  ... bench:          27 ns/iter (+/- 5)
 test bench_timestamp                   ... bench:           8 ns/iter (+/- 0)
 ```
 
