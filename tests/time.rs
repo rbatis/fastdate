@@ -14,6 +14,35 @@ fn test_display() {
     assert_eq!("08:00:00", d.to_string());
 }
 
+
+#[test]
+fn test_date_12345678910() {
+    let d = Time::from_str("11:12:13.12345678910");
+    println!("{:?}", d);
+    assert_eq!(true, d.is_err());
+}
+
+#[test]
+fn test_date_123456789() {
+    let d = Time::from_str("11:12:13.123456789").unwrap();
+    println!("{}", d);
+    assert_eq!("11:12:13.123456789".to_string(), d.to_string());
+}
+
+#[test]
+fn test_date_12345678() {
+    let d = Time::from_str("11:12:13.12345678").unwrap();
+    println!("{}", d);
+    assert_eq!("11:12:13.12345678".to_string(), d.to_string());
+}
+
+#[test]
+fn test_date_1234567() {
+    let d = Time::from_str("11:12:13.1234567").unwrap();
+    println!("{}", d);
+    assert_eq!("11:12:13.1234567".to_string(), d.to_string());
+}
+
 #[test]
 fn test_date_123456() {
     let d = Time::from_str("11:12:13.123456").unwrap();
