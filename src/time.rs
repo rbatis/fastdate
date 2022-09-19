@@ -7,8 +7,8 @@ use std::time::Duration;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Time {
-    /// 0...999999
-    pub micro: u32,
+    /// 0...999999999
+    pub nano: u32,
     /// 0...59
     pub sec: u8,
     /// 0...59
@@ -24,7 +24,7 @@ impl Time {
         if bytes.len() < offset {
             return Ok((
                 Self {
-                    micro: 0,
+                    nano: 0,
                     sec: 0,
                     min: 0,
                     hour: 0,
@@ -59,7 +59,7 @@ impl Time {
             return Err(Error::E("OutOfRangeMinute".to_string()));
         }
         let mut length: usize = 5;
-        let (second, microsecond) = {
+        let (second, nano) = {
             let s1 = get_digit!(bytes, offset + 6, "InvalidCharSecond");
             let s2 = get_digit!(bytes, offset + 7, "InvalidCharSecond");
             let second = s1 * 10 + s2;
@@ -67,7 +67,7 @@ impl Time {
                 return Err(Error::E("OutOfRangeSecond".to_string()));
             }
             length = 8;
-            let mut microsecond = 0;
+            let mut nano = 0;
             let frac_sep = bytes.get(offset + 8).copied();
             let mut number_buf = *b"         ";
             if frac_sep == Some(b'.') || frac_sep == Some(b',') {
@@ -97,21 +97,18 @@ impl Time {
             }
             let mut i = 0;
             for idx in 0..number_buf.len() {
-                let item = number_buf[number_buf.len() - 1 - idx];
+                let item = number_buf[idx];
                 if item != ' ' as u8 {
                     //is number
-                    let v = (item - '0' as u8) as u32 * 10_u32.pow(i as u32);
-                    microsecond += v;
+                    let v = (item - '0' as u8) as u32;
+                    nano = nano + v * 10_u32.pow(8 - i);
                     i += 1;
                 }
             }
-            if microsecond > 999999 {
-                microsecond = microsecond / 1000;
-            }
-            (second, microsecond)
+            (second, nano)
         };
         let t = Self {
-            micro: microsecond,
+            nano: nano,
             sec: second,
             min: minute,
             hour,
@@ -121,7 +118,7 @@ impl Time {
 
     /// 0...999999
     pub fn set_micro(mut self, arg: u32) -> Self {
-        self.micro = arg;
+        self.nano = arg * 1000;
         self
     }
     /// 0...59
@@ -139,6 +136,45 @@ impl Time {
         self.hour = arg;
         self
     }
+
+    /// display time and return len
+    pub fn display_time(&self, start: usize, buf: &mut [u8]) -> usize {
+        buf[start + 0] = b'0' + (self.hour / 10) as u8;
+        buf[start + 1] = b'0' + (self.hour % 10) as u8;
+        buf[start + 3] = b'0' + (self.min / 10) as u8;
+        buf[start + 4] = b'0' + (self.min % 10) as u8;
+        buf[start + 6] = b'0' + (self.sec / 10) as u8;
+        buf[start + 7] = b'0' + (self.sec % 10) as u8;
+        let mut real_len = start + 1 + 8 + 8 + 1;
+        buf[start + 8] = b'.';
+        buf[start + 9] = b'0' + (self.nano / 100000000 % 10) as u8;
+        buf[start + 10] = b'0' + (self.nano / 10000000 % 10) as u8;
+        buf[start + 11] = b'0' + (self.nano / 1000000 % 10) as u8;
+        buf[start + 12] = b'0' + (self.nano / 100000 % 10) as u8;
+        buf[start + 13] = b'0' + (self.nano / 10000 % 10) as u8;
+        buf[start + 14] = b'0' + (self.nano / 1000 % 10) as u8;
+        buf[start + 15] = b'0' + (self.nano / 100 % 10) as u8;
+        buf[start + 16] = b'0' + (self.nano / 10 % 10) as u8;
+        buf[start + 17] = b'0' + (self.nano % 10) as u8;
+        if self.nano == 0 {
+            real_len = real_len - 10;
+        } else {
+            let current = real_len;
+            let mut last_zero = false;
+            for i in 0..8 {
+                let i = current - 1 - i;
+                if buf[i] == b'0' {
+                    last_zero = true;
+                }
+                if last_zero == true && buf[i] == b'0' {
+                    real_len -= 1;
+                } else {
+                    break;
+                }
+            }
+        }
+        real_len
+    }
 }
 
 impl From<Duration> for Time {
@@ -146,12 +182,12 @@ impl From<Duration> for Time {
         let hour = (d.as_secs() / 3600) as u8;
         let min = (d.as_secs() / 60 - (hour as u64 * 60)) as u8;
         let sec = (d.as_secs() - hour as u64 * 3600u64 - min as u64 * 60u64) as u8;
-        let micros = d.as_micros()
-            - (hour as u128 * 3600000000) as u128
-            - (min as u128 * 60000000) as u128
-            - (sec as u128 * 1000000) as u128;
+        let micros = d
+            - Duration::from_secs(hour as u64 * 3600u64)
+            - Duration::from_secs(min as u64 * 60u64)
+            - Duration::from_secs(sec as u64);
         Self {
-            micro: micros as u32,
+            nano: micros.as_nanos() as u32,
             sec: sec,
             min: min,
             hour: hour,
@@ -164,14 +200,14 @@ impl From<Time> for Duration {
         Duration::from_secs(d.hour as u64 * 60 * 60)
             + Duration::from_secs(d.min as u64 * 60)
             + Duration::from_secs(d.sec as u64)
-            + Duration::from_micros(d.micro as u64)
+            + Duration::from_nanos(d.nano as u64)
     }
 }
 
 impl FromStr for Time {
     type Err = Error;
 
-    /// from RFC3339Micro = "15:04:05.999999"
+    /// from RFC3339Micro = "15:04:05.999999999"
     fn from_str(s: &str) -> Result<Time, Error> {
         //"00:00:00.000000";
         let (t, _) = Time::parse_bytes_partial(s.as_bytes(), 0)?;
@@ -180,32 +216,19 @@ impl FromStr for Time {
 }
 
 impl Display for Time {
-    /// fmt RFC3339Micro = "2006-01-02T15:04:05.999999"
+    /// fmt RFC3339Micro = "2006-01-02T15:04:05.999999999"
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let mut buf: [u8; 15] = *b"00:00:00.000000";
-
-        buf[0] = b'0' + (self.hour / 10) as u8;
-        buf[1] = b'0' + (self.hour % 10) as u8;
-        buf[3] = b'0' + (self.min / 10) as u8;
-        buf[4] = b'0' + (self.min % 10) as u8;
-        buf[6] = b'0' + (self.sec / 10) as u8;
-        buf[7] = b'0' + (self.sec % 10) as u8;
-
-        buf[9] = b'0' + (self.micro / 100000 % 10) as u8;
-        buf[10] = b'0' + (self.micro / 10000 % 10) as u8;
-        buf[11] = b'0' + (self.micro / 1000 % 10) as u8;
-        buf[12] = b'0' + (self.micro / 100 % 10) as u8;
-        buf[13] = b'0' + (self.micro / 10 % 10) as u8;
-        buf[14] = b'0' + (self.micro % 10) as u8;
-
-        f.write_str(std::str::from_utf8(&buf[..]).unwrap())
+        let mut buf: [u8; 18] = *b"00:00:00.000000000";
+        let len = self.display_time(0, &mut buf);
+        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
     }
 }
 
+
 impl Serialize for Time {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -213,8 +236,8 @@ impl Serialize for Time {
 
 impl<'de> Deserialize<'de> for Time {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         Time::from_str(&String::deserialize(deserializer)?)
@@ -225,7 +248,7 @@ impl<'de> Deserialize<'de> for Time {
 impl From<DateTime> for Time {
     fn from(arg: DateTime) -> Self {
         Time {
-            micro: arg.micro,
+            nano: arg.nano,
             sec: arg.sec,
             min: arg.min,
             hour: arg.hour,

@@ -39,7 +39,7 @@ fn test_offset() {
 #[test]
 fn test_timestamp() {
     let mut now = DateTime::utc();
-    now.micro = 0;
+    now.nano = 0;
     let timestamp = now.unix_timestamp();
     let new_time = DateTime::from_timestamp(timestamp);
     assert_eq!(now, new_time);
@@ -48,7 +48,7 @@ fn test_timestamp() {
 #[test]
 fn test_timestamp_micros() {
     let mut now = DateTime::utc();
-    now.micro = 0;
+    now.nano = 0;
     let timestamp = now.unix_timestamp_micros();
     let new_time = DateTime::from_timestamp_micros(timestamp);
     assert_eq!(now, new_time);
@@ -57,7 +57,7 @@ fn test_timestamp_micros() {
 #[test]
 fn test_timestamp_millis() {
     let mut now = DateTime::utc();
-    now.micro = 0;
+    now.nano = 0;
     let timestamp = now.unix_timestamp_millis();
     let new_time = DateTime::from_timestamp_millis(timestamp);
     assert_eq!(now, new_time);
@@ -98,11 +98,12 @@ fn test_offset_zone() {
 #[test]
 fn test_into() {
     let utc = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
+    println!("utc={}", utc);
     let date: Date = utc.clone().into();
     let time: Time = utc.into();
-    println!("{},{}", date, time);
+    println!("date={},time={}", date, time);
     assert_eq!("2022-12-12", date.to_string());
-    assert_eq!("08:00:00.000000", time.to_string());
+    assert_eq!("08:00:00", time.to_string());
 }
 
 #[test]
@@ -171,7 +172,7 @@ fn test_week() {
 fn test_nano() {
     let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
     println!("{}", date1.to_string());
-    assert_eq!("2019-04-28 00:00:00.023333", date1.to_string());
+    assert_eq!("2019-04-28 00:00:00.023333333", date1.to_string());
 }
 
 #[test]
@@ -184,6 +185,13 @@ fn test_nano_more_than() {
 fn test_parse_date() {
     let date = DateTime::from_str("2013-10-06").unwrap();
     assert_eq!(date.to_string(), "2013-10-06 00:00:00");
+}
+
+#[test]
+fn test_ser_date() {
+    let date = DateTime::from_str("2022-09-19 14:01:58.175861").unwrap();
+    let js = serde_json::to_string(&date).unwrap();
+    assert_eq!("\"2022-09-19 14:01:58.175861\"", js);
 }
 
 #[test]

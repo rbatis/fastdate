@@ -4,7 +4,7 @@ use crate::{Date, Time};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{Display, Formatter};
 use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -25,8 +25,8 @@ pub fn offset_sec() -> i32 {
 /// Supports comparsion and sorting.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct DateTime {
-    /// 0...999999
-    pub micro: u32,
+    /// 0...999999999
+    pub nano: u32,
     /// 0...59
     pub sec: u8,
     /// 0...59
@@ -234,7 +234,7 @@ impl DateTime {
 
     /// 0...999999
     pub fn set_micro(mut self, arg: u32) -> Self {
-        self.micro = arg;
+        self.nano = arg * 1000;
         self
     }
     /// 0...59
@@ -377,7 +377,7 @@ impl From<SystemTime> for DateTime {
         };
 
         DateTime {
-            micro: (dur - Duration::from_secs(dur.as_secs())).as_micros() as u32,
+            nano: (dur - Duration::from_secs(dur.as_secs())).as_nanos() as u32,
             sec: (secs_of_day % 60) as u8,
             min: ((secs_of_day % 3600) / 60) as u8,
             hour: (secs_of_day / 3600) as u8,
@@ -415,10 +415,10 @@ impl From<DateTime> for SystemTime {
         let sec = Duration::from_secs(
             v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days * 86400,
         );
-        if v.micro > 0 {
-            UNIX_EPOCH + sec + Duration::from_micros(v.micro as u64)
+        if v.nano > 0 {
+            UNIX_EPOCH + sec + Duration::from_nanos(v.nano as u64)
         } else {
-            UNIX_EPOCH + sec - Duration::from_micros(v.micro as u64)
+            UNIX_EPOCH + sec - Duration::from_nanos(v.nano as u64)
         }
     }
 }
@@ -426,7 +426,7 @@ impl From<DateTime> for SystemTime {
 impl From<Date> for DateTime {
     fn from(arg: Date) -> Self {
         Self {
-            micro: 0,
+            nano: 0,
             sec: 0,
             min: 0,
             hour: 0,
@@ -440,7 +440,7 @@ impl From<Date> for DateTime {
 impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
         Self {
-            micro: arg.micro,
+            nano: arg.nano,
             sec: arg.sec,
             min: arg.min,
             hour: arg.hour,
@@ -458,7 +458,7 @@ impl FromStr for DateTime {
     fn from_str(s: &str) -> Result<DateTime, Error> {
         let bytes = s.as_bytes();
         let mut date = DateTime {
-            micro: 0,
+            nano: 0,
             sec: 0,
             min: 0,
             hour: 0,
@@ -476,7 +476,7 @@ impl FromStr for DateTime {
             date.hour = t.hour;
             date.min = t.min;
             date.sec = t.sec;
-            date.micro = t.micro;
+            date.nano = t.nano;
             let start = 11 + offset;
             //+09:00
             let mut offset_sec = 0;
@@ -529,43 +529,20 @@ impl FromStr for DateTime {
 }
 
 impl Display for DateTime {
-    /// fmt RFC3339Micro = "2006-01-02T15:04:05.999999"
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let mut buf: [u8; 26] = *b"0000-00-00 00:00:00.000000";
-
+    /// fmt RFC3339Nano = "2006-01-02T15:04:05.999999999"
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let mut buf: [u8; 29] = *b"0000-00-00 00:00:00.000000000";
         buf[0] = b'0' + (self.year / 1000) as u8;
         buf[1] = b'0' + (self.year / 100 % 10) as u8;
         buf[2] = b'0' + (self.year / 10 % 10) as u8;
         buf[3] = b'0' + (self.year % 10) as u8;
-
         buf[5] = b'0' + (self.mon / 10) as u8;
         buf[6] = b'0' + (self.mon % 10) as u8;
-
         buf[8] = b'0' + (self.day / 10) as u8;
         buf[9] = b'0' + (self.day % 10) as u8;
-
-        buf[11] = b'0' + (self.hour / 10) as u8;
-        buf[12] = b'0' + (self.hour % 10) as u8;
-        buf[14] = b'0' + (self.min / 10) as u8;
-        buf[15] = b'0' + (self.min % 10) as u8;
-        buf[17] = b'0' + (self.sec / 10) as u8;
-        buf[18] = b'0' + (self.sec % 10) as u8;
-
-        if self.micro != 0 {
-            buf[20] = b'0' + (self.micro / 100000 % 10) as u8;
-            buf[21] = b'0' + (self.micro / 10000 % 10) as u8;
-            buf[22] = b'0' + (self.micro / 1000 % 10) as u8;
-            buf[23] = b'0' + (self.micro / 100 % 10) as u8;
-            buf[24] = b'0' + (self.micro / 10 % 10) as u8;
-            buf[25] = b'0' + (self.micro % 10) as u8;
-            f.write_str(std::str::from_utf8(&buf[..]).unwrap())
-        } else {
-            let mut buf_new: [u8; 19] = *b"0000-00-00 00:00:00";
-            for x in 0..buf_new.len() {
-                buf_new[x] = buf[x];
-            }
-            f.write_str(std::str::from_utf8(&buf_new[..]).unwrap())
-        }
+        let time = Time::from(self.clone());
+        let len = time.display_time(11, &mut buf);
+        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
     }
 }
 
@@ -587,8 +564,8 @@ fn is_leap_year(y: u16) -> bool {
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -596,8 +573,8 @@ impl Serialize for DateTime {
 
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
