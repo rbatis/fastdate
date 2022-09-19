@@ -119,3 +119,13 @@ fn bench_timestamp(b: &mut Bencher) {
         });
     });
 }
+
+#[bench]
+fn bench_get_micro(b: &mut Bencher) {
+    let now = DateTime::utc();
+    b.iter(|| {
+        std::hint::black_box({
+            let _ = now.get_micro();
+        });
+    });
+}

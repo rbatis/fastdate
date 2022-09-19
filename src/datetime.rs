@@ -267,6 +267,41 @@ impl DateTime {
         self.year = arg;
         self
     }
+
+    /// get micro secs
+    pub fn get_micro(&self) -> u32 {
+        self.nano / 1000
+    }
+
+    /// get sec
+    pub fn get_sec(&self) -> u8 {
+        self.sec
+    }
+
+    /// get sec
+    pub fn get_min(&self) -> u8 {
+        self.min
+    }
+
+    /// get hour
+    pub fn get_hour(&self) -> u8 {
+        self.hour
+    }
+
+    /// get day
+    pub fn get_day(&self) -> u8 {
+        self.day
+    }
+
+    /// get mon
+    pub fn get_mon(&self) -> u8 {
+        self.mon
+    }
+
+    /// get year
+    pub fn get_year(&self) -> u16 {
+        self.year
+    }
 }
 
 impl Add<Duration> for DateTime {

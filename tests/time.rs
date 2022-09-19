@@ -131,3 +131,9 @@ fn test_ser_time() {
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!("\"14:01:58.175861\"", js);
 }
+
+#[test]
+fn test_get_micro() {
+    let date = Time::from_str("14:01:58.175861").unwrap();
+    assert_eq!(175861, date.get_micro());
+}

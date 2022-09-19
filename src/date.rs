@@ -97,6 +97,21 @@ impl Date {
         self.year = arg;
         self
     }
+
+    /// get day
+    pub fn get_day(&self) -> u8 {
+        self.day
+    }
+
+    /// get mon
+    pub fn get_mon(&self) -> u8 {
+        self.mon
+    }
+
+    /// get year
+    pub fn get_year(&self) -> u16 {
+        self.year
+    }
 }
 
 impl FromStr for Date {

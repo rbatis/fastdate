@@ -137,6 +137,26 @@ impl Time {
         self
     }
 
+    /// get micro secs
+    pub fn get_micro(&self) -> u32{
+        self.nano / 1000
+    }
+
+    /// get sec
+    pub fn get_sec(&self) -> u8{
+        self.sec
+    }
+
+    /// get sec
+    pub fn get_min(&self) -> u8{
+        self.min
+    }
+
+    /// get hour
+    pub fn get_hour(&self) -> u8{
+        self.hour
+    }
+
     /// display time and return len
     pub fn display_time(&self, start: usize, buf: &mut [u8]) -> usize {
         buf[start + 0] = b'0' + (self.hour / 10) as u8;
