@@ -489,7 +489,7 @@ impl From<Time> for DateTime {
 impl FromStr for DateTime {
     type Err = Error;
 
-    /// from RFC3339Nano = "0000-00-00 00:00:00.000000"
+    /// from RFC3339Nano = "0000-00-00 00:00:00.000000000"
     fn from_str(s: &str) -> Result<DateTime, Error> {
         let bytes = s.as_bytes();
         let mut date = DateTime {
