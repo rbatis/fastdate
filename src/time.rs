@@ -116,6 +116,12 @@ impl Time {
         Ok((t, length))
     }
 
+    /// 0...999999999
+    pub fn set_nano(mut self, arg: u32) -> Self {
+        self.nano = arg;
+        self
+    }
+
     /// 0...999999
     pub fn set_micro(mut self, arg: u32) -> Self {
         self.nano = arg * 1000;
@@ -136,24 +142,27 @@ impl Time {
         self.hour = arg;
         self
     }
-
+    /// get nano
+    pub fn get_nano(&self) -> u32 {
+        self.nano
+    }
     /// get micro secs
-    pub fn get_micro(&self) -> u32{
+    pub fn get_micro(&self) -> u32 {
         self.nano / 1000
     }
 
     /// get sec
-    pub fn get_sec(&self) -> u8{
+    pub fn get_sec(&self) -> u8 {
         self.sec
     }
 
     /// get sec
-    pub fn get_min(&self) -> u8{
+    pub fn get_min(&self) -> u8 {
         self.min
     }
 
     /// get hour
-    pub fn get_hour(&self) -> u8{
+    pub fn get_hour(&self) -> u8 {
         self.hour
     }
 

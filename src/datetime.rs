@@ -231,7 +231,15 @@ impl DateTime {
         };
         wday as u8
     }
-
+    /// 0...999999999
+    pub fn set_nano(mut self, arg: u32) -> Self {
+        self.nano = arg;
+        self
+    }
+    /// get nano 0...999999999
+    pub fn get_nano(&self) -> u32 {
+        self.nano
+    }
     /// 0...999999
     pub fn set_micro(mut self, arg: u32) -> Self {
         self.nano = arg * 1000;
