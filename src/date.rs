@@ -112,6 +112,22 @@ impl Date {
     pub fn get_year(&self) -> u16 {
         self.year
     }
+
+    /// display date and return len
+    pub fn display_date(&self, start: usize, buf: &mut [u8]) -> usize {
+        buf[start + 0] = b'0' + (self.year / 1000) as u8;
+        buf[start + 1] = b'0' + (self.year / 100 % 10) as u8;
+        buf[start + 2] = b'0' + (self.year / 10 % 10) as u8;
+        buf[start + 3] = b'0' + (self.year % 10) as u8;
+
+        buf[start + 5] = b'0' + (self.mon / 10) as u8;
+        buf[start + 6] = b'0' + (self.mon % 10) as u8;
+
+        buf[start + 8] = b'0' + (self.day / 10) as u8;
+        buf[start + 9] = b'0' + (self.day % 10) as u8;
+
+        start + 10
+    }
 }
 
 impl FromStr for Date {
@@ -127,25 +143,15 @@ impl FromStr for Date {
 impl Display for Date {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut buf: [u8; 10] = *b"0000-00-00";
-
-        buf[0] = b'0' + (self.year / 1000) as u8;
-        buf[1] = b'0' + (self.year / 100 % 10) as u8;
-        buf[2] = b'0' + (self.year / 10 % 10) as u8;
-        buf[3] = b'0' + (self.year % 10) as u8;
-
-        buf[5] = b'0' + (self.mon / 10) as u8;
-        buf[6] = b'0' + (self.mon % 10) as u8;
-
-        buf[8] = b'0' + (self.day / 10) as u8;
-        buf[9] = b'0' + (self.day % 10) as u8;
+        self.display_date(0, &mut buf);
         f.write_str(std::str::from_utf8(&buf[..]).unwrap())
     }
 }
 
 impl Serialize for Date {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -153,8 +159,8 @@ impl Serialize for Date {
 
 impl<'de> Deserialize<'de> for Date {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         Date::from_str(&String::deserialize(deserializer)?)
