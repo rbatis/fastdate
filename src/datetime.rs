@@ -80,6 +80,15 @@ impl DateTime {
         Self::from(SystemTime::from(self) - d)
     }
 
+    ///add sec
+    pub fn add_sec(self, sec: i64) -> Self {
+        if sec > 0 {
+            self.add(Duration::from_secs(sec as u64))
+        } else {
+            self.sub(Duration::from_secs(sec as u64))
+        }
+    }
+
     /// is self before on other?
     pub fn before(&self, other: &DateTime) -> bool {
         self < other
