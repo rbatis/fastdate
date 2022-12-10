@@ -85,7 +85,7 @@ impl DateTime {
         if sec > 0 {
             self.add(Duration::from_secs(sec as u64))
         } else {
-            self.sub(Duration::from_secs(sec as u64))
+            self.sub(Duration::from_secs((-sec) as u64))
         }
     }
 

@@ -211,3 +211,11 @@ fn test_add_day() {
     let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_day(1));
     assert_eq!(date.to_string(), "2013-10-07 00:00:00");
 }
+
+#[test]
+fn test_add_sub_sec() {
+    let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(1);
+    assert_eq!(date.to_string(), "2013-10-06 00:00:01");
+    let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
+    assert_eq!(date.to_string(), "2013-10-05 23:59:59");
+}
