@@ -2,6 +2,7 @@
 fastdate of Any RFC3339Micro
 
 this date cartes is very fast(<= 50ns) including 
+* offset_sec()
 * from_str("2022-12-13 11:12:14.123456")
 * now()
 * utc()
@@ -89,5 +90,7 @@ fn main(){
     let timestamp = DateTime::now().unix_timestamp_nano();
     //from unix_timestamp_nano
     let datetime = DateTime::from_timestamp_nano(timestamp);
+    //sum Greenwich Mean Time (GMT) from datetime
+    let time_gmt = DateTime::now().sub(Duration::from_secs(offset_sec() as u64));
 }
 ```
