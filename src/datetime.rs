@@ -442,8 +442,7 @@ impl From<SystemTime> for DateTime {
 
 impl From<DateTime> for SystemTime {
     fn from(v: DateTime) -> SystemTime {
-        let leap_years =
-            ((v.year - 1) - 1968) / 4 - ((v.year - 1) - 1900) / 100 + ((v.year - 1) - 1600) / 400;
+        let leap_years = ((v.year as i16 - 1) - 1968) / 4 - ((v.year as i16 - 1) - 1900) / 100 + ((v.year as i16 - 1) - 1600) / 400;
         let mut ydays = match v.mon {
             1 => 0,
             2 => 31,
@@ -463,15 +462,24 @@ impl From<DateTime> for SystemTime {
         if is_leap_year(v.year) && v.mon > 2 {
             ydays += 1;
         }
-        let days = (v.year as u64 - 1970) * 365 + leap_years as u64 + ydays;
-        let sec = Duration::from_secs(
-            v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days * 86400,
-        );
+        let days = (v.year as i64 - 1970) * 365 + leap_years as i64 + ydays as i64;
+
+        let mut t;
         if v.nano > 0 {
-            UNIX_EPOCH + sec + Duration::from_nanos(v.nano as u64)
+            t = UNIX_EPOCH + Duration::from_nanos(v.nano as u64)
         } else {
-            UNIX_EPOCH + sec - Duration::from_nanos(v.nano as u64)
+            t = UNIX_EPOCH - Duration::from_nanos(v.nano as u64)
         }
+        if days >= 0 {
+            t = t + Duration::from_secs(
+                v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days as u64 * 86400,
+            );
+        } else {
+            t = t - Duration::from_secs(
+                v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + (-days) as u64 * 86400,
+            );
+        }
+        t
     }
 }
 
