@@ -22,7 +22,7 @@ pub fn offset_sec() -> i32 {
 /// Parse using `FromStr` impl.
 /// Format using the `Display` trait.
 /// Convert timestamp into/from `SystemTime` to use.
-/// Supports comparsion and sorting.
+/// Supports compare and sorting.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct DateTime {
     /// 0...999999999
