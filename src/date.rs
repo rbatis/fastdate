@@ -9,7 +9,7 @@ use crate::error::Error;
 ///
 /// Parse using `FromStr` impl.
 /// Format using the `Display` trait.
-/// Convert timestamp into/from `SytemTime` to use.
+/// Convert timestamp into/from `SystemTime` to use.
 /// Supports comparsion and sorting.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Date {
