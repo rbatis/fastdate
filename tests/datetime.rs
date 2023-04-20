@@ -1,4 +1,4 @@
-use fastdate::{Date, DateTime, DurationFrom, Time};
+use fastdate::{Date, DateTime, DurationFrom, is_leap_year, Time};
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -50,6 +50,19 @@ fn test_timestamp_befor_epoch() {
     let before = -243333936;//1962-04-16 23:14:24
     let date = DateTime::from_timestamp(before);
     assert_eq!(date.to_string(), "1962-04-16 23:14:24");
+}
+
+#[test]
+fn test_is_leap_year() {
+    println!("is_leap_year 1968={}",is_leap_year(1968));
+    println!("is_leap_year 1969={}",is_leap_year(1969));
+    println!("is_leap_year 1970={}",is_leap_year(1970));
+    println!("is_leap_year 1971={}",is_leap_year(1971));
+    println!("is_leap_year 1972={}",is_leap_year(1972));
+    println!("is_leap_year 1973={}",is_leap_year(1973));
+    println!("is_leap_year 1974={}",is_leap_year(1974));
+    println!("is_leap_year 1975={}",is_leap_year(1975));
+    println!("is_leap_year 1976={}",is_leap_year(1976));
 }
 
 #[test]

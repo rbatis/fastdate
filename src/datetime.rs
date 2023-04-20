@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::sys::Timespec;
-use crate::{Date, Time};
+use crate::{Date, DurationFrom, Time};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
@@ -366,86 +366,151 @@ impl Sub<DateTime> for DateTime {
 }
 
 //平年
-const MON1: [i32; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const MON1: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //闰年
-const MON2: [i32; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const MON2: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //每个四年的总天数
-const FOUR_YEAR: i32 = 366 + 365 + 365 + 365;
+const FOUR_YEAR: u64 = 366 + 365 + 365 + 365;
 
+fn find_mon_day(is_leap_year: bool, days: u64) -> (u64, u64) {
+    let mons = {
+        if is_leap_year {
+            MON2
+        } else {
+            MON1
+        }
+    };
+    let mon11 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8] + mons[9] + mons[10];
+    let mon10 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8] + mons[9];
+    let mon9 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8];
+    let mon8 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7];
+    let mon7 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6];
+    let mon6 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5];
+    let mon5 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4];
+    let mon4 = mons[0] + mons[1] + mons[2] + mons[3];
+    let mon3 = mons[0] + mons[1] + mons[2];
+    let mon2 = mons[0] + mons[1];
+    let mon1 = mons[0];
+    if days > mon11 {
+        let mon = 12 as u64;
+        let day = days - mon11;
+        return (mon, day);
+    } else if days > mon10 {
+        let mon = 11 as u64;
+        let day = days - mon10;
+        return (mon, day);
+    } else if days > mon9 {
+        let mon = 10 as u64;
+        let day = days - mon9;
+        return (mon, day);
+    } else if days > mon8 {
+        let mon = 9 as u64;
+        let day = days - mon8;
+        return (mon, day);
+    } else if days > mon7 {
+        let mon = 8 as u64;
+        let day = days - mon7;
+        return (mon, day);
+    } else if days > mon6 {
+        let mon = 7 as u64;
+        let day = days - mon6;
+        return (mon, day);
+    } else if days > mon5 {
+        let mon = 6 as u64;
+        let day = days - mon5;
+        return (mon, day);
+    } else if days > mon4 {
+        let mon = 5 as u64;
+        let day = days - mon4;
+        return (mon, day);
+    } else if days > mon3 {
+        let mon = 4 as u64;
+        let day = days - mon3;
+        return (mon, day);
+    } else if days > mon2 {
+        let mon = 3 as u64;
+        let day = days - mon2;
+        return (mon, day);
+    } else if days > mon1 {
+        let mon = 2 as u64;
+        let day = days - mon1;
+        return (mon, day);
+    } else {
+        let mon = 1 as u64;
+        let day = days;
+        return (mon, day);
+    }
+}
+
+// is_leap_year 1968=true
+// is_leap_year 1969=false
+// is_leap_year 1970=false
+// is_leap_year 1971=false
+// is_leap_year 1972=true
+// is_leap_year 1973=false
+// is_leap_year 1974=false
+// is_leap_year 1975=false
+// is_leap_year 1976=true
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
-        let dur = v
-            .duration_since(UNIX_EPOCH)
-            .expect("all times should be after the epoch");
-        let secs_since_epoch = dur.as_secs();
-
-        if secs_since_epoch >= 253402300800 {
-            // year 9999
-            panic!("date must be before year 9999");
-        }
-
-        /* 2000-03-01 (mod 400 year, immediately after feb29 */
-        const LEAPOCH: i64 = 11017;
-        const DAYS_PER_400Y: i64 = 365 * 400 + 97;
-        const DAYS_PER_100Y: i64 = 365 * 100 + 24;
-        const DAYS_PER_4Y: i64 = 365 * 4 + 1;
-
-        let days = (secs_since_epoch / 86400) as i64 - LEAPOCH;
-        let secs_of_day = secs_since_epoch % 86400;
-
-        let mut qc_cycles = days / DAYS_PER_400Y;
-        let mut remdays = days % DAYS_PER_400Y;
-
-        if remdays < 0 {
-            remdays += DAYS_PER_400Y;
-            qc_cycles -= 1;
-        }
-
-        let mut c_cycles = remdays / DAYS_PER_100Y;
-        if c_cycles == 4 {
-            c_cycles -= 1;
-        }
-        remdays -= c_cycles * DAYS_PER_100Y;
-
-        let mut q_cycles = remdays / DAYS_PER_4Y;
-        if q_cycles == 25 {
-            q_cycles -= 1;
-        }
-        remdays -= q_cycles * DAYS_PER_4Y;
-
-        let mut remyears = remdays / 365;
-        if remyears == 4 {
-            remyears -= 1;
-        }
-        remdays -= remyears * 365;
-
-        let mut year = 2000 + remyears + 4 * q_cycles + 100 * c_cycles + 400 * qc_cycles;
-
-        let months = [31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 29];
-        let mut mon = 0;
-        for mon_len in months.iter() {
-            mon += 1;
-            if remdays < *mon_len {
-                break;
+        let year_1968 = UNIX_EPOCH - Duration::from_day(365) - Duration::from_day(366);
+        if v >= year_1968 {
+            let dur = v.duration_since(year_1968).unwrap_or_default();
+            let sec = dur.as_secs();
+            let days = sec / (24 * 3600);
+            let num_four = days / (FOUR_YEAR as u64);
+            let mut leap_index = 0;//[leap year,year,year,year]
+            let mut year = 1968 + num_four * 4;
+            let remain_days = days - num_four * (FOUR_YEAR as u64);
+            if days % (FOUR_YEAR as u64) != 0 {
+                if remain_days > (366 + 365 + 365) {
+                    year += 3;
+                    leap_index = 3;
+                } else if remain_days > (366 + 365) {
+                    year += 2;
+                    leap_index = 2;
+                } else if remain_days > (366) {
+                    year += 1;
+                    leap_index = 1;
+                } else {
+                    leap_index = 0;
+                }
             }
-            remdays -= *mon_len;
-        }
-        let mday = remdays + 1;
-        let mon = if mon + 2 > 12 {
-            year += 1;
-            mon - 10
+            println!("year={}", year);
+            match leap_index {
+                0 => {
+                    let day = remain_days;
+                    let (mon, day) = find_mon_day(true, day);
+                    println!("{},{}", mon, day);
+                }
+                1 => {
+                    let day = remain_days - 366;
+                    let (mon, day) = find_mon_day(false, day);
+                    println!("{},{}", mon, day);
+                }
+                2 => {
+                    let day = remain_days - 366 - 365;
+                    let (mon, day) = find_mon_day(false, day);
+                    println!("{},{}", mon, day);
+                }
+                3 => {
+                    let day = remain_days - 366 - 365 - 365;
+                    let (mon, day) = find_mon_day(false, day);
+                    println!("{},{}", mon, day);
+                }
+                _ => {}
+            }
         } else {
-            mon + 2
-        };
-
+            let dur = year_1968.duration_since(v).unwrap_or_default();
+        }
         DateTime {
-            nano: (dur - Duration::from_secs(dur.as_secs())).as_nanos() as u32,
-            sec: (secs_of_day % 60) as u8,
-            min: ((secs_of_day % 3600) / 60) as u8,
-            hour: (secs_of_day / 3600) as u8,
-            day: mday as u8,
-            mon: mon as u8,
-            year: year as u16,
+            nano: 0,
+            sec: 0,
+            min: 0,
+            hour: 0,
+            day: 0,
+            mon: 0,
+            year: 0,
         }
     }
 }
@@ -628,7 +693,7 @@ impl PartialOrd for DateTime {
     }
 }
 
-fn is_leap_year(y: u16) -> bool {
+pub fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
