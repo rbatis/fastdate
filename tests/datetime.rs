@@ -46,6 +46,13 @@ fn test_timestamp() {
 }
 
 #[test]
+fn test_timestamp_befor_epoch() {
+    let before = -243333936;//1962-04-16 23:14:24
+    let date = DateTime::from_timestamp(before);
+    assert_eq!(date.to_string(), "1962-04-16 23:14:24");
+}
+
+#[test]
 fn test_timestamp_micros() {
     let mut now = DateTime::utc();
     now.nano = 0;

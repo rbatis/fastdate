@@ -133,8 +133,11 @@ impl DateTime {
 
     ///from timestamp sec
     pub fn from_timestamp(sec: i64) -> DateTime {
-        let v = UNIX_EPOCH + Duration::from_secs(sec as u64);
-        Self::from(v)
+        if sec > 0 {
+            Self::from(UNIX_EPOCH + Duration::from_secs(sec as u64))
+        } else {
+            Self::from(UNIX_EPOCH - Duration::from_secs(-sec as u64))
+        }
     }
     ///from timestamp micros
     pub fn from_timestamp_micros(micros: i64) -> DateTime {
@@ -361,6 +364,13 @@ impl Sub<DateTime> for DateTime {
         Duration::from_nanos(nano as u64)
     }
 }
+
+//平年
+const MON1: [i32; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//闰年
+const MON2: [i32; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//每个四年的总天数
+const FOUR_YEAR: i32 = 366 + 365 + 365 + 365;
 
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
