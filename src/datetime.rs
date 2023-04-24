@@ -366,18 +366,18 @@ impl Sub<DateTime> for DateTime {
 }
 
 //平年
-const MON1: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const DefaultYear: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //闰年
-const MON2: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const LeapYear: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //每个四年的总天数
 const FOUR_YEAR: u64 = 366 + 365 + 365 + 365;
 
 fn find_mon_day(is_leap_year: bool, days: u64) -> (u64, u64) {
     let mons = {
         if is_leap_year {
-            MON2
+            LeapYear
         } else {
-            MON1
+            DefaultYear
         }
     };
     let mon11 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8] + mons[9] + mons[10];
@@ -693,9 +693,7 @@ impl PartialOrd for DateTime {
     }
 }
 
-pub fn is_leap_year(y: u16) -> bool {
-    y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
-}
+
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -714,5 +712,59 @@ impl<'de> Deserialize<'de> for DateTime {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
         DateTime::from_str(&s).map_err(|e| D::Error::custom(e))
+    }
+}
+
+
+pub fn is_leap_year(y: u16) -> bool {
+    y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
+}
+
+pub fn sum_datetime(s: SystemTime) -> DateTime {
+    let d = s.duration_since(UNIX_EPOCH).unwrap();
+    let mut total_days = d.as_secs() / (24 * 3600);
+    let total_years = total_days / 365;
+    let mut current_year = 1970;
+    let mut current_year_is_leap_year = false;
+    let mut mon = 0;
+    for _ in 0..total_years {
+        current_year += 1;
+        current_year_is_leap_year = is_leap_year(current_year as u16);
+        if current_year_is_leap_year {
+            total_days -= 366;
+        } else {
+            total_days -= 365;
+        }
+        if total_days < 365 {
+            break;
+        }
+    }
+    if current_year_is_leap_year {
+        for m in LeapYear {
+            mon += 1;
+            if total_days > m {
+                total_days -= m;
+            } else {
+                break;
+            }
+        }
+    } else {
+        for m in DefaultYear {
+            mon += 1;
+            if total_days > m {
+                total_days -= m;
+            } else {
+                break;
+            }
+        }
+    }
+    DateTime {
+        nano: 0,
+        sec: 0,
+        min: 0,
+        hour: 0,
+        day: total_days as u8,
+        mon: mon,
+        year: current_year as u16,
     }
 }

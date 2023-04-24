@@ -1,6 +1,6 @@
-use fastdate::{Date, DateTime, DurationFrom, is_leap_year, Time};
+use fastdate::{Date, DateTime, DurationFrom, is_leap_year, sum_datetime, Time};
 use std::str::FromStr;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 #[test]
 fn test_other_space() {
@@ -238,4 +238,10 @@ fn test_add_sub_sec() {
     assert_eq!(date.to_string(), "2013-10-06 00:00:01");
     let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
     assert_eq!(date.to_string(), "2013-10-05 23:59:59");
+}
+
+#[test]
+fn test_sum_datetime(){
+    let dt= sum_datetime(SystemTime::now());
+    println!("{}",dt);
 }
