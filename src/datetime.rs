@@ -437,7 +437,9 @@ impl From<DateTime> for SystemTime {
         let mut mon = 1;
         for i in years {
             if mon == v.mon {
-                r = r + Duration::from_secs((v.day - 1) as u64 * 24 * 3600);
+                if v.day > 0 {
+                    r = r + Duration::from_secs((v.day - 1) as u64 * 24 * 3600);
+                }
                 break;
             }
             r = r + Duration::from_secs(i * 24 * 3600);
