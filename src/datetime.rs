@@ -440,17 +440,14 @@ impl From<DateTime> for SystemTime {
         for i in years {
             if mon == v.mon {
                 if v.day > 0 {
-                    mon_day_secs +=(v.day - 1) as u64 * 24 * 3600;
+                    mon_day_secs += (v.day - 1) as u64 * 24 * 3600;
                 }
                 break;
             }
-            mon_day_secs +=i * 24 * 3600;
+            mon_day_secs += i * 24 * 3600;
             mon += 1;
         }
-        r = r + Duration::from_secs(mon_day_secs);
-        r = r + Duration::from_secs(v.hour as u64 * 3600);
-        r = r + Duration::from_secs(v.min as u64 * 60);
-        r = r + Duration::from_secs(v.sec as u64);
+        r = r + Duration::from_secs(mon_day_secs + v.hour as u64 * 3600 + v.min as u64 * 60 + v.sec as u64);
         r = r + Duration::from_nanos(v.nano as u64);
         r
     }
