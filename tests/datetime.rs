@@ -1,6 +1,6 @@
-use fastdate::{Date, DateTime, DurationFrom, is_leap_year, sum_datetime, Time};
+use fastdate::{Date, DateTime, DurationFrom, is_leap_year, Time};
 use std::str::FromStr;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration};
 
 #[test]
 fn test_other_space() {
@@ -47,9 +47,9 @@ fn test_timestamp() {
 
 #[test]
 fn test_timestamp_befor_epoch() {
-    let before = -243333936;//1962-04-16 23:14:24
-    let date = DateTime::from_timestamp(before);
-    assert_eq!(date.to_string(), "1962-04-16 23:14:24");
+    let before = -5259600000;//1969-11-01 03:00:00
+    let date = DateTime::from_timestamp_millis(before);
+    assert_eq!(date.to_string(), "1969-11-01 03:00:00");
 }
 
 #[test]
@@ -238,10 +238,4 @@ fn test_add_sub_sec() {
     assert_eq!(date.to_string(), "2013-10-06 00:00:01");
     let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
     assert_eq!(date.to_string(), "2013-10-05 23:59:59");
-}
-
-#[test]
-fn test_sum_datetime(){
-    let dt= sum_datetime(SystemTime::now());
-    println!("{}",dt);
 }

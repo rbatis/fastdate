@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::sys::Timespec;
-use crate::{Date, DurationFrom, Time};
+use crate::{Date, Time};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
@@ -101,34 +101,53 @@ impl DateTime {
 
     /// unix_timestamp sec
     pub fn unix_timestamp(&self) -> i64 {
-        let s = SystemTime::from(self.clone())
-            .duration_since(UNIX_EPOCH)
-            .expect("all times should be after the epoch");
-        return s.as_secs() as i64;
+        if self.year >= 1970 {
+            SystemTime::from(self.clone())
+                .duration_since(UNIX_EPOCH)
+                .expect("duration_since fail").as_secs() as i64
+        } else {
+            -(UNIX_EPOCH.duration_since(SystemTime::from(self.clone()))
+                .expect("duration_since fail").as_secs() as i64)
+        }
     }
 
     ///unix_timestamp micros
     pub fn unix_timestamp_micros(&self) -> i64 {
-        let s = SystemTime::from(self.clone())
-            .duration_since(UNIX_EPOCH)
-            .expect("all times should be after the epoch");
-        return s.as_micros() as i64;
+        if self.year >= 1970 {
+            SystemTime::from(self.clone())
+                .duration_since(UNIX_EPOCH)
+                .expect("duration_since fail").as_micros() as i64
+        } else {
+            -(UNIX_EPOCH.duration_since(SystemTime::from(self.clone()))
+                .expect("duration_since fail").as_micros() as i64)
+        }
     }
 
     ///unix_timestamp millis
     pub fn unix_timestamp_millis(&self) -> i64 {
-        let s = SystemTime::from(self.clone())
-            .duration_since(UNIX_EPOCH)
-            .expect("all times should be after the epoch");
-        return s.as_millis() as i64;
+        if self.year >= 1970 {
+            SystemTime::from(self.clone())
+                .duration_since(UNIX_EPOCH)
+                .expect("duration_since fail").as_millis() as i64
+        } else {
+            -(UNIX_EPOCH
+                .duration_since(SystemTime::from(self.clone()))
+                .expect("duration_since fail").as_millis() as i64)
+        }
     }
 
     ///unix_timestamp nano
-    pub fn unix_timestamp_nano(&self) -> u128 {
-        let s = SystemTime::from(self.clone())
-            .duration_since(UNIX_EPOCH)
-            .expect("all times should be after the epoch");
-        return s.as_nanos();
+    pub fn unix_timestamp_nano(&self) -> i128 {
+        if self.year >= 1970 {
+            SystemTime::from(self.clone())
+                .duration_since(UNIX_EPOCH)
+                .expect("duration_since fail")
+                .as_nanos() as i128
+        } else {
+            -(UNIX_EPOCH.duration_since(SystemTime::from(self.clone()))
+                .expect("duration_since fail")
+                .as_nanos() as i128)
+        }
     }
 
     ///from timestamp sec
@@ -136,23 +155,32 @@ impl DateTime {
         if sec > 0 {
             Self::from(UNIX_EPOCH + Duration::from_secs(sec as u64))
         } else {
-            Self::from(UNIX_EPOCH - Duration::from_secs(-sec as u64))
+            Self::from(UNIX_EPOCH - Duration::from_secs((-sec) as u64))
         }
     }
     ///from timestamp micros
     pub fn from_timestamp_micros(micros: i64) -> DateTime {
-        let v = UNIX_EPOCH + Duration::from_micros(micros as u64);
-        Self::from(v)
+        if micros > 0 {
+            Self::from(UNIX_EPOCH + Duration::from_micros(micros as u64))
+        } else {
+            Self::from(UNIX_EPOCH - Duration::from_micros((-micros) as u64))
+        }
     }
     ///from timestamp millis
     pub fn from_timestamp_millis(ms: i64) -> DateTime {
-        let v = UNIX_EPOCH + Duration::from_millis(ms as u64);
-        Self::from(v)
+        if ms > 0 {
+            Self::from(UNIX_EPOCH + Duration::from_millis(ms as u64))
+        } else {
+            Self::from(UNIX_EPOCH - Duration::from_millis((-ms) as u64))
+        }
     }
     ///from timestamp nano
-    pub fn from_timestamp_nano(nano: u128) -> DateTime {
-        let v = UNIX_EPOCH + Duration::from_nanos(nano as u64);
-        Self::from(v)
+    pub fn from_timestamp_nano(nano: i128) -> DateTime {
+        if nano > 0 {
+            Self::from(UNIX_EPOCH + Duration::from_nanos(nano as u64))
+        } else {
+            Self::from(UNIX_EPOCH - Duration::from_nanos((-nano) as u64))
+        }
     }
 
     /// parse an string by format.
@@ -365,150 +393,9 @@ impl Sub<DateTime> for DateTime {
     }
 }
 
-
-//每个四年的总天数
-const FOUR_YEAR: u64 = 366 + 365 + 365 + 365;
-
-fn find_mon_day(is_leap_year: bool, days: u64) -> (u64, u64) {
-    let mons = {
-        if is_leap_year {
-            LeapYear
-        } else {
-            DefaultYear
-        }
-    };
-    let mon11 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8] + mons[9] + mons[10];
-    let mon10 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8] + mons[9];
-    let mon9 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7] + mons[8];
-    let mon8 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6] + mons[7];
-    let mon7 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5] + mons[6];
-    let mon6 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4] + mons[5];
-    let mon5 = mons[0] + mons[1] + mons[2] + mons[3] + mons[4];
-    let mon4 = mons[0] + mons[1] + mons[2] + mons[3];
-    let mon3 = mons[0] + mons[1] + mons[2];
-    let mon2 = mons[0] + mons[1];
-    let mon1 = mons[0];
-    if days > mon11 {
-        let mon = 12 as u64;
-        let day = days - mon11;
-        return (mon, day);
-    } else if days > mon10 {
-        let mon = 11 as u64;
-        let day = days - mon10;
-        return (mon, day);
-    } else if days > mon9 {
-        let mon = 10 as u64;
-        let day = days - mon9;
-        return (mon, day);
-    } else if days > mon8 {
-        let mon = 9 as u64;
-        let day = days - mon8;
-        return (mon, day);
-    } else if days > mon7 {
-        let mon = 8 as u64;
-        let day = days - mon7;
-        return (mon, day);
-    } else if days > mon6 {
-        let mon = 7 as u64;
-        let day = days - mon6;
-        return (mon, day);
-    } else if days > mon5 {
-        let mon = 6 as u64;
-        let day = days - mon5;
-        return (mon, day);
-    } else if days > mon4 {
-        let mon = 5 as u64;
-        let day = days - mon4;
-        return (mon, day);
-    } else if days > mon3 {
-        let mon = 4 as u64;
-        let day = days - mon3;
-        return (mon, day);
-    } else if days > mon2 {
-        let mon = 3 as u64;
-        let day = days - mon2;
-        return (mon, day);
-    } else if days > mon1 {
-        let mon = 2 as u64;
-        let day = days - mon1;
-        return (mon, day);
-    } else {
-        let mon = 1 as u64;
-        let day = days;
-        return (mon, day);
-    }
-}
-
-// is_leap_year 1968=true
-// is_leap_year 1969=false
-// is_leap_year 1970=false
-// is_leap_year 1971=false
-// is_leap_year 1972=true
-// is_leap_year 1973=false
-// is_leap_year 1974=false
-// is_leap_year 1975=false
-// is_leap_year 1976=true
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
-        let year_1968 = UNIX_EPOCH - Duration::from_day(365) - Duration::from_day(366);
-        if v >= year_1968 {
-            let dur = v.duration_since(year_1968).unwrap_or_default();
-            let sec = dur.as_secs();
-            let days = sec / (24 * 3600);
-            let num_four = days / (FOUR_YEAR as u64);
-            let mut leap_index = 0;//[leap year,year,year,year]
-            let mut year = 1968 + num_four * 4;
-            let remain_days = days - num_four * (FOUR_YEAR as u64);
-            if days % (FOUR_YEAR as u64) != 0 {
-                if remain_days > (366 + 365 + 365) {
-                    year += 3;
-                    leap_index = 3;
-                } else if remain_days > (366 + 365) {
-                    year += 2;
-                    leap_index = 2;
-                } else if remain_days > (366) {
-                    year += 1;
-                    leap_index = 1;
-                } else {
-                    leap_index = 0;
-                }
-            }
-            println!("year={}", year);
-            match leap_index {
-                0 => {
-                    let day = remain_days;
-                    let (mon, day) = find_mon_day(true, day);
-                    println!("{},{}", mon, day);
-                }
-                1 => {
-                    let day = remain_days - 366;
-                    let (mon, day) = find_mon_day(false, day);
-                    println!("{},{}", mon, day);
-                }
-                2 => {
-                    let day = remain_days - 366 - 365;
-                    let (mon, day) = find_mon_day(false, day);
-                    println!("{},{}", mon, day);
-                }
-                3 => {
-                    let day = remain_days - 366 - 365 - 365;
-                    let (mon, day) = find_mon_day(false, day);
-                    println!("{},{}", mon, day);
-                }
-                _ => {}
-            }
-        } else {
-            let dur = year_1968.duration_since(v).unwrap_or_default();
-        }
-        DateTime {
-            nano: 0,
-            sec: 0,
-            min: 0,
-            hour: 0,
-            day: 0,
-            mon: 0,
-            year: 0,
-        }
+        DateTime::from_system_time(v)
     }
 }
 
@@ -535,7 +422,6 @@ impl From<DateTime> for SystemTime {
             ydays += 1;
         }
         let days = (v.year as i64 - 1970) * 365 + leap_years as i64 + ydays as i64;
-
         let mut t;
         if v.nano > 0 {
             t = UNIX_EPOCH + Duration::from_nanos(v.nano as u64)
@@ -712,69 +598,96 @@ impl<'de> Deserialize<'de> for DateTime {
 }
 
 
-//平年
-static DefaultYear: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-//闰年
-static LeapYear: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//DEFAULT_YEAR
+static DEFAULT_YEAR: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//LEAP_YEAR
+static LEAP_YEAR: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//Day num
+static DAY: u128 = 24 * 60 * 60 * 1000000000;
 
 pub fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
-pub fn sum_datetime(s: SystemTime) -> DateTime {
-    let d = s.duration_since(UNIX_EPOCH).unwrap();
-    let days = d.as_secs() / (24 * 3600);
-    let mut total_days = days;
-    if d.as_secs() % (24 * 3600) > 0 {
-        total_days += 1;
-    }
-    let total_years = total_days / 365;
-    let mut current_year = 1970;
-    let mut current_year_is_leap_year = false;
-    let mut mon = 0;
-    for _ in 0..total_years {
-        current_year += 1;
-        current_year_is_leap_year = is_leap_year(current_year as u16);
-        if current_year_is_leap_year {
-            total_days -= 366;
+impl DateTime {
+    pub fn from_system_time(s: SystemTime) -> Self {
+        let mut dt = Self {
+            nano: 0,
+            sec: 0,
+            min: 0,
+            hour: 0,
+            day: 0,
+            mon: 0,
+            year: 0000,
+        };
+        let d;
+        if s < UNIX_EPOCH {
+            d = UNIX_EPOCH.duration_since(s).unwrap();
+            dt.year = 1969;
         } else {
-            total_days -= 365;
+            d = s.duration_since(UNIX_EPOCH).unwrap();
+            dt.year = 1970;
         }
-        if total_days < 365 {
-            break;
-        }
-    }
-    if current_year_is_leap_year {
-        for m in LeapYear {
-            mon += 1;
-            if total_days > m {
-                total_days -= m;
+        let mut remain = d.as_nanos();
+        let total_years = d.as_secs() / (365 * 24 * 3600) + 1;
+        for _ in 0..total_years {
+            if is_leap_year(dt.year) {
+                if remain > (366 * DAY) {
+                    remain -= 366 * DAY;
+                } else {
+                    break;
+                }
             } else {
+                if remain > (365 * DAY) {
+                    remain -= 365 * DAY;
+                } else {
+                    break;
+                }
+            }
+            if s < UNIX_EPOCH {
+                dt.year -= 1;
+            } else {
+                dt.year += 1;
+            }
+        }
+        let mons;
+        if is_leap_year(dt.year) {
+            mons = LEAP_YEAR;
+        } else {
+            mons = DEFAULT_YEAR;
+        }
+        //mon-day
+        if s < UNIX_EPOCH {
+            let mut t: u128 = 0;
+            for m in mons {
+                t += m as u128 * 24 * 3600 * 1000000000;
+            }
+            remain = t - remain;
+        }
+        let mut mon = 0;
+        for m in mons {
+            mon += 1;
+            let mon_days = m as u128 * 24 * 3600 * 1000000000;
+            if remain > mon_days {
+                remain = remain.sub(mon_days);
+                dt.mon = mon;
+            } else {
+                dt.mon = mon;
+                for _ in 0..m {
+                    if remain < DAY {
+                        dt.day += 1;
+                        break;
+                    }
+                    remain = remain.sub(DAY);
+                    dt.day += 1;
+                }
                 break;
             }
         }
-    } else {
-        for m in DefaultYear {
-            mon += 1;
-            if total_days > m {
-                total_days -= m;
-            } else {
-                break;
-            }
-        }
-    }
-    let left = d - Duration::from_secs(3600 * days * 24);
-    let hour = left.as_secs() / (60 * 60);
-    let min = (left - Duration::from_secs(hour * (60 * 60))).as_secs() / 60;
-    let sec = (left - Duration::from_secs(hour * (60 * 60)) - Duration::from_secs(min * 60)).as_secs();
-    let nano = (left - Duration::from_secs(hour * (60 * 60)) - Duration::from_secs(min * 60) - Duration::from_secs(sec)).as_nanos();
-    DateTime {
-        nano: nano as u32,
-        sec: sec as u8,
-        min: min as u8,
-        hour: hour as u8,
-        day: total_days as u8,
-        mon: mon,
-        year: current_year as u16,
+        dt.hour = ((remain / 1000000000) / 3600) as u8;
+        dt.min = ((remain - dt.hour as u128 * 3600 * 1000000000) / (60 * 1000000000)) as u8;
+        dt.sec = ((remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000) / 1000000000) as u8;
+        dt.nano = (remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000 - dt.sec as u128 * 1000000000) as u32;
+        dt
     }
 }
