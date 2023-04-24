@@ -409,23 +409,24 @@ impl From<DateTime> for SystemTime {
             years = 1970 - v.year;
         }
         if years > 1 {
+            let mut days = 0;
             for idx in 0..years {
                 let y;
                 if v.year >= 1970 {
                     y = 1970 + (idx + 1);
-                    if is_leap_year(y) {
-                        r = r + Duration::from_secs(366 * 24 * 3600);
-                    } else {
-                        r = r + Duration::from_secs(365 * 24 * 3600);
-                    }
                 } else {
                     y = 1970 - (idx + 1);
-                    if is_leap_year(y) {
-                        r = r - Duration::from_secs(366 * 24 * 3600);
-                    } else {
-                        r = r - Duration::from_secs(365 * 24 * 3600);
-                    }
                 }
+                if is_leap_year(y) {
+                    days += 366;
+                } else {
+                    days += 365;
+                }
+            }
+            if v.year >= 1970 {
+                r = r + Duration::from_secs(days * 24 * 3600);
+            } else {
+                r = r - Duration::from_secs(days * 24 * 3600);
             }
         }
         let years;
@@ -435,16 +436,18 @@ impl From<DateTime> for SystemTime {
             years = DEFAULT_YEAR;
         }
         let mut mon = 1;
+        let mut mon_day_secs = 0;
         for i in years {
             if mon == v.mon {
                 if v.day > 0 {
-                    r = r + Duration::from_secs((v.day - 1) as u64 * 24 * 3600);
+                    mon_day_secs +=(v.day - 1) as u64 * 24 * 3600;
                 }
                 break;
             }
-            r = r + Duration::from_secs(i * 24 * 3600);
+            mon_day_secs +=i * 24 * 3600;
             mon += 1;
         }
+        r = r + Duration::from_secs(mon_day_secs);
         r = r + Duration::from_secs(v.hour as u64 * 3600);
         r = r + Duration::from_secs(v.min as u64 * 60);
         r = r + Duration::from_secs(v.sec as u64);
