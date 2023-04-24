@@ -624,6 +624,7 @@ pub fn is_leap_year(y: u16) -> bool {
 
 impl DateTime {
     pub fn from_system_time(s: SystemTime) -> Self {
+        let is_less = s < UNIX_EPOCH;
         let mut dt = Self {
             nano: 0,
             sec: 0,
@@ -634,7 +635,7 @@ impl DateTime {
             year: 0000,
         };
         let d;
-        if s < UNIX_EPOCH {
+        if is_less {
             d = UNIX_EPOCH.duration_since(s).unwrap();
             dt.year = 1969;
         } else {
@@ -657,7 +658,7 @@ impl DateTime {
                     break;
                 }
             }
-            if s < UNIX_EPOCH {
+            if is_less {
                 dt.year -= 1;
             } else {
                 dt.year += 1;
@@ -670,7 +671,7 @@ impl DateTime {
             mons = DEFAULT_YEAR;
         }
         //mon-day
-        if s < UNIX_EPOCH {
+        if is_less {
             let mut t: u128 = 0;
             for m in mons {
                 t += m as u128 * 24 * 3600 * 1000000000;
