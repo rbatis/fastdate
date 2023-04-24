@@ -365,10 +365,7 @@ impl Sub<DateTime> for DateTime {
     }
 }
 
-//平年
-const DefaultYear: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-//闰年
-const LeapYear: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 //每个四年的总天数
 const FOUR_YEAR: u64 = 366 + 365 + 365 + 365;
 
@@ -694,7 +691,6 @@ impl PartialOrd for DateTime {
 }
 
 
-
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where
@@ -716,13 +712,22 @@ impl<'de> Deserialize<'de> for DateTime {
 }
 
 
+//平年
+static DefaultYear: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+//闰年
+static LeapYear: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 pub fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
 pub fn sum_datetime(s: SystemTime) -> DateTime {
     let d = s.duration_since(UNIX_EPOCH).unwrap();
-    let mut total_days = d.as_secs() / (24 * 3600);
+    let days = d.as_secs() / (24 * 3600);
+    let mut total_days = days;
+    if d.as_secs() % (24 * 3600) > 0 {
+        total_days += 1;
+    }
     let total_years = total_days / 365;
     let mut current_year = 1970;
     let mut current_year_is_leap_year = false;
@@ -758,11 +763,16 @@ pub fn sum_datetime(s: SystemTime) -> DateTime {
             }
         }
     }
+    let left = d - Duration::from_secs(3600 * days * 24);
+    let hour = left.as_secs() / (60 * 60);
+    let min = (left - Duration::from_secs(hour * (60 * 60))).as_secs() / 60;
+    let sec = (left - Duration::from_secs(hour * (60 * 60)) - Duration::from_secs(min * 60)).as_secs();
+    let nano = (left - Duration::from_secs(hour * (60 * 60)) - Duration::from_secs(min * 60) - Duration::from_secs(sec)).as_nanos();
     DateTime {
-        nano: 0,
-        sec: 0,
-        min: 0,
-        hour: 0,
+        nano: nano as u32,
+        sec: sec as u8,
+        min: min as u8,
+        hour: hour as u8,
         day: total_days as u8,
         mon: mon,
         year: current_year as u16,
