@@ -617,6 +617,7 @@ static LEAP_YEAR: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //Day num
 static DAY: u128 = 24 * 60 * 60 * 1000000000;
 
+#[inline]
 pub fn is_leap_year(y: u16) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
