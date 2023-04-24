@@ -401,43 +401,53 @@ impl From<SystemTime> for DateTime {
 
 impl From<DateTime> for SystemTime {
     fn from(v: DateTime) -> SystemTime {
-        let leap_years = ((v.year as i16 - 1) - 1968) / 4 - ((v.year as i16 - 1) - 1900) / 100 + ((v.year as i16 - 1) - 1600) / 400;
-        let mut ydays = match v.mon {
-            1 => 0,
-            2 => 31,
-            3 => 59,
-            4 => 90,
-            5 => 120,
-            6 => 151,
-            7 => 181,
-            8 => 212,
-            9 => 243,
-            10 => 273,
-            11 => 304,
-            12 => 334,
-            _ => unreachable!(),
-        } + v.day as u64
-            - 1;
-        if is_leap_year(v.year) && v.mon > 2 {
-            ydays += 1;
-        }
-        let days = (v.year as i64 - 1970) * 365 + leap_years as i64 + ydays as i64;
-        let mut t;
-        if v.nano > 0 {
-            t = UNIX_EPOCH + Duration::from_nanos(v.nano as u64)
+        let mut r = UNIX_EPOCH;
+        let mut years = 0;
+        if v.year >= 1970 {
+            years = v.year - 1970;
         } else {
-            t = UNIX_EPOCH - Duration::from_nanos(v.nano as u64)
+            years = 1970 - v.year;
         }
-        if days >= 0 {
-            t = t + Duration::from_secs(
-                v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + days as u64 * 86400,
-            );
+        if years > 1 {
+            for idx in 0..years {
+                let y;
+                if v.year >= 1970 {
+                    y = 1970 + (idx + 1);
+                    if is_leap_year(y) {
+                        r = r + Duration::from_secs(366 * 24 * 3600);
+                    } else {
+                        r = r + Duration::from_secs(365 * 24 * 3600);
+                    }
+                } else {
+                    y = 1970 - (idx + 1);
+                    if is_leap_year(y) {
+                        r = r - Duration::from_secs(366 * 24 * 3600);
+                    } else {
+                        r = r - Duration::from_secs(365 * 24 * 3600);
+                    }
+                }
+            }
+        }
+        let years;
+        if is_leap_year(v.year) {
+            years = LEAP_YEAR;
         } else {
-            t = t - Duration::from_secs(
-                v.sec as u64 + v.min as u64 * 60 + v.hour as u64 * 3600 + (-days) as u64 * 86400,
-            );
+            years = DEFAULT_YEAR;
         }
-        t
+        let mut mon = 1;
+        for i in years {
+            if mon == v.mon {
+                r = r + Duration::from_secs((v.day - 1) as u64 * 24 * 3600);
+                break;
+            }
+            r = r + Duration::from_secs(i * 24 * 3600);
+            mon += 1;
+        }
+        r = r + Duration::from_secs(v.hour as u64 * 3600);
+        r = r + Duration::from_secs(v.min as u64 * 60);
+        r = r + Duration::from_secs(v.sec as u64);
+        r = r + Duration::from_nanos(v.nano as u64);
+        r
     }
 }
 

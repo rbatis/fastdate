@@ -1,6 +1,6 @@
 use fastdate::{Date, DateTime, DurationFrom, is_leap_year, Time};
 use std::str::FromStr;
-use std::time::{Duration};
+use std::time::{Duration, SystemTime};
 
 #[test]
 fn test_other_space() {
@@ -54,15 +54,15 @@ fn test_timestamp_befor_epoch() {
 
 #[test]
 fn test_is_leap_year() {
-    println!("is_leap_year 1968={}",is_leap_year(1968));
-    println!("is_leap_year 1969={}",is_leap_year(1969));
-    println!("is_leap_year 1970={}",is_leap_year(1970));
-    println!("is_leap_year 1971={}",is_leap_year(1971));
-    println!("is_leap_year 1972={}",is_leap_year(1972));
-    println!("is_leap_year 1973={}",is_leap_year(1973));
-    println!("is_leap_year 1974={}",is_leap_year(1974));
-    println!("is_leap_year 1975={}",is_leap_year(1975));
-    println!("is_leap_year 1976={}",is_leap_year(1976));
+    println!("is_leap_year 1968={}", is_leap_year(1968));
+    println!("is_leap_year 1969={}", is_leap_year(1969));
+    println!("is_leap_year 1970={}", is_leap_year(1970));
+    println!("is_leap_year 1971={}", is_leap_year(1971));
+    println!("is_leap_year 1972={}", is_leap_year(1972));
+    println!("is_leap_year 1973={}", is_leap_year(1973));
+    println!("is_leap_year 1974={}", is_leap_year(1974));
+    println!("is_leap_year 1975={}", is_leap_year(1975));
+    println!("is_leap_year 1976={}", is_leap_year(1976));
 }
 
 #[test]
@@ -238,4 +238,17 @@ fn test_add_sub_sec() {
     assert_eq!(date.to_string(), "2013-10-06 00:00:01");
     let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
     assert_eq!(date.to_string(), "2013-10-05 23:59:59");
+}
+
+#[test]
+fn test_1958_unix() {
+    let date = DateTime::from_str("1958-01-01").unwrap();
+    println!("s={:?},date={}",SystemTime::from(date.clone()),DateTime::from_system_time(SystemTime::from(date.clone())));
+    assert_eq!(date.unix_timestamp(), -378691200);
+}
+
+#[test]
+fn test_1968_unix() {
+    let date = DateTime::from_str("1968-01-01").unwrap();
+    assert_eq!(date.unix_timestamp(), -63158400);
 }
