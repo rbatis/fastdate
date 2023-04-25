@@ -705,12 +705,6 @@ impl DateTime {
     }
 
     pub fn count_leap_years_sec(now_sec: u64) -> u64 {
-        // let now_year = now_sec as f64 / (365.0 * 24.0 * 60.0 * 60.0);
-        // let mut count = (now_year / 4.0) - (now_year / 100.0) + (now_year / 400.0);
-        // if (count + 0.5) as u64 > (count as u64) {
-        //     return (count + 0.5) as u64;
-        // }
-        // return count as u64;
         let now_year = now_sec as f64 / (365.0 * 24.0 * 60.0 * 60.0);
         (now_year / 4.0 - now_year / 100.0 + now_year / 400.0 + 0.5) as u64
     }
