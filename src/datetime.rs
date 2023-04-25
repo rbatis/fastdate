@@ -37,7 +37,7 @@ pub struct DateTime {
     pub day: u8,
     /// 1...12
     pub mon: u8,
-    /// 1970...9999
+    /// 0000...9999
     pub year: u16,
 }
 
@@ -310,7 +310,7 @@ impl DateTime {
         self.mon = arg;
         self
     }
-    /// 1970...9999
+    /// 0000...9999
     pub fn set_year(mut self, arg: u16) -> Self {
         self.year = arg;
         self
