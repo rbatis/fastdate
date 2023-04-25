@@ -254,6 +254,12 @@ fn test_1968_unix() {
 }
 
 #[test]
+fn test_1928_unix() {
+    let date = DateTime::from_str("1928-01-01").unwrap();
+    assert_eq!(date.unix_timestamp(), -1325462400);
+}
+
+#[test]
 fn test_count_leap_years() {
     let mut y = 0;
     for i in 1970..DateTime::now().year {
