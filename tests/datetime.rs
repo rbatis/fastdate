@@ -243,7 +243,7 @@ fn test_add_sub_sec() {
 #[test]
 fn test_1958_unix() {
     let date = DateTime::from_str("1958-01-01").unwrap();
-    println!("s={:?},date={}",SystemTime::from(date.clone()),DateTime::from_system_time(SystemTime::from(date.clone())));
+    println!("s={:?},date={}", SystemTime::from(date.clone()), DateTime::from_system_time(SystemTime::from(date.clone())));
     assert_eq!(date.unix_timestamp(), -378691200);
 }
 
@@ -251,4 +251,28 @@ fn test_1958_unix() {
 fn test_1968_unix() {
     let date = DateTime::from_str("1968-01-01").unwrap();
     assert_eq!(date.unix_timestamp(), -63158400);
+}
+
+#[test]
+fn test_count_leap_years() {
+    let mut y = 0;
+    for i in 1970..DateTime::now().year {
+        if is_leap_year(i) {
+            println!("leap={}",i);
+            y += 1;
+        }
+    }
+    assert_eq!(y, DateTime::count_leap_years(SystemTime::now()));
+}
+
+#[test]
+fn test_count_leap_years_before() {
+    let mut y = 0;
+    for i in 1950..1970 {
+        if is_leap_year(i) {
+            y += 1;
+        }
+    }
+    let dt = DateTime::from_str("1950-01-01 00:00:00").unwrap();
+    assert_eq!(y, DateTime::count_leap_years(SystemTime::from(dt)));
 }

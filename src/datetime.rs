@@ -614,7 +614,7 @@ impl<'de> Deserialize<'de> for DateTime {
 static DEFAULT_YEAR: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //LEAP_YEAR
 static LEAP_YEAR: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-//Day num
+//Day Nano
 static DAY: u128 = 24 * 60 * 60 * 1000000000;
 
 #[inline]
@@ -641,28 +641,11 @@ impl DateTime {
             d = s.duration_since(UNIX_EPOCH).unwrap();
             dt.year = 1970;
         }
-        let mut remain = d.as_nanos();
-        let total_years = d.as_secs() / (365 * 24 * 3600) + 1;
-        for _ in 0..total_years {
-            if is_leap_year(dt.year) {
-                if remain > (366 * DAY) {
-                    remain -= 366 * DAY;
-                } else {
-                    break;
-                }
-            } else {
-                if remain > (365 * DAY) {
-                    remain -= 365 * DAY;
-                } else {
-                    break;
-                }
-            }
-            if s < UNIX_EPOCH {
-                dt.year -= 1;
-            } else {
-                dt.year += 1;
-            }
-        }
+
+        let year_offset = (d.as_nanos() / (365 * DAY)) as i32;
+        dt.year += year_offset as u16;
+        let mut remain = d.as_nanos() - (year_offset as u128 * 365 * DAY) - Self::count_leap_years_sec(d.as_secs()) as u128 * DAY;
+
         let mons;
         if is_leap_year(dt.year) {
             mons = LEAP_YEAR;
@@ -691,8 +674,8 @@ impl DateTime {
                         dt.day += 1;
                         break;
                     }
-                    remain = remain.sub(DAY);
                     dt.day += 1;
+                    remain = remain.sub(DAY);
                 }
                 break;
             }
@@ -702,5 +685,33 @@ impl DateTime {
         dt.sec = ((remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000) / 1000000000) as u8;
         dt.nano = (remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000 - dt.sec as u128 * 1000000000) as u32;
         dt
+    }
+
+
+    pub fn count_leap_years(now: SystemTime) -> u64 {
+        Self::count_leap_years_sec({
+            if now > UNIX_EPOCH {
+                now
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs()
+            } else {
+                UNIX_EPOCH
+                    .duration_since(now)
+                    .unwrap()
+                    .as_secs()
+            }
+        })
+    }
+
+    pub fn count_leap_years_sec(now_sec: u64) -> u64 {
+        // let now_year = now_sec as f64 / (365.0 * 24.0 * 60.0 * 60.0);
+        // let mut count = (now_year / 4.0) - (now_year / 100.0) + (now_year / 400.0);
+        // if (count + 0.5) as u64 > (count as u64) {
+        //     return (count + 0.5) as u64;
+        // }
+        // return count as u64;
+        let now_year = now_sec as f64 / (365.0 * 24.0 * 60.0 * 60.0);
+        (now_year / 4.0 - now_year / 100.0 + now_year / 400.0 + 0.5) as u64
     }
 }
