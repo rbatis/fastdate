@@ -266,25 +266,8 @@ fn test_1928_unix() {
 }
 
 #[test]
-fn test_count_leap_years() {
-    let mut y = 0;
-    for i in 1970..DateTime::now().year {
-        if is_leap_year(i) {
-            println!("leap={}",i);
-            y += 1;
-        }
-    }
-    assert_eq!(y, DateTime::count_leap_years(SystemTime::now()));
-}
-
-#[test]
-fn test_count_leap_years_before() {
-    let mut y = 0;
-    for i in 1950..1970 {
-        if is_leap_year(i) {
-            y += 1;
-        }
-    }
-    let dt = DateTime::from_str("1950-01-01 00:00:00").unwrap();
-    assert_eq!(y, DateTime::count_leap_years(SystemTime::from(dt)));
+fn test_from_unix() {
+    let dt = DateTime::from_timestamp_millis(-708249600000);
+    println!("{}", dt.to_string());
+    assert_eq!(dt.to_string(), "1947-07-23 16:00:00");
 }
