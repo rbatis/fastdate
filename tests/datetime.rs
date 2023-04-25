@@ -275,5 +275,11 @@ fn test_from_unix() {
 #[test]
 fn test_count_leap_years_sec() {
     let num = DateTime::count_leap_years_sec(10009 * 365 * 24 * 3600);
-    println!("{}", num);
+    assert_eq!(num,1950);
+
+    let num = DateTime::count_leap_years_sec(1970 * 365 * 24 * 3600);
+    assert_eq!(num,477);
+
+    let num = DateTime::count_leap_years_sec(-1970 * 365 * 24 * 3600);
+    assert_eq!(num,478);
 }
