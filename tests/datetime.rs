@@ -271,3 +271,9 @@ fn test_from_unix() {
     println!("{}", dt.to_string());
     assert_eq!(dt.to_string(), "1947-07-23 16:00:00");
 }
+
+#[test]
+fn test_count_leap_years_sec() {
+    let num = DateTime::count_leap_years_sec(10009 * 365 * 24 * 3600);
+    println!("{}", num);
+}

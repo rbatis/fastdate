@@ -434,7 +434,7 @@ impl From<DateTime> for SystemTime {
                     } else {
                         y = 1970 - (idx + 1);
                     }
-                    if is_leap_year(y) {
+                    if is_leap_year(y as u32) {
                         days += 366;
                     } else {
                         days += 365;
@@ -448,7 +448,7 @@ impl From<DateTime> for SystemTime {
             }
         }
         let years;
-        if is_leap_year(v.year) {
+        if is_leap_year(v.year as u32) {
             years = LEAP_YEAR;
         } else {
             years = DEFAULT_YEAR;
@@ -636,7 +636,7 @@ static LEAP_YEAR: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 static DAY: u128 = 24 * 60 * 60 * 1000000000;
 
 #[inline]
-pub fn is_leap_year(y: u16) -> bool {
+pub fn is_leap_year(y: u32) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
 }
 
@@ -672,7 +672,7 @@ impl DateTime {
             remain = remain - Self::count_leap_years_sec(d.as_secs() as i64) as u128 * DAY;
         }
         let mons;
-        if is_leap_year(dt.year) {
+        if is_leap_year(dt.year as u32) {
             mons = LEAP_YEAR;
         } else {
             mons = DEFAULT_YEAR;
@@ -715,15 +715,28 @@ impl DateTime {
     pub fn count_leap_years_sec(now_sec: i64) -> u64 {
         if now_sec >= 0 {
             //after 1970
-            let years = now_sec / (365 * 24 * 3600);
+            let mut years = now_sec / (365 * 24 * 3600);
+            let mut remain_years = 0;
+            if (1970 + years) > 9999 {
+                remain_years = years - 9999;
+                years = 9999 - 1970;
+            }
             let ys = &LEAP_YEARS[1970..(1970 + years) as usize];
             let mut leaps: u64 = 0;
             for x in ys {
                 leaps += *x as u64;
             }
+            for y in 0..remain_years {
+                if is_leap_year(y as u32 + 9999) {
+                    leaps += 1;
+                }
+            }
             leaps
         } else {
-            let years = -now_sec / (365 * 24 * 3600);
+            let mut years = -now_sec / (365 * 24 * 3600);
+            if (1969 - years) < 0 {
+                years = 1969;
+            }
             let ys = &LEAP_YEARS[(1969 - years) as usize..1970];
             let mut leaps: u64 = 0;
             for x in ys {
