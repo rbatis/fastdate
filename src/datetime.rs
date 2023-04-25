@@ -727,7 +727,7 @@ impl DateTime {
                 leaps += *x as u64;
             }
             for y in 0..remain_years {
-                if is_leap_year(y as u32 + 9999) {
+                if is_leap_year(y as u32 + 10000) {
                     leaps += 1;
                 }
             }
