@@ -248,6 +248,12 @@ fn test_1958_unix() {
 }
 
 #[test]
+fn test_1958_week() {
+    let date = DateTime::from_str("1958-01-01").unwrap();
+    assert_eq!(date.week_day(), 3);
+}
+
+#[test]
 fn test_1968_unix() {
     let date = DateTime::from_str("1968-01-01").unwrap();
     assert_eq!(date.unix_timestamp(), -63158400);
