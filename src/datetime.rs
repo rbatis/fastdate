@@ -447,25 +447,18 @@ impl From<DateTime> for SystemTime {
                 r = r - Duration::from_secs(days * 24 * 3600);
             }
         }
-        let years;
+        let mons;
         if is_leap_year(v.year as u32) {
-            years = LEAP_YEAR;
+            mons = &LEAP_YEAR[0..(v.mon - 1) as usize];
         } else {
-            years = DEFAULT_YEAR;
+            mons = &DEFAULT_YEAR[0..(v.mon - 1) as usize];
         }
-        let mut mon = 1;
-        let mut mon_day_secs = 0;
-        for i in years {
-            if mon == v.mon {
-                if v.day > 0 {
-                    mon_day_secs += (v.day - 1) as u64 * 24 * 3600;
-                }
-                break;
-            }
-            mon_day_secs += i * 24 * 3600;
-            mon += 1;
+        let mut days = 0;
+        for x in mons {
+            days += *x as u64;
         }
-        r = r + Duration::from_secs(mon_day_secs + v.hour as u64 * 3600 + v.min as u64 * 60 + v.sec as u64);
+        days += (v.day - 1) as u64;
+        r = r + Duration::from_secs(days * 24 * 3600 + v.hour as u64 * 3600 + v.min as u64 * 60 + v.sec as u64);
         r = r + Duration::from_nanos(v.nano as u64);
         r
     }
