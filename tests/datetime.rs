@@ -66,6 +66,13 @@ fn test_is_leap_year() {
 }
 
 #[test]
+fn test_is_leap_year_count() {
+    let num1 = DateTime::count_leap_years_sec((1976 - 1970) * 365 * 24 * 3600);
+    let num2 = DateTime::count_leap_years_sec((1968 - 1976) * 365 * 24 * 3600);
+    assert_eq!(num1 + num2, 3);
+}
+
+#[test]
 fn test_timestamp_micros() {
     let mut now = DateTime::utc();
     now.nano = 0;
@@ -275,11 +282,11 @@ fn test_from_unix() {
 #[test]
 fn test_count_leap_years_sec() {
     let num = DateTime::count_leap_years_sec(10009 * 365 * 24 * 3600);
-    assert_eq!(num,1950);
+    assert_eq!(num, 1950);
 
     let num = DateTime::count_leap_years_sec(1970 * 365 * 24 * 3600);
-    assert_eq!(num,477);
+    assert_eq!(num, 477);
 
     let num = DateTime::count_leap_years_sec(-1970 * 365 * 24 * 3600);
-    assert_eq!(num,478);
+    assert_eq!(num, 478);
 }
