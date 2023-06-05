@@ -353,6 +353,38 @@ impl DateTime {
     pub fn get_year(&self) -> u16 {
         self.year
     }
+
+    pub fn from_system_time(s: SystemTime) -> Self {
+        // Convert SystemTime to OffsetDateTime
+        let offset_datetime =  time1::OffsetDateTime::from(s);
+
+        // Extract date and time components
+        let date = offset_datetime.date();
+        let time = offset_datetime.time();
+
+        // Calculate nanoseconds
+        let nanos = time.nanosecond() as u32;
+
+        // Calculate seconds, minutes, and hours
+        let sec = time.second() as u8;
+        let min = time.minute() as u8;
+        let hour = time.hour() as u8;
+
+        // Calculate day, month, and year
+        let day = date.day() as u8;
+        let mon = date.month() as u8;
+        let year = date.year() as u16;
+
+        DateTime {
+            nano: nanos,
+            sec,
+            min,
+            hour,
+            day,
+            mon,
+            year,
+        }
+    }
 }
 
 impl Add<Duration> for DateTime {
@@ -625,117 +657,8 @@ impl<'de> Deserialize<'de> for DateTime {
 static DEFAULT_YEAR: [u64; 12] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 //LEAP_YEAR
 static LEAP_YEAR: [u64; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-//Day Nano
-static DAY: u128 = 24 * 60 * 60 * 1000000000;
 
 #[inline]
 pub fn is_leap_year(y: u32) -> bool {
     y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)
-}
-
-impl DateTime {
-    pub fn from_system_time(s: SystemTime) -> Self {
-        let mut dt = Self {
-            nano: 0,
-            sec: 0,
-            min: 0,
-            hour: 0,
-            day: 0,
-            mon: 0,
-            year: 0000,
-        };
-        let d;
-        if s < UNIX_EPOCH {
-            d = UNIX_EPOCH.duration_since(s).unwrap();
-            dt.year = 1969;
-        } else {
-            d = s.duration_since(UNIX_EPOCH).unwrap();
-            dt.year = 1970;
-        }
-        let year_offset = (d.as_nanos() / (365 * DAY)) as i32;
-        if s < UNIX_EPOCH {
-            dt.year -= year_offset as u16;
-        } else {
-            dt.year += year_offset as u16;
-        }
-        let mut remain = d.as_nanos() - (year_offset as u128 * 365 * DAY);
-        if s < UNIX_EPOCH {
-            remain = remain - Self::count_leap_years_sec(-(d.as_secs() as i64)) as u128 * DAY;
-        } else {
-            remain = remain - Self::count_leap_years_sec(d.as_secs() as i64) as u128 * DAY;
-        }
-        let mons;
-        if is_leap_year(dt.year as u32) {
-            mons = LEAP_YEAR;
-        } else {
-            mons = DEFAULT_YEAR;
-        }
-        //mon-day
-        if s < UNIX_EPOCH {
-            let mut t: u128 = 0;
-            for m in mons {
-                t += m as u128 * DAY;
-            }
-            remain = t - remain;
-        }
-        let mut mon = 0;
-        for m in mons {
-            mon += 1;
-            let mon_days = m as u128 * DAY;
-            if remain > mon_days {
-                remain = remain.sub(mon_days);
-                dt.mon = mon;
-            } else {
-                dt.mon = mon;
-                for _ in 0..m {
-                    if remain < DAY {
-                        dt.day += 1;
-                        break;
-                    }
-                    dt.day += 1;
-                    remain = remain.sub(DAY);
-                }
-                break;
-            }
-        }
-        dt.hour = ((remain / 1000000000) / 3600) as u8;
-        dt.min = ((remain - dt.hour as u128 * 3600 * 1000000000) / (60 * 1000000000)) as u8;
-        dt.sec = ((remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000) / 1000000000) as u8;
-        dt.nano = (remain - dt.hour as u128 * 3600 * 1000000000 - dt.min as u128 * 60 * 1000000000 - dt.sec as u128 * 1000000000) as u32;
-        dt
-    }
-
-    pub fn count_leap_years_sec(now_sec: i64) -> u64 {
-        if now_sec >= 0 {
-            //after 1970
-            let mut years = now_sec / (365 * 24 * 3600);
-            let mut remain_years = 0;
-            if (1970 + years) > 9999 {
-                remain_years = years - 9999;
-                years = 9999 - 1970;
-            }
-            let ys = &LEAP_YEARS[1970..(1970 + years) as usize];
-            let mut leaps: u64 = 0;
-            for x in ys {
-                leaps += *x as u64;
-            }
-            for y in 0..remain_years {
-                if is_leap_year(y as u32 + 10000) {
-                    leaps += 1;
-                }
-            }
-            leaps
-        } else {
-            let mut years = -now_sec / (365 * 24 * 3600);
-            if (1969 - years) < 0 {
-                years = 1969;
-            }
-            let ys = &LEAP_YEARS[(1969 - years) as usize..1970];
-            let mut leaps: u64 = 0;
-            for x in ys {
-                leaps += *x as u64;
-            }
-            leaps
-        }
-    }
 }

@@ -49,6 +49,17 @@ fn test_timestamp() {
 fn test_timestamp_befor_epoch() {
     let before = -5259600000;//1969-11-01 03:00:00
     let date = DateTime::from_timestamp_millis(before);
+
+    println!("get {:?}",date);
+    println!("want {:?}",DateTime{
+        nano: 0,
+        sec: 0,
+        min: 0,
+        hour: 3,
+        day: 1,
+        mon: 11,
+        year: 1969,
+    });
     assert_eq!(date.to_string(), "1969-11-01 03:00:00");
 }
 
@@ -63,13 +74,6 @@ fn test_is_leap_year() {
     println!("is_leap_year 1974={}", is_leap_year(1974));
     println!("is_leap_year 1975={}", is_leap_year(1975));
     println!("is_leap_year 1976={}", is_leap_year(1976));
-}
-
-#[test]
-fn test_is_leap_year_count() {
-    let num1 = DateTime::count_leap_years_sec((1976 - 1970) * 365 * 24 * 3600);
-    let num2 = DateTime::count_leap_years_sec((1968 - 1976) * 365 * 24 * 3600);
-    assert_eq!(num1 + num2, 3);
 }
 
 #[test]
@@ -280,13 +284,14 @@ fn test_from_unix() {
 }
 
 #[test]
-fn test_count_leap_years_sec() {
-    let num = DateTime::count_leap_years_sec(10009 * 365 * 24 * 3600);
-    assert_eq!(num, 1950);
-
-    let num = DateTime::count_leap_years_sec(1970 * 365 * 24 * 3600);
-    assert_eq!(num, 477);
-
-    let num = DateTime::count_leap_years_sec(-1970 * 365 * 24 * 3600);
-    assert_eq!(num, 478);
+fn test_add() {
+    let epoch = fastdate::DateTime::from(fastdate::Date {
+        day: 1,
+        mon: 1,
+        year: 2000,
+    });
+    let us: u64 = 693484748000000;
+    let v = epoch + std::time::Duration::from_micros(us as u64);
+    println!("{}", v);//2023-02-14 07:37:40
+    assert_eq!(v.to_string(),"2021-12-22 10:39:08");
 }
