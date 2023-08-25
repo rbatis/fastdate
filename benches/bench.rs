@@ -128,3 +128,13 @@ fn bench_get_micro(b: &mut Bencher) {
         });
     });
 }
+
+//27 ns/iter (+/- 1)
+#[bench]
+fn bench_from_timestamp_millis(b: &mut Bencher) {
+    b.iter(|| {
+        std::hint::black_box({
+            DateTime::from_timestamp_millis(1692948547638);
+        });
+    });
+}
