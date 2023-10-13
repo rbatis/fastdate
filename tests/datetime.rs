@@ -17,8 +17,14 @@ fn test_date() {
 }
 
 #[test]
-fn test_date_utc() {
+fn test_date_local() {
     let d = DateTime::now();
+    println!("{}", d);
+}
+
+#[test]
+fn test_date_utc() {
+    let d = DateTime::utc();
     println!("{}", d);
 }
 
