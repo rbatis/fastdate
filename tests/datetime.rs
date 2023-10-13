@@ -57,8 +57,8 @@ fn test_timestamp_befor_epoch() {
     let before = -5259600000;//1969-11-01 03:00:00
     let date = DateTime::from_timestamp_millis(before);
 
-    println!("get {:?}",date);
-    println!("want {:?}",DateTime{
+    println!("get {:?}", date);
+    println!("want {:?}", DateTime {
         nano: 0,
         sec: 0,
         min: 0,
@@ -156,7 +156,7 @@ fn test_befor_after() {
 #[test]
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
-    assert_eq!( date.to_string(),"2022-12-12 00:00:00");
+    assert_eq!(date.to_string(), "2022-12-12 00:00:00");
 }
 
 #[test]
@@ -231,6 +231,7 @@ fn test_ser_date() {
     let date = DateTime::from_str("2022-09-19 14:01:58.175861").unwrap();
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!("\"2022-09-19 14:01:58.175861\"", js);
+    assert_eq!(date.offset, 0);
 }
 
 #[test]
@@ -301,5 +302,5 @@ fn test_add() {
     let us: u64 = 693484748000000;
     let v = epoch + std::time::Duration::from_micros(us as u64);
     println!("{}", v);//2023-02-14 07:37:40
-    assert_eq!(v.to_string(),"2021-12-22 10:39:08");
+    assert_eq!(v.to_string(), "2021-12-22 10:39:08");
 }
