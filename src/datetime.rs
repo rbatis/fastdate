@@ -42,6 +42,8 @@ pub struct DateTime {
     pub mon: u8,
     /// 0000...9999
     pub year: u16,
+    /// timezone offset seconds
+    pub offset: i64,
 }
 
 impl DateTime {
@@ -52,11 +54,9 @@ impl DateTime {
     ///local zone time
     pub fn now() -> Self {
         let offset = GLOBAL_OFFSET.deref().clone();
-        if offset > 0 {
-            Self::from(SystemTime::now() + Duration::from_secs(offset as u64))
-        } else {
-            Self::from(SystemTime::now() - Duration::from_secs(offset.abs() as u64))
-        }
+        let mut s = Self::from(SystemTime::now());
+        s.offset = offset as i64;
+        s
     }
 
     /// set offset
@@ -64,13 +64,15 @@ impl DateTime {
     /// let mut  dt = fastdate::DateTime::utc();
     /// dt = dt.set_offset(fastdate::offset_sec());
     /// ```
-    pub fn set_offset(self, offset_sec: i32) -> DateTime {
+    pub fn set_offset(mut self, offset_sec: i32) -> DateTime {
         let time: SystemTime = self.into();
-        if offset_sec > 0 {
+        self = if offset_sec > 0 {
             Self::from(time + Duration::from_secs(offset_sec as u64))
         } else {
             Self::from(time - Duration::from_secs(offset_sec.abs() as u64))
-        }
+        };
+        self.offset = offset_sec as i64;
+        self
     }
 
     /// add Duration
@@ -101,6 +103,7 @@ impl DateTime {
     pub fn after(&self, other: &DateTime) -> bool {
         self > other
     }
+
 
     /// unix_timestamp sec
     pub fn unix_timestamp(&self) -> i64 {
@@ -356,7 +359,7 @@ impl DateTime {
 
     pub fn from_system_time(s: SystemTime) -> Self {
         // Convert SystemTime to OffsetDateTime
-        let offset_datetime =  time1::OffsetDateTime::from(s);
+        let offset_datetime = time1::OffsetDateTime::from(s);
 
         // Extract date and time components
         let date = offset_datetime.date();
@@ -383,7 +386,23 @@ impl DateTime {
             day,
             mon,
             year,
+            offset: 0,
         }
+    }
+
+    pub fn display(&self,  f: &mut Formatter) ->std::fmt::Result {
+        let mut buf: [u8; 29] = *b"0000-00-00 00:00:00.000000000";
+        buf[0] = b'0' + (self.year / 1000) as u8;
+        buf[1] = b'0' + (self.year / 100 % 10) as u8;
+        buf[2] = b'0' + (self.year / 10 % 10) as u8;
+        buf[3] = b'0' + (self.year % 10) as u8;
+        buf[5] = b'0' + (self.mon / 10) as u8;
+        buf[6] = b'0' + (self.mon % 10) as u8;
+        buf[8] = b'0' + (self.day / 10) as u8;
+        buf[9] = b'0' + (self.day % 10) as u8;
+        let time = Time::from(self.clone());
+        let len = time.display_time(11, &mut buf);
+        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
     }
 }
 
@@ -492,6 +511,12 @@ impl From<DateTime> for SystemTime {
         days += (v.day - 1) as u64;
         r = r + Duration::from_secs(days * 24 * 3600 + v.hour as u64 * 3600 + v.min as u64 * 60 + v.sec as u64);
         r = r + Duration::from_nanos(v.nano as u64);
+
+        if v.offset > 0 {
+            r = r.sub(Duration::from_secs(v.offset as u64))
+        } else {
+            r = r.add(Duration::from_secs((-v.offset) as u64))
+        }
         r
     }
 }
@@ -506,6 +531,7 @@ impl From<Date> for DateTime {
             day: arg.day,
             mon: arg.mon,
             year: arg.year,
+            offset: 0,
         }
     }
 }
@@ -520,6 +546,7 @@ impl From<Time> for DateTime {
             day: 0,
             mon: 0,
             year: 0,
+            offset: 0,
         }
     }
 }
@@ -538,6 +565,7 @@ impl FromStr for DateTime {
             day: 0,
             mon: 0,
             year: 0,
+            offset: 0,
         };
         if bytes.len() >= 10 {
             let d = Date::parse_bytes_partial(&bytes)?;
@@ -588,11 +616,7 @@ impl FromStr for DateTime {
                     }
                 }
             }
-            if offset_sec > 0 {
-                date = date.add(Duration::from_secs(offset_sec as u64));
-            } else if offset_sec < 0 {
-                date = date.sub(Duration::from_secs(offset_sec.abs() as u64));
-            }
+            date=date.set_offset(offset_sec);
             if bytes[bytes.len() - 1] == 'Z' as u8 {
                 date = date.set_offset(crate::offset_sec()); //append offset
             }
@@ -604,18 +628,7 @@ impl FromStr for DateTime {
 impl Display for DateTime {
     /// fmt RFC3339Nano = "2006-01-02T15:04:05.999999999"
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let mut buf: [u8; 29] = *b"0000-00-00 00:00:00.000000000";
-        buf[0] = b'0' + (self.year / 1000) as u8;
-        buf[1] = b'0' + (self.year / 100 % 10) as u8;
-        buf[2] = b'0' + (self.year / 10 % 10) as u8;
-        buf[3] = b'0' + (self.year % 10) as u8;
-        buf[5] = b'0' + (self.mon / 10) as u8;
-        buf[6] = b'0' + (self.mon % 10) as u8;
-        buf[8] = b'0' + (self.day / 10) as u8;
-        buf[9] = b'0' + (self.day % 10) as u8;
-        let time = Time::from(self.clone());
-        let len = time.display_time(11, &mut buf);
-        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
+        self.display(f)
     }
 }
 

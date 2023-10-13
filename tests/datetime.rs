@@ -32,8 +32,9 @@ fn test_date_utc_add() {
 
 #[test]
 fn test_offset() {
-    let utc = DateTime::from_str("2022-12-12 12:12:12.000000").unwrap();
-    assert_eq!(format!("{}", utc.set_offset(1)), "2022-12-12 12:12:13");
+    let utc = DateTime::from_str("2022-12-12 12:12:12.000000+08").unwrap();
+    assert_eq!(format!("{}", utc), "2022-12-12 20:12:12");
+    assert_eq!(utc.unix_timestamp(), 1670847132);
 }
 
 #[test]
@@ -59,6 +60,7 @@ fn test_timestamp_befor_epoch() {
         day: 1,
         mon: 11,
         year: 1969,
+        offset: 0,
     });
     assert_eq!(date.to_string(), "1969-11-01 03:00:00");
 }
