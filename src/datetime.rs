@@ -43,7 +43,7 @@ pub struct DateTime {
     /// 0000...9999
     pub year: u16,
     /// timezone offset seconds
-    pub offset: i64,
+    pub offset: i32,
 }
 
 impl DateTime {
@@ -69,7 +69,7 @@ impl DateTime {
         } else {
             Self::from(time - Duration::from_secs(offset_sec.abs() as u64))
         };
-        self.offset = offset_sec as i64;
+        self.offset = offset_sec;
         self
     }
 
