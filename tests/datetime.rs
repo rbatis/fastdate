@@ -1,4 +1,4 @@
-use fastdate::{Date, DateTime, DurationFrom, is_leap_year, Time};
+use fastdate::{Date, DateTime, DurationFrom, is_leap_year, offset_sec, Time};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 
@@ -20,6 +20,7 @@ fn test_date() {
 fn test_date_local() {
     let d = DateTime::now();
     println!("{}", d);
+    println!("{}",d.unix_timestamp());
 }
 
 #[test]
@@ -228,10 +229,11 @@ fn test_parse_date() {
 
 #[test]
 fn test_ser_date() {
-    let date = DateTime::from_str("2022-09-19 14:01:58.175861").unwrap();
+    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926").unwrap();
+    date=date.set_offset(offset_sec());
     let js = serde_json::to_string(&date).unwrap();
-    assert_eq!("\"2022-09-19 14:01:58.175861\"", js);
-    assert_eq!(date.offset, 0);
+    assert_eq!(js,"\"2023-10-14 00:57:41.123926\"");
+    assert_eq!(date.offset, 28800);
 }
 
 #[test]
