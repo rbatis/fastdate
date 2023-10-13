@@ -618,7 +618,7 @@ impl FromStr for DateTime {
             }
             date=date.set_offset(offset_sec);
             if bytes[bytes.len() - 1] == 'Z' as u8 {
-                date = date.set_offset(crate::offset_sec()); //append offset
+                date = date.set_offset(0); //append offset
             }
         }
         Ok(date)

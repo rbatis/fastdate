@@ -156,7 +156,7 @@ fn test_befor_after() {
 #[test]
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
-    assert_eq!("2022-12-12 08:00:00", date.to_string());
+    assert_eq!( date.to_string(),"2022-12-12 00:00:00");
 }
 
 #[test]
