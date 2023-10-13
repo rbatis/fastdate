@@ -388,7 +388,7 @@ impl DateTime {
         }
     }
 
-    pub fn display(&self,  f: &mut Formatter) ->std::fmt::Result {
+    pub fn display(&self, f: &mut Formatter) -> std::fmt::Result {
         let mut buf: [u8; 29] = *b"0000-00-00 00:00:00.000000000";
         buf[0] = b'0' + (self.year / 1000) as u8;
         buf[1] = b'0' + (self.year / 100 % 10) as u8;
@@ -614,7 +614,7 @@ impl FromStr for DateTime {
                     }
                 }
             }
-            date=date.set_offset(offset_sec);
+            date = date.set_offset(offset_sec);
             if bytes[bytes.len() - 1] == 'Z' as u8 {
                 date = date.set_offset(0); //append offset
             }
