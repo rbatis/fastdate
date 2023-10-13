@@ -54,9 +54,7 @@ impl DateTime {
     ///local zone time
     pub fn now() -> Self {
         let offset = GLOBAL_OFFSET.deref().clone();
-        let mut s = Self::from(SystemTime::now());
-        s.offset = offset as i64;
-        s
+        Self::from(SystemTime::now()).set_offset(offset)
     }
 
     /// set offset
