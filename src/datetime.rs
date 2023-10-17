@@ -644,7 +644,7 @@ impl Ord for DateTime {
 
 impl PartialOrd for DateTime {
     fn partial_cmp(&self, other: &DateTime) -> Option<cmp::Ordering> {
-        Some(self.cmp(other))
+        Some(self.unix_timestamp_nano().cmp(&other.unix_timestamp_nano()))
     }
 }
 
