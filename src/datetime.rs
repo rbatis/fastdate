@@ -75,12 +75,18 @@ impl DateTime {
 
     /// add Duration
     pub fn add(self, d: Duration) -> Self {
-        Self::from(SystemTime::from(self) + d)
+        let offset = self.offset;
+        let mut s = Self::from(SystemTime::from(self) + d);
+        s.offset = offset;
+        s
     }
 
     /// sub Duration
     pub fn sub(self, d: Duration) -> Self {
-        Self::from(SystemTime::from(self) - d)
+        let offset = self.offset;
+        let mut s = Self::from(SystemTime::from(self) - d);
+        s.offset = offset;
+        s
     }
 
     ///add/sub sec
