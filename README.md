@@ -27,18 +27,19 @@ this date cartes is very fast(<= 50ns) including
 * cmp(&self, other: &DateTime)/>/</>=/<= and more....
 
 ```log
-test bench_add                         ... bench:          23 ns/iter (+/- 4)
-test bench_date_display                ... bench:          46 ns/iter (+/- 1)
-test bench_date_from_str_iso_8601      ... bench:          45 ns/iter (+/- 0)
-test bench_date_from_str_iso_8601_time ... bench:          43 ns/iter (+/- 1)
-test bench_date_now_local              ... bench:          40 ns/iter (+/- 0)
-test bench_date_parse_format           ... bench:          51 ns/iter (+/- 1)
-test bench_date_utc                    ... bench:          39 ns/iter (+/- 0)
-test bench_datetime_from_str           ... bench:          14 ns/iter (+/- 0)
-test bench_eq                          ... bench:           0 ns/iter (+/- 0)
-test bench_get_micro                   ... bench:           0 ns/iter (+/- 0)
-test bench_set_offset                  ... bench:          27 ns/iter (+/- 5)
-test bench_timestamp                   ... bench:           8 ns/iter (+/- 0)
+test bench_add                         ... bench:          16 ns/iter (+/- 0)
+test bench_date_display                ... bench:          45 ns/iter (+/- 0)
+test bench_date_from_str_iso_8601      ... bench:          73 ns/iter (+/- 1)
+test bench_date_from_str_iso_8601_time ... bench:          93 ns/iter (+/- 2)
+test bench_date_now_local              ... bench:          64 ns/iter (+/- 0)
+test bench_date_parse_format           ... bench:         123 ns/iter (+/- 3)
+test bench_date_utc                    ... bench:          48 ns/iter (+/- 1)
+test bench_datetime_from_str           ... bench:          72 ns/iter (+/- 1)
+test bench_eq                          ... bench:          27 ns/iter (+/- 0)
+test bench_from_timestamp_millis       ... bench:          22 ns/iter (+/- 0)
+test bench_get_micro                   ... bench:           1 ns/iter (+/- 0)
+test bench_set_offset                  ... bench:          13 ns/iter (+/- 0)
+test bench_timestamp                   ... bench:           3 ns/iter (+/- 0)
 ```
 
 * it can from_str for any RFC3339,iso_8601
