@@ -305,6 +305,20 @@ impl DateTime {
     }
 
     pub fn display(&self, f: &mut Formatter) -> std::fmt::Result {
+        //TODO RFC3339
+        // let mut buf: [u8; 29] = *b"0000-00-00T00:00:00.000000000Z";
+        // let mut buf: [u8; 29] = *b"0000-00-00T00:00:00.000000000+08:00";
+        // buf[0] = b'0' + (self.year / 1000) as u8;
+        // buf[1] = b'0' + (self.year / 100 % 10) as u8;
+        // buf[2] = b'0' + (self.year / 10 % 10) as u8;
+        // buf[3] = b'0' + (self.year % 10) as u8;
+        // buf[5] = b'0' + (self.mon / 10) as u8;
+        // buf[6] = b'0' + (self.mon % 10) as u8;
+        // buf[8] = b'0' + (self.day / 10) as u8;
+        // buf[9] = b'0' + (self.day % 10) as u8;
+        // let time = Time::from(self.clone());
+        // let len = time.display_time(11, &mut buf);
+        // f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
         let s = self.inner.format(&Rfc3339).unwrap();
         f.write_str(&s)
     }
