@@ -11,7 +11,7 @@ use test::Bencher;
 fn bench_datetime_from_str(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::from_str("1997-12-13 11:12:13.123456").expect("TODO: panic message");
+            DateTime::from_str("1997-12-13T11:12:13.123456Z").expect("TODO: panic message");
         });
     });
 }
@@ -21,7 +21,7 @@ fn bench_datetime_from_str(b: &mut Bencher) {
 fn bench_date_from_str_iso_8601(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::from_str("1997-12-13 11:12:13.123456Z").expect("TODO: panic message");
+            DateTime::from_str("1997-12-13T11:12:13.123456Z").expect("TODO: panic message");
         });
     });
 }
@@ -31,7 +31,7 @@ fn bench_date_from_str_iso_8601(b: &mut Bencher) {
 fn bench_date_from_str_iso_8601_time(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::from_str("1997-12-13 11:12:13.123456+09").expect("TODO: panic message");
+            DateTime::from_str("1997-12-13T11:12:13.123456+09:00").expect("TODO: panic message");
         });
     });
 }
@@ -41,7 +41,7 @@ fn bench_date_from_str_iso_8601_time(b: &mut Bencher) {
 fn bench_date_parse_format(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456")
+            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z")
                 .expect("TODO: panic message");
         });
     });

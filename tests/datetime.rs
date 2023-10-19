@@ -252,26 +252,26 @@ fn test_add_sub_sec() {
 
 #[test]
 fn test_1958_unix() {
-    let date = DateTime::from_str("1958-01-01").unwrap();
+    let date = DateTime::from_str("1958-01-01T00:00:00Z").unwrap();
     println!("s={:?},date={}", SystemTime::from(date.clone()), DateTime::from_system_time(SystemTime::from(date.clone()),0));
     assert_eq!(date.unix_timestamp(), -378691200);
 }
 
 #[test]
 fn test_1958_week() {
-    let date = DateTime::from_str("1958-01-01").unwrap();
+    let date = DateTime::from_str("1958-01-01T00:00:00Z").unwrap();
     assert_eq!(date.week_day(), 3);
 }
 
 #[test]
 fn test_1968_unix() {
-    let date = DateTime::from_str("1968-01-01").unwrap();
+    let date = DateTime::from_str("1968-01-01T00:00:00Z").unwrap();
     assert_eq!(date.unix_timestamp(), -63158400);
 }
 
 #[test]
 fn test_1928_unix() {
-    let date = DateTime::from_str("1928-01-01").unwrap();
+    let date = DateTime::from_str("1928-01-01T00:00:00Z").unwrap();
     assert_eq!(date.unix_timestamp(), -1325462400);
 }
 
@@ -290,7 +290,7 @@ fn test_add() {
         year: 2000,
     });
     let us: u64 = 693484748000000;
-    let v = epoch + std::time::Duration::from_micros(us as u64);
+    let v = epoch + Duration::from_micros(us as u64);
     println!("{}", v);//2023-02-14 07:37:40
     assert_eq!(v.to_string(), "2021-12-22T10:39:08Z");
 }

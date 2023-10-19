@@ -151,7 +151,7 @@ impl DateTime {
     /// TODO: support +00:00
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
-        let mut buf: [u8; 32] = *b"0000-00-00 00:00:00.000000+00:00";
+        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000+00:00";
         let format_bytes = format.as_bytes();
         let mut idx_year = 0;
         let mut idx_mon = 5;
