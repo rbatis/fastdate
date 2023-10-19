@@ -8,7 +8,7 @@ fn test_display() {
     let d = Time {
         nano: 0,
         sec: 0,
-        min: 0,
+        minu: 0,
         hour: 8,
     };
     assert_eq!("08:00:00", d.to_string());
@@ -91,7 +91,7 @@ fn test_from_time() {
     let d = Duration::from(Time {
         nano: 1 * 1000,
         sec: 1,
-        min: 1,
+        minu: 1,
         hour: 1,
     });
     println!("{}", d.as_nanos());
@@ -103,7 +103,7 @@ fn test_display_time_nano_zero() {
     let d = Time {
         nano: 0,
         sec: 0,
-        min: 0,
+        minu: 0,
         hour: 0,
     };
     let mut buf: [u8; 18] = *b"00:00:00.000000000";
@@ -116,7 +116,7 @@ fn test_display_time_nano_zero_no() {
     let d = Time {
         nano: 1,
         sec: 0,
-        min: 0,
+        minu: 0,
         hour: 0,
     };
     let mut buf: [u8; 18] = *b"00:00:00.000000000";

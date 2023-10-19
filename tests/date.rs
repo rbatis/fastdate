@@ -10,8 +10,8 @@ fn test_date() {
 
 #[test]
 fn test_ser() {
-    let d = DateTime::from_str("2022-12-13 11:12:13").unwrap();
+    let d = DateTime::from_str("2022-12-13T11:12:13Z").unwrap();
     println!("{}", d);
     let v = serde_json::to_string(&d).unwrap();
-    assert_eq!("\"2022-12-13 11:12:13\"", v);
+    assert_eq!(v, "\"2022-12-13T11:12:13Z\"");
 }

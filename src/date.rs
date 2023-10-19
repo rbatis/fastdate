@@ -18,7 +18,7 @@ pub struct Date {
     /// 1...12
     pub mon: u8,
     /// 0000...9999
-    pub year: u16,
+    pub year: i32,
 }
 
 impl Date {
@@ -78,7 +78,7 @@ impl Date {
         Ok(Self {
             day,
             mon: month,
-            year,
+            year: year as i32,
         })
     }
 
@@ -93,7 +93,7 @@ impl Date {
         self
     }
     /// 0000...9999
-    pub fn set_year(mut self, arg: u16) -> Self {
+    pub fn set_year(mut self, arg: i32) -> Self {
         self.year = arg;
         self
     }
@@ -109,7 +109,7 @@ impl Date {
     }
 
     /// get year
-    pub fn get_year(&self) -> u16 {
+    pub fn get_year(&self) -> i32 {
         self.year
     }
 
@@ -171,9 +171,9 @@ impl<'de> Deserialize<'de> for Date {
 impl From<DateTime> for Date {
     fn from(arg: DateTime) -> Self {
         Date {
-            day: arg.day,
-            mon: arg.mon,
-            year: arg.year,
+            day: arg.day(),
+            mon: arg.mon(),
+            year: arg.year(),
         }
     }
 }

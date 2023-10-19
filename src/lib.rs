@@ -1,5 +1,7 @@
 #![allow(unused_assignments)]
 
+pub extern crate time1;
+
 pub mod error;
 pub mod sys;
 

@@ -12,7 +12,7 @@ pub struct Time {
     /// 0...59
     pub sec: u8,
     /// 0...59
-    pub min: u8,
+    pub minu: u8,
     /// 0...23
     pub hour: u8,
 }
@@ -26,7 +26,7 @@ impl Time {
                 Self {
                     nano: 0,
                     sec: 0,
-                    min: 0,
+                    minu: 0,
                     hour: 0,
                 },
                 0,
@@ -110,7 +110,7 @@ impl Time {
         let t = Self {
             nano: nano,
             sec: second,
-            min: minute,
+            minu: minute,
             hour,
         };
         Ok((t, length))
@@ -134,7 +134,7 @@ impl Time {
     }
     /// 0...59
     pub fn set_min(mut self, arg: u8) -> Self {
-        self.min = arg;
+        self.minu = arg;
         self
     }
     /// 0...23
@@ -157,8 +157,8 @@ impl Time {
     }
 
     /// get sec
-    pub fn get_min(&self) -> u8 {
-        self.min
+    pub fn get_minu(&self) -> u8 {
+        self.minu
     }
 
     /// get hour
@@ -170,8 +170,8 @@ impl Time {
     pub fn display_time(&self, start: usize, buf: &mut [u8]) -> usize {
         buf[start + 0] = b'0' + (self.hour / 10) as u8;
         buf[start + 1] = b'0' + (self.hour % 10) as u8;
-        buf[start + 3] = b'0' + (self.min / 10) as u8;
-        buf[start + 4] = b'0' + (self.min % 10) as u8;
+        buf[start + 3] = b'0' + (self.minu / 10) as u8;
+        buf[start + 4] = b'0' + (self.minu % 10) as u8;
         buf[start + 6] = b'0' + (self.sec / 10) as u8;
         buf[start + 7] = b'0' + (self.sec % 10) as u8;
         let mut real_len = start + 1 + 8 + 8 + 1;
@@ -218,7 +218,7 @@ impl From<Duration> for Time {
         Self {
             nano: micros.as_nanos() as u32,
             sec: sec,
-            min: min,
+            minu: min,
             hour: hour,
         }
     }
@@ -227,7 +227,7 @@ impl From<Duration> for Time {
 impl From<Time> for Duration {
     fn from(d: Time) -> Self {
         Duration::from_secs(d.hour as u64 * 60 * 60)
-            + Duration::from_secs(d.min as u64 * 60)
+            + Duration::from_secs(d.minu as u64 * 60)
             + Duration::from_secs(d.sec as u64)
             + Duration::from_nanos(d.nano as u64)
     }
@@ -277,10 +277,10 @@ impl<'de> Deserialize<'de> for Time {
 impl From<DateTime> for Time {
     fn from(arg: DateTime) -> Self {
         Time {
-            nano: arg.nano,
-            sec: arg.sec,
-            min: arg.min,
-            hour: arg.hour,
+            nano: arg.nano(),
+            sec: arg.sec(),
+            minu: arg.minu(),
+            hour: arg.hour(),
         }
     }
 }
