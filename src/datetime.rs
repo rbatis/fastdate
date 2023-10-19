@@ -304,23 +304,74 @@ impl DateTime {
         }.set_offset(offset)
     }
 
+    /// RFC3339 "0000-00-00T00:00:00.000000000Z"
+    /// RFC3339 "0000-00-00T00:00:00.000000000+00:00:00"
     pub fn display(&self, f: &mut Formatter) -> std::fmt::Result {
-        //TODO RFC3339
-        // let mut buf: [u8; 29] = *b"0000-00-00T00:00:00.000000000Z";
-        // let mut buf: [u8; 29] = *b"0000-00-00T00:00:00.000000000+08:00";
-        // buf[0] = b'0' + (self.year / 1000) as u8;
-        // buf[1] = b'0' + (self.year / 100 % 10) as u8;
-        // buf[2] = b'0' + (self.year / 10 % 10) as u8;
-        // buf[3] = b'0' + (self.year % 10) as u8;
-        // buf[5] = b'0' + (self.mon / 10) as u8;
-        // buf[6] = b'0' + (self.mon % 10) as u8;
-        // buf[8] = b'0' + (self.day / 10) as u8;
-        // buf[9] = b'0' + (self.day % 10) as u8;
-        // let time = Time::from(self.clone());
-        // let len = time.display_time(11, &mut buf);
-        // f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
-        let s = self.inner.format(&Rfc3339).unwrap();
-        f.write_str(&s)
+        let mut buf: [u8; 38] = *b"0000-00-00T00:00:00.000000000+00:00:00";
+        let year = self.year();
+        let mon = self.mon();
+        let day = self.day();
+        buf[0] = b'0' + (year / 1000) as u8;
+        buf[1] = b'0' + (year / 100 % 10) as u8;
+        buf[2] = b'0' + (year / 10 % 10) as u8;
+        buf[3] = b'0' + (year % 10) as u8;
+        buf[5] = b'0' + (mon / 10);
+        buf[6] = b'0' + (mon % 10);
+        buf[8] = b'0' + (day / 10);
+        buf[9] = b'0' + (day % 10);
+        let time = Time::from(self.clone());
+        let mut len = time.display_time(11, &mut buf);
+        let offset = self.offset();
+        if offset == 0 {
+            buf[len] = b'Z';
+            len += 1;
+        } else {
+            let (h, m, s) = self.inner.offset().as_hms();
+            if offset > 0 {
+                buf[len] = b'+';
+                len += 1;
+                buf[len] = b'0' + (h as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (h as u8 % 10);
+                len += 1;
+                buf[len] = b':' + (m as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (m as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (m as u8 % 10);
+                len += 1;
+                if s != 0 {
+                    buf[len] = b':' + (s as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (s as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (s as u8 % 10);
+                    len += 1;
+                }
+            } else {
+                buf[len] = b'-';
+                len += 1;
+                buf[len] = b'0' + (-h as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (-h as u8 % 10);
+                len += 1;
+                buf[len] = b':' + (-m as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (-m as u8 / 10);
+                len += 1;
+                buf[len] = b'0' + (-m as u8 % 10);
+                len += 1;
+                if s != 0 {
+                    buf[len] = b':' + (-s as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (-s as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (-s as u8 % 10);
+                    len += 1;
+                }
+            }
+        }
+        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
     }
 }
 
