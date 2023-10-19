@@ -49,12 +49,12 @@ pub struct DateTime {
 impl DateTime {
     ///utc time
     pub fn utc() -> Self {
-        Self::from(SystemTime::now())
+        Self::from_system_time(SystemTime::now(),0)
     }
     ///local zone time
     pub fn now() -> Self {
         let offset = GLOBAL_OFFSET.deref().clone();
-        Self::from(SystemTime::now()).set_offset(offset)
+        Self::from_system_time(SystemTime::now(),0).set_offset(offset)
     }
 
     /// set offset
@@ -65,9 +65,9 @@ impl DateTime {
     pub fn set_offset(mut self, offset_sec: i32) -> DateTime {
         let time: SystemTime = self.into();
         self = if offset_sec > 0 {
-            Self::from(time + Duration::from_secs(offset_sec as u64))
+            Self::from_system_time(time + Duration::from_secs(offset_sec as u64),0)
         } else {
-            Self::from(time - Duration::from_secs(offset_sec.abs() as u64))
+            Self::from_system_time(time - Duration::from_secs(offset_sec.abs() as u64),0)
         };
         self.offset = offset_sec;
         self
@@ -76,7 +76,7 @@ impl DateTime {
     /// add Duration
     pub fn add(self, d: Duration) -> Self {
         let offset = self.offset;
-        let mut s = Self::from(SystemTime::from(self) + d);
+        let mut s = Self::from_system_time(SystemTime::from(self) + d,0);
         s.offset = offset;
         s
     }
@@ -84,7 +84,7 @@ impl DateTime {
     /// sub Duration
     pub fn sub(self, d: Duration) -> Self {
         let offset = self.offset;
-        let mut s = Self::from(SystemTime::from(self) - d);
+        let mut s = Self::from_system_time(SystemTime::from(self) - d,0);
         s.offset = offset;
         s
     }
@@ -163,33 +163,33 @@ impl DateTime {
     ///from timestamp sec
     pub fn from_timestamp(sec: i64) -> DateTime {
         if sec > 0 {
-            Self::from(UNIX_EPOCH + Duration::from_secs(sec as u64))
+            Self::from_system_time(UNIX_EPOCH + Duration::from_secs(sec as u64),0)
         } else {
-            Self::from(UNIX_EPOCH - Duration::from_secs((-sec) as u64))
+            Self::from_system_time(UNIX_EPOCH - Duration::from_secs((-sec) as u64),0)
         }
     }
     ///from timestamp micros
     pub fn from_timestamp_micros(micros: i64) -> DateTime {
         if micros > 0 {
-            Self::from(UNIX_EPOCH + Duration::from_micros(micros as u64))
+            Self::from_system_time(UNIX_EPOCH + Duration::from_micros(micros as u64),0)
         } else {
-            Self::from(UNIX_EPOCH - Duration::from_micros((-micros) as u64))
+            Self::from_system_time(UNIX_EPOCH - Duration::from_micros((-micros) as u64),0)
         }
     }
     ///from timestamp millis
     pub fn from_timestamp_millis(ms: i64) -> DateTime {
         if ms > 0 {
-            Self::from(UNIX_EPOCH + Duration::from_millis(ms as u64))
+            Self::from_system_time(UNIX_EPOCH + Duration::from_millis(ms as u64),0)
         } else {
-            Self::from(UNIX_EPOCH - Duration::from_millis((-ms) as u64))
+            Self::from_system_time(UNIX_EPOCH - Duration::from_millis((-ms) as u64),0)
         }
     }
     ///from timestamp nano
     pub fn from_timestamp_nano(nano: i128) -> DateTime {
         if nano > 0 {
-            Self::from(UNIX_EPOCH + Duration::from_nanos(nano as u64))
+            Self::from_system_time(UNIX_EPOCH + Duration::from_nanos(nano as u64),0)
         } else {
-            Self::from(UNIX_EPOCH - Duration::from_nanos((-nano) as u64))
+            Self::from_system_time(UNIX_EPOCH - Duration::from_nanos((-nano) as u64),0)
         }
     }
 
@@ -361,7 +361,7 @@ impl DateTime {
         self.year
     }
 
-    pub fn from_system_time(s: SystemTime) -> Self {
+    pub fn from_system_time(s: SystemTime, offset: i32) -> Self {
         // Convert SystemTime to OffsetDateTime
         let offset_datetime = time1::OffsetDateTime::from(s);
 
@@ -390,7 +390,7 @@ impl DateTime {
             day,
             mon,
             year,
-            offset: 0,
+            offset,
         }
     }
 
@@ -453,7 +453,7 @@ impl Sub<DateTime> for DateTime {
 
 impl From<SystemTime> for DateTime {
     fn from(v: SystemTime) -> DateTime {
-        DateTime::from_system_time(v)
+        DateTime::from_system_time(v, 0)
     }
 }
 

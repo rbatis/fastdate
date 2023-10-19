@@ -274,7 +274,7 @@ fn test_add_sub_sec() {
 #[test]
 fn test_1958_unix() {
     let date = DateTime::from_str("1958-01-01").unwrap();
-    println!("s={:?},date={}", SystemTime::from(date.clone()), DateTime::from_system_time(SystemTime::from(date.clone())));
+    println!("s={:?},date={}", SystemTime::from(date.clone()), DateTime::from_system_time(SystemTime::from(date.clone()),0));
     assert_eq!(date.unix_timestamp(), -378691200);
 }
 
