@@ -97,6 +97,21 @@ fn test_timestamp_nano() {
 }
 
 #[test]
+fn test_date_time() {
+    let new_time = DateTime::from((Date{
+        day: 12,
+        mon: 12,
+        year: 2023,
+    }, Time{
+        nano: 12,
+        sec: 12,
+        minu: 12,
+        hour: 12,
+    }));
+    assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
+}
+
+#[test]
 fn test_unix_timestamp() {
     let d = DateTime::now().unix_timestamp();
     println!("unix:{}", d);
