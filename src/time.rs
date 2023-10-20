@@ -156,7 +156,7 @@ impl Time {
         self.sec
     }
 
-    /// get sec
+    /// minute
     pub fn minute(&self) -> u8 {
         self.minute
     }
