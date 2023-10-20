@@ -105,7 +105,7 @@ fn test_date_time() {
     }, Time{
         nano: 12,
         sec: 12,
-        minu: 12,
+        minute: 12,
         hour: 12,
     }));
     assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
@@ -120,7 +120,7 @@ fn test_set_offset() {
     }, Time{
         nano: 12,
         sec: 12,
-        minu: 12,
+        minute: 12,
         hour: 12,
     }));
     let timestamp_nano = new_time.unix_timestamp_nano();

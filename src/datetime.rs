@@ -255,8 +255,8 @@ impl DateTime {
         self.inner.second()
     }
 
-    /// get sec
-    pub fn minu(&self) -> u8 {
+    /// minute
+    pub fn minute(&self) -> u8 {
         self.inner.minute()
     }
 
@@ -442,13 +442,13 @@ impl From<Date> for DateTime {
 
 impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
-        Self::from_str(&format!("0000-00-00 {:02}:{:02}:{:02}.{:09}Z", arg.hour, arg.minu, arg.sec, arg.nano)).unwrap()
+        Self::from_str(&format!("0000-00-00 {:02}:{:02}:{:02}.{:09}Z", arg.hour, arg.minute, arg.sec, arg.nano)).unwrap()
     }
 }
 
 impl From<(Date, Time)> for DateTime {
     fn from(arg: (Date, Time)) -> Self {
-        Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minu, arg.1.sec, arg.1.nano)).unwrap()
+        Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap()
     }
 }
 
