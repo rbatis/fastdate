@@ -483,7 +483,7 @@ impl FromStr for DateTime {
             have_offset = true;
         }
         if have_offset == false {
-            v.push_str("Z");
+            v.push_str("+00:00");
         }
         let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| Error::from(e.to_string()))?;
         Ok(Self {
