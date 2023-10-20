@@ -13,7 +13,7 @@ fn test_other_space() {
 fn test_date() {
     let d = DateTime::from_str("1234-12-13 11:12:13.123456").unwrap();
     println!("{}", d);
-    assert_eq!(d.to_string(), "1234-12-13T11:12:13.123456Z".to_string());
+    assert_eq!(d.to_string(), "1234-12-13T19:12:13.123456+08:00".to_string());
 }
 
 #[test]
@@ -75,8 +75,8 @@ fn test_timestamp() {
 #[test]
 fn test_timestamp_micros() {
     let now = DateTime::utc();
-    let timestamp = now.unix_timestamp_micros();
-    let new_time = DateTime::from_timestamp_micros(timestamp);
+    let timestamp = now.unix_timestamp_nano();
+    let new_time = DateTime::from_timestamp_nano(timestamp);
     assert_eq!(now, new_time);
 }
 
@@ -230,7 +230,7 @@ fn test_week() {
 fn test_nano() {
     let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
     println!("{}", date1.to_string());
-    assert_eq!(date1.to_string(), "2019-04-28T00:00:00.023333333Z");
+    assert_eq!(date1.to_string(), "2019-04-28T08:00:00.023333333+08:00");
 }
 
 

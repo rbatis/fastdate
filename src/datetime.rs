@@ -514,9 +514,13 @@ impl FromStr for DateTime {
             v.push_str("+00:00");
         }
         let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| Error::from(e.to_string()))?;
-        Ok(Self {
+        let mut s = Self {
             inner
-        })
+        };
+        if have_offset == false {
+            s = s.set_offset(offset_sec());
+        }
+        Ok(s)
     }
 }
 
