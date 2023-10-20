@@ -355,6 +355,7 @@ fn test_display_datetime() {
     let v = epoch.display(false);
     assert_eq!(v, "2000-01-01T01:01:11.000001233");
 }
+
 #[test]
 fn test_display_stand() {
     let epoch = fastdate::DateTime::from((Date {
@@ -369,4 +370,23 @@ fn test_display_stand() {
     }));
     let v = epoch.display_stand();
     assert_eq!(v, "2000-01-01 01:01:11.000001233");
+}
+
+#[test]
+fn test_set_micro() {
+    let mut dt = fastdate::DateTime::from((Date {
+        day: 1,
+        mon: 1,
+        year: 2000,
+    }, Time {
+        nano: 1233,
+        sec: 11,
+        minute: 1,
+        hour: 1,
+    }));
+    dt = dt.set_nano(0);
+    assert_eq!(dt.display_stand(), "2000-01-01 01:01:11");
+
+    dt = dt.set_nano(1);
+    assert_eq!(dt.display_stand(), "2000-01-01 01:01:11.000001");
 }

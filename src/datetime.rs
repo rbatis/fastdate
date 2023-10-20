@@ -307,8 +307,8 @@ impl DateTime {
 
     /// stand "0000-00-00 00:00:00.000000000"
     pub fn display_stand(&self) -> String {
-        let mut v =self.display(false);
-        v.replace_range((10..11)," ");
+        let mut v = self.display(false);
+        v.replace_range(10..11, " ");
         v
     }
 
@@ -391,6 +391,15 @@ impl DateTime {
             }
         }
         len
+    }
+
+    pub fn set_nano(mut self, nano: u32) -> Self {
+        let v = self.nano();
+        if nano != v {
+            self = self.sub(Duration::from_nanos(v as u64));
+            self = self.add(Duration::from_micros(nano as u64));
+        }
+        self
     }
 }
 
