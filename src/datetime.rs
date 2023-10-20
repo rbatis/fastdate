@@ -511,16 +511,18 @@ impl FromStr for DateTime {
             have_offset = true;
         }
         if have_offset == false {
-            v.push_str("+00:00");
+            let of = UtcOffset::from_whole_seconds(offset_sec()).unwrap();
+            let (h, m, _) = of.as_hms();
+            if h >= 0 && m >= 0 {
+                v.push_str(&format!("+{:02}:{:02}", h, m));
+            } else {
+                v.push_str(&format!("-{:02}:{:02}", h, m));
+            }
         }
         let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| Error::from(e.to_string()))?;
-        let mut s = Self {
+        Ok(Self {
             inner
-        };
-        if have_offset == false {
-            s = s.set_offset(offset_sec());
-        }
-        Ok(s)
+        })
     }
 }
 

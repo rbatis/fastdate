@@ -13,7 +13,7 @@ fn test_other_space() {
 fn test_date() {
     let d = DateTime::from_str("1234-12-13 11:12:13.123456").unwrap();
     println!("{}", d);
-    assert_eq!(d.to_string(), "1234-12-13T19:12:13.123456+08:00".to_string());
+    assert_eq!(d.to_string(), "1234-12-13T11:12:13.123456+08:00".to_string());
 }
 
 #[test]
@@ -176,6 +176,7 @@ fn test_befor_after() {
 fn test_from_str_zone() {
     let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
     assert_eq!(date1.offset(), offset_sec());
+    println!("{}",date1);
 }
 
 #[test]
@@ -202,7 +203,7 @@ fn test_parse_z_sub() {
 fn test_set_offset_sub() {
     let mut date = DateTime::from_str("2022-12-12 09:00:00").unwrap();
     date = date.set_offset(-9 * 3600);
-    assert_eq!(date.to_string(), "2022-12-12T00:00:00-09:00");
+    assert_eq!(date.to_string(), "2022-12-11T16:00:00-09:00");
 }
 
 #[test]
@@ -227,7 +228,8 @@ fn test_parse_format2() {
 
 #[test]
 fn test_week() {
-    let date = DateTime::from_str("2022-07-27 00:27:11.000000").unwrap();
+    let date = DateTime::from_str("2022-07-27 09:27:11.000000+08:00").unwrap();
+    println!("{}",date);
     println!("week,{}", date.week_day());
     assert_eq!(3, date.week_day());
 }
@@ -236,7 +238,7 @@ fn test_week() {
 fn test_nano() {
     let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
     println!("{}", date1.to_string());
-    assert_eq!(date1.to_string(), "2019-04-28T08:00:00.023333333+08:00");
+    assert_eq!(date1.to_string(), "2019-04-28T00:00:00.023333333+08:00");
 }
 
 
@@ -251,7 +253,7 @@ fn test_ser_date() {
     let mut date = DateTime::from_str("2023-10-13 16:57:41.123926").unwrap();
     date = date.set_offset(offset_sec());
     let js = serde_json::to_string(&date).unwrap();
-    assert_eq!(js, "\"2023-10-14T00:57:41.123926+08:00\"");
+    assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
 }
 
 #[test]
@@ -259,7 +261,7 @@ fn test_de_date() {
     let mut date = DateTime::from_str("2023-10-13 16:57:41.123926").unwrap();
     date = date.set_offset(offset_sec());
     let js = serde_json::to_string(&date).unwrap();
-    assert_eq!(js, "\"2023-10-14T00:57:41.123926+08:00\"");
+    assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
     let new_date = serde_json::from_str::<DateTime>(&js).unwrap();
     assert_eq!(new_date.offset(), 28800);
 }
