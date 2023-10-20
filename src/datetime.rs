@@ -304,10 +304,27 @@ impl DateTime {
         }.set_offset(offset)
     }
 
+
+    /// stand "0000-00-00 00:00:00.000000000"
+    pub fn display_stand(&self) -> String {
+        let mut v =self.display(false);
+        v.replace_range((10..11)," ");
+        v
+    }
+
     /// RFC3339 "0000-00-00T00:00:00.000000000Z"
     /// RFC3339 "0000-00-00T00:00:00.000000000+00:00:00"
-    pub fn display(&self, f: &mut Formatter) -> std::fmt::Result {
+    pub fn display(&self, zone: bool) -> String {
         let mut buf: [u8; 38] = *b"0000-00-00T00:00:00.000000000+00:00:00";
+        let len = self.do_display(&mut buf, zone);
+        std::str::from_utf8(&buf[..len]).unwrap().to_string()
+    }
+
+    /// let mut buf: [u8; 38] = *b"0000-00-00T00:00:00.000000000+00:00:00";
+    /// than print this:
+    /// RFC3339 "0000-00-00T00:00:00.000000000Z"
+    /// RFC3339 "0000-00-00T00:00:00.000000000+00:00:00"
+    pub fn do_display(&self, buf: &mut [u8; 38], add_zone: bool) -> usize {
         let year = self.year();
         let mon = self.mon();
         let day = self.day();
@@ -320,58 +337,60 @@ impl DateTime {
         buf[8] = b'0' + (day / 10);
         buf[9] = b'0' + (day % 10);
         let time = Time::from(self.clone());
-        let mut len = time.display_time(11, &mut buf);
-        let offset = self.offset();
-        if offset == 0 {
-            buf[len] = b'Z';
-            len += 1;
-        } else {
-            let (h, m, s) = self.inner.offset().as_hms();
-            if offset > 0 {
-                buf[len] = b'+';
+        let mut len = time.display_time(11, buf);
+        if add_zone {
+            let offset = self.offset();
+            if offset == 0 {
+                buf[len] = b'Z';
                 len += 1;
-                buf[len] = b'0' + (h as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (h as u8 % 10);
-                len += 1;
-                buf[len] = b':' + (m as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (m as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (m as u8 % 10);
-                len += 1;
-                if s != 0 {
-                    buf[len] = b':' + (s as u8 / 10);
-                    len += 1;
-                    buf[len] = b'0' + (s as u8 / 10);
-                    len += 1;
-                    buf[len] = b'0' + (s as u8 % 10);
-                    len += 1;
-                }
             } else {
-                buf[len] = b'-';
-                len += 1;
-                buf[len] = b'0' + (-h as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (-h as u8 % 10);
-                len += 1;
-                buf[len] = b':' + (-m as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (-m as u8 / 10);
-                len += 1;
-                buf[len] = b'0' + (-m as u8 % 10);
-                len += 1;
-                if s != 0 {
-                    buf[len] = b':' + (-s as u8 / 10);
+                let (h, m, s) = self.inner.offset().as_hms();
+                if offset > 0 {
+                    buf[len] = b'+';
                     len += 1;
-                    buf[len] = b'0' + (-s as u8 / 10);
+                    buf[len] = b'0' + (h as u8 / 10);
                     len += 1;
-                    buf[len] = b'0' + (-s as u8 % 10);
+                    buf[len] = b'0' + (h as u8 % 10);
                     len += 1;
+                    buf[len] = b':' + (m as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (m as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (m as u8 % 10);
+                    len += 1;
+                    if s != 0 {
+                        buf[len] = b':' + (s as u8 / 10);
+                        len += 1;
+                        buf[len] = b'0' + (s as u8 / 10);
+                        len += 1;
+                        buf[len] = b'0' + (s as u8 % 10);
+                        len += 1;
+                    }
+                } else {
+                    buf[len] = b'-';
+                    len += 1;
+                    buf[len] = b'0' + (-h as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (-h as u8 % 10);
+                    len += 1;
+                    buf[len] = b':' + (-m as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (-m as u8 / 10);
+                    len += 1;
+                    buf[len] = b'0' + (-m as u8 % 10);
+                    len += 1;
+                    if s != 0 {
+                        buf[len] = b':' + (-s as u8 / 10);
+                        len += 1;
+                        buf[len] = b'0' + (-s as u8 / 10);
+                        len += 1;
+                        buf[len] = b'0' + (-s as u8 % 10);
+                        len += 1;
+                    }
                 }
             }
         }
-        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
+        len
     }
 }
 
@@ -495,7 +514,9 @@ impl FromStr for DateTime {
 impl Display for DateTime {
     /// fmt RFC3339Nano = "2006-01-02T15:04:05.999999999"
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        self.display(f)
+        let mut buf: [u8; 38] = *b"0000-00-00T00:00:00.000000000+00:00:00";
+        let len = self.do_display(&mut buf, true);
+        f.write_str(std::str::from_utf8(&buf[..len]).unwrap())
     }
 }
 
