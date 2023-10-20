@@ -173,6 +173,12 @@ fn test_befor_after() {
 }
 
 #[test]
+fn test_from_str_zone() {
+    let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
+    assert_eq!(date1.offset(), offset_sec());
+}
+
+#[test]
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
     assert_eq!(date.to_string(), "2022-12-12T00:00:00Z");
