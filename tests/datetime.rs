@@ -112,6 +112,25 @@ fn test_date_time() {
 }
 
 #[test]
+fn test_set_offset() {
+    let new_time = DateTime::from((Date{
+        day: 12,
+        mon: 12,
+        year: 2023,
+    }, Time{
+        nano: 12,
+        sec: 12,
+        minu: 12,
+        hour: 12,
+    }));
+    let timestamp_nano = new_time.unix_timestamp_nano();
+    assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
+    let new_time=new_time.set_offset(offset_sec());
+    assert_eq!(new_time.to_string(), "2023-12-12T20:12:12.000000012+08:00");
+    assert_eq!(new_time.unix_timestamp_nano(),timestamp_nano);
+}
+
+#[test]
 fn test_unix_timestamp() {
     let d = DateTime::now().unix_timestamp();
     println!("unix:{}", d);
