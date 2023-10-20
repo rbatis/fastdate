@@ -467,7 +467,7 @@ impl FromStr for DateTime {
             v.push_str("T00:00:00.00Z");
         }
         if v.len() > 10 && &v[10..11] != "T" {
-            v = v.replace(" ", "T").to_string();
+            v.replace_range(10..11, "T");
         }
         let mut have_offset = false;
         let bytes = v.as_bytes();
