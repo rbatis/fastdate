@@ -245,7 +245,7 @@ fn test_nano() {
 #[test]
 fn test_parse_date() {
     let date = DateTime::from_str("2013-10-06").unwrap();
-    assert_eq!(date.to_string(), "2013-10-06T00:00:00Z");
+    assert_eq!(date.to_string(), "2013-10-06T00:00:00+08:00");
 }
 
 #[test]
@@ -269,27 +269,27 @@ fn test_de_date() {
 #[test]
 fn test_add_minute() {
     let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_minute(1));
-    assert_eq!(date.to_string(), "2013-10-06T00:01:00Z");
+    assert_eq!(date.to_string(), "2013-10-06T00:01:00+08:00");
 }
 
 #[test]
 fn test_add_hour() {
     let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_hour(1));
-    assert_eq!(date.to_string(), "2013-10-06T01:00:00Z");
+    assert_eq!(date.to_string(), "2013-10-06T01:00:00+08:00");
 }
 
 #[test]
 fn test_add_day() {
     let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_day(1));
-    assert_eq!(date.to_string(), "2013-10-07T00:00:00Z");
+    assert_eq!(date.to_string(), "2013-10-07T00:00:00+08:00");
 }
 
 #[test]
 fn test_add_sub_sec() {
     let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(1);
-    assert_eq!(date.to_string(), "2013-10-06T00:00:01Z");
+    assert_eq!(date.to_string(), "2013-10-06T00:00:01+08:00");
     let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
-    assert_eq!(date.to_string(), "2013-10-05T23:59:59Z");
+    assert_eq!(date.to_string(), "2013-10-05T23:59:59+08:00");
 }
 
 #[test]

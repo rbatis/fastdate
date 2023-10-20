@@ -492,23 +492,23 @@ impl FromStr for DateTime {
     fn from_str(arg: &str) -> Result<DateTime, Error> {
         let mut v = arg.to_string();
         if v.len() == 10 {
-            v.push_str("T00:00:00.00Z");
+            v.push_str("T00:00:00.00");
         }
         if v.len() > 10 && &v[10..11] != "T" {
             v.replace_range(10..11, "T");
         }
-        let mut have_offset = false;
         let bytes = v.as_bytes();
-        if !v.ends_with('Z') {
-            if bytes.len() >= 22 {
-                if let Some(b) = bytes.get(bytes.len() - 6) {
-                    if *b == '+' as u8 || *b == '-' as u8 {
-                        have_offset = true;
-                    }
+        let mut have_offset = false;
+        if v.ends_with("Z"){
+            v.pop();
+            v.push_str("+00:00");
+            have_offset = true;
+        }else{
+            if let Some(b) = bytes.get(bytes.len() - 6) {
+                if *b == '+' as u8 || *b == '-' as u8 {
+                    have_offset = true;
                 }
             }
-        } else {
-            have_offset = true;
         }
         if have_offset == false {
             let of = UtcOffset::from_whole_seconds(offset_sec()).unwrap();
