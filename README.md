@@ -11,7 +11,7 @@ this date cartes is very fast(<= 50ns) including
 * eq()/==
 * add()/sub()
 * set_offset()
-* parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13")
+* parse("HH:MM:SS.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13")
 * unix_timestamp()
 * unix_timestamp_millis()
 * unix_timestamp_nano()
@@ -76,7 +76,7 @@ fn main(){
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456+08:00");
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456Z");
     //parse by format str
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    let date = DateTime::parse("HH:MM:SS.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
     //to_string()
     let s = datetime.to_string();//1234-12-13 11:12:13.123456
     //unix_timestamp

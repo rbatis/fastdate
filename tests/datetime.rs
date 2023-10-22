@@ -4,9 +4,9 @@ use std::time::{Duration, SystemTime};
 
 #[test]
 fn test_other_space() {
-    let d = DateTime::parse("YYYY MM DD hh_mm_ss.000000", "1234_12_13_11_12_13.123456").unwrap();
+    let d = DateTime::parse("YYYY-MM-DDTHH_MM_SS.000000", "1234_12_13_11_12_13.123456").unwrap();
     println!("{}", d);
-    assert_eq!("1234-12-13T11:12:13.123456Z".to_string(), d.to_string());
+    assert_eq!("1234-12-13T11:12:13.123456+08:00".to_string(), d.to_string());
 }
 
 #[test]
@@ -216,13 +216,13 @@ fn test_time_sub_time() {
 
 #[test]
 fn test_parse_format() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456").unwrap();
+    let date = DateTime::parse("YYYY-MM-DD HH:MM:SS.000000", "2022-12-13 11:12:14.123456").unwrap();
     println!("{}", date);
 }
 
 #[test]
 fn test_parse_format2() {
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
+    let date = DateTime::parse("HH:MM:SS.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
     println!("{}", date);
 }
 

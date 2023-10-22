@@ -142,85 +142,78 @@ impl DateTime {
     /// parse an string by format.
     /// format str must be:
     /// ```rust
-    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD HH:MM:SS.000000","2022-12-13 11:12:14.123456").unwrap();
     /// ```
     /// or any position
     /// ```rust
-    ///  fastdate::DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    ///  fastdate::DateTime::parse("HH:MM:SS.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
     /// ```
-    /// TODO: support +00:00
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
-        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000+00:00";
+        let mut buf: [u8; 26] = *b"0000-00-00T00:00:00.000000";
         let format_bytes = format.as_bytes();
         let mut idx_year = 0;
         let mut idx_mon = 5;
         let mut idx_day = 8;
         let mut idx_hour = 11;
-        let mut idx_min = 14;
+        let mut idx_minute = 14;
         let mut idx_sec = 17;
         let mut idx_micro = 20;
         let mut v = 0;
-        for x in format_bytes {
-            if x == &('Y' as u8) {
+        for char_fmt in format_bytes {
+            if char_fmt == &('Y' as u8) && idx_year <= 3 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong YYYY format!"));
                 }
                 buf[idx_year] = bytes[v];
                 idx_year += 1;
             }
-            if x == &('M' as u8) {
+            if char_fmt == &('M' as u8) && idx_mon <= 6 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong MM format!"));
                 }
                 buf[idx_mon] = bytes[v];
                 idx_mon += 1;
             }
-            if x == &('D' as u8) {
+            if char_fmt == &('D' as u8) && idx_day <= 9 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong DD format!"));
                 }
                 buf[idx_day] = bytes[v];
                 idx_day += 1;
             }
-            if x == &('h' as u8) {
+            if (char_fmt == &('H' as u8) || char_fmt == &('h' as u8)) && idx_hour <= 12 {
                 if v >= bytes.len() {
-                    return Err(Error::from("wrong hh format!"));
+                    return Err(Error::from("wrong HH format!"));
                 }
                 buf[idx_hour] = bytes[v];
                 idx_hour += 1;
             }
-            if x == &('m' as u8) {
+            if (char_fmt == &('M' as u8) || char_fmt == &('m' as u8)) && idx_minute <= 15 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong mm format!"));
                 }
-                buf[idx_min] = bytes[v];
-                idx_min += 1;
+                buf[idx_minute] = bytes[v];
+                idx_minute += 1;
             }
-            if x == &('s' as u8) {
+            if (char_fmt == &('S' as u8) || char_fmt == &('s' as u8)) && idx_sec <= 18 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong ss format!"));
                 }
                 buf[idx_sec] = bytes[v];
                 idx_sec += 1;
             }
-            if x == &('0' as u8) {
+            if char_fmt == &('0' as u8) && idx_micro <= 25 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong .000000 format!"));
                 }
                 buf[idx_micro] = bytes[v];
                 idx_micro += 1;
             }
-            if x == &('O' as u8) {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong OH format!"));
-                }
-                buf[idx_micro] = bytes[v];
-                idx_micro += 1;
-            }
             v += 1;
         }
-        DateTime::from_str(std::str::from_utf8(&buf[..]).unwrap_or_default())
+        let str = std::str::from_utf8(&buf[..]).unwrap_or_default();
+        DateTime::from_str(str)
     }
 
     /// get week_day
@@ -499,11 +492,11 @@ impl FromStr for DateTime {
         }
         let bytes = v.as_bytes();
         let mut have_offset = false;
-        if v.ends_with("Z"){
+        if v.ends_with("Z") {
             v.pop();
             v.push_str("+00:00");
             have_offset = true;
-        }else{
+        } else {
             if let Some(b) = bytes.get(bytes.len() - 6) {
                 if *b == '+' as u8 || *b == '-' as u8 {
                     have_offset = true;
@@ -519,7 +512,10 @@ impl FromStr for DateTime {
                 v.push_str(&format!("-{:02}:{:02}", h, m));
             }
         }
-        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| Error::from(e.to_string()))?;
+        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| {
+            let info = format!("{} of '{}'", e, arg);
+            Error::from(info)
+        })?;
         Ok(Self {
             inner
         })
@@ -537,7 +533,7 @@ impl Display for DateTime {
 
 impl Ord for DateTime {
     fn cmp(&self, other: &DateTime) -> cmp::Ordering {
-        SystemTime::from(self.clone()).cmp(&SystemTime::from(other.clone()))
+        self.unix_timestamp_nano().cmp(&other.unix_timestamp_nano())
     }
 }
 
