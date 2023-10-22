@@ -146,7 +146,7 @@ impl DateTime {
     /// ```
     /// or any position
     /// ```rust
-    ///  fastdate::DateTime::parse("HH:MM:SS.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD,HH:MM:SS.000000","2022-12-13,11:12:14.123456").unwrap();
     /// ```
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
