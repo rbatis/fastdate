@@ -171,6 +171,17 @@ fn test_offset_zone() {
 }
 
 #[test]
+fn test_offset_zone2() {
+    let mut epoch = fastdate::DateTime::from(Date {
+        day: 1,
+        mon: 1,
+        year: 2000,
+    });
+    println!("{}", epoch);
+    epoch = epoch.set_offset(8*3600).add_sub_sec(-8*3600);
+    println!("{}", epoch);
+}
+#[test]
 fn test_into() {
     let utc = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
     let date: Date = utc.clone().into();

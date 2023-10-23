@@ -464,6 +464,13 @@ impl From<Date> for DateTime {
     }
 }
 
+/// from((Date{},offset_sec()))
+impl From<(Date, i32)> for DateTime {
+    fn from(arg: (Date, i32)) -> Self {
+        Self::from(arg.0).set_offset(arg.1).add_sub_sec(-arg.1 as i64)
+    }
+}
+
 impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
         Self::from_str(&format!("0000-00-00 {:02}:{:02}:{:02}.{:09}Z", arg.hour, arg.minute, arg.sec, arg.nano)).unwrap()
@@ -476,7 +483,7 @@ impl From<(Date, Time)> for DateTime {
     }
 }
 
-///from date,time,offset sec
+///from(Date{},Time{},offset_sec())
 impl From<(Date, Time, i32)> for DateTime {
     fn from(arg: (Date, Time, i32)) -> Self {
         let mut datetime = Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap();
