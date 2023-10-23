@@ -131,6 +131,22 @@ fn test_set_offset() {
 }
 
 #[test]
+fn test_set_offset2() {
+    let new_time = DateTime::from((Date {
+        day: 12,
+        mon: 12,
+        year: 2023,
+    }, Time {
+        nano: 12,
+        sec: 12,
+        minute: 12,
+        hour: 12,
+    }, 8*3600));
+    println!("{}", new_time.display_stand());
+    assert_eq!(new_time.display(true), "2023-12-12T12:12:12.000000012+08:00");
+}
+
+#[test]
 fn test_unix_timestamp() {
     let d = DateTime::now().unix_timestamp();
     println!("unix:{}", d);
@@ -176,7 +192,7 @@ fn test_befor_after() {
 fn test_from_str_zone() {
     let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
     assert_eq!(date1.offset(), offset_sec());
-    println!("{}",date1);
+    println!("{}", date1);
 }
 
 #[test]
@@ -229,7 +245,7 @@ fn test_parse_format2() {
 #[test]
 fn test_week() {
     let date = DateTime::from_str("2022-07-27 09:27:11.000000+08:00").unwrap();
-    println!("{}",date);
+    println!("{}", date);
     println!("week,{}", date.week_day());
     assert_eq!(3, date.week_day());
 }

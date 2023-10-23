@@ -47,8 +47,11 @@ impl DateTime {
     /// dt = dt.set_offset(fastdate::offset_sec());
     /// ```
     pub fn set_offset(mut self, mut offset_sec: i32) -> DateTime {
-        if offset_sec > 24 * 60 * 60 {
-            offset_sec = 24 * 60 * 60;
+        if offset_sec >= 86399 {
+            offset_sec = 86399;
+        }
+        if offset_sec <= -86399 {
+            offset_sec = -86399;
         }
         self.inner = self.inner.to_offset(UtcOffset::from_whole_seconds(offset_sec).unwrap());
         self
@@ -470,6 +473,15 @@ impl From<Time> for DateTime {
 impl From<(Date, Time)> for DateTime {
     fn from(arg: (Date, Time)) -> Self {
         Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap()
+    }
+}
+
+///from date,time,offset sec
+impl From<(Date, Time, i32)> for DateTime {
+    fn from(arg: (Date, Time, i32)) -> Self {
+        let mut datetime = Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap();
+        datetime = datetime.set_offset(arg.2).add_sub_sec(-arg.2 as i64);
+        datetime
     }
 }
 
