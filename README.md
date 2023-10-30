@@ -14,7 +14,7 @@ this date cartes is very fast(<= 50ns) including
 * eq()/==
 * add()/sub()
 * set_offset()
-* parse("HH:MM:SS.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13")
+* parse("YYYY-MM-DD,HH:MM:SS.000000","2022-12-13,11:12:14.123456")
 * unix_timestamp()
 * unix_timestamp_millis()
 * unix_timestamp_nano()
