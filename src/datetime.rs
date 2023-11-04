@@ -162,6 +162,7 @@ impl DateTime {
     /// ```
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
+        let mut len = 26;
         let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000      ";
         let format_bytes = format.as_bytes();
         let mut idx_year = 0;
@@ -224,9 +225,6 @@ impl DateTime {
             }
             v += 1;
         }
-        if arg.ends_with("Z") {
-            buf[26] = 'Z' as u8;
-        }
         let bytes_add_sub = bytes[arg.len() - 6];
         let bytes_m = bytes[arg.len() - 3];
         if arg.len() >= 6 && (bytes_add_sub == b'+' || bytes_add_sub == b'-') && bytes_m == b':' {
@@ -235,10 +233,14 @@ impl DateTime {
             for x in datas {
                 buf[i] = *x;
                 i += 1;
+                len += 1;
             }
         }
-        let mut str = std::str::from_utf8(&buf[..]).unwrap_or_default();
-        str = str.trim_end();
+        if bytes[bytes.len() - 1] == 'Z' as u8 {
+            len += 1;
+            buf[len - 1] = 'Z' as u8;
+        }
+        let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
         DateTime::from_str(str)
     }
 
