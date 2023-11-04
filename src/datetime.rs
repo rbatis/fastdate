@@ -144,6 +144,7 @@ impl DateTime {
 
     /// parse an string by format.
     /// format str must be:
+    /// parse local time
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
     /// ```
@@ -151,9 +152,17 @@ impl DateTime {
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD,hh:mm:ss.000000","2022-12-13,11:12:14.123456").unwrap();
     /// ```
+    /// or time zone(UTC)
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z").unwrap();
+    /// ```
+    /// or time zone(UTC+Hour)
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    /// ```
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
-        let mut buf: [u8; 26] = *b"0000-00-00T00:00:00.000000";
+        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000      ";
         let format_bytes = format.as_bytes();
         let mut idx_year = 0;
         let mut idx_mon = 5;
@@ -215,7 +224,21 @@ impl DateTime {
             }
             v += 1;
         }
-        let str = std::str::from_utf8(&buf[..]).unwrap_or_default();
+        if arg.ends_with("Z") {
+            buf[26] = 'Z' as u8;
+        }
+        let bytes_add_sub = bytes[arg.len() - 6];
+        let bytes_m = bytes[arg.len() - 3];
+        if arg.len() >= 6 && (bytes_add_sub == b'+' || bytes_add_sub == b'-') && bytes_m == b':' {
+            let datas = &bytes[(bytes.len() - 6)..];
+            let mut i = bytes.len() - 6;
+            for x in datas {
+                buf[i] = *x;
+                i += 1;
+            }
+        }
+        let mut str = std::str::from_utf8(&buf[..]).unwrap_or_default();
+        str = str.trim_end();
         DateTime::from_str(str)
     }
 
