@@ -276,6 +276,12 @@ fn test_parse_format5() {
     assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+06:00");
 }
 
+#[test]
+fn test_parse_format6() {
+    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+08:00");
+}
 
 #[test]
 fn test_week() {

@@ -225,15 +225,16 @@ impl DateTime {
             }
             v += 1;
         }
-        let bytes_add_sub = bytes[arg.len() - 6];
-        let bytes_m = bytes[arg.len() - 3];
-        if arg.len() >= 6 && (bytes_add_sub == b'+' || bytes_add_sub == b'-') && bytes_m == b':' {
-            let datas = &bytes[(bytes.len() - 6)..];
-            let mut i = bytes.len() - 6;
-            for x in datas {
-                buf[i] = *x;
-                i += 1;
-                len += 1;
+        if arg.len() >= 6 {
+            let bytes_add_sub = bytes[arg.len() - 6];
+            if bytes[arg.len() - 3] == b':' && (bytes_add_sub == b'+' || bytes_add_sub == b'-') {
+                let zone_data = &bytes[(bytes.len() - 6)..];
+                let mut i = bytes.len() - 6;
+                for x in zone_data {
+                    buf[i] = *x;
+                    i += 1;
+                    len += 1;
+                }
             }
         }
         if bytes[bytes.len() - 1] == 'Z' as u8 {

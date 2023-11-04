@@ -18,8 +18,7 @@ fn test_display() {
 #[test]
 fn test_date_12345678910() {
     let d = Time::from_str("11:12:13.12345678910");
-    println!("{:?}", d);
-    assert_eq!(true, d.is_err());
+    assert_eq!("SecondFractionTooLong", d.err().unwrap().to_string());
 }
 
 #[test]
