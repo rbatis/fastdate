@@ -542,11 +542,10 @@ impl FromStr for DateTime {
             have_offset = Some(v.len() - 6);
         } else {
             if v.len() >= 6 {
-                let bytes = v.as_bytes();
-                if let Some(b) = bytes.get(bytes.len() - 6) {
-                    if *b == '+' as u8 || *b == '-' as u8 {
-                        have_offset = Some(bytes.len() - 6);
-                    }
+                let index = v.len() - 6;
+                let b = &v[index..(index + 1)];
+                if b == "+" || b == "-" {
+                    have_offset = Some(index);
                 }
             }
         }
@@ -554,7 +553,7 @@ impl FromStr for DateTime {
             if offset >= 1 {
                 offset = offset - 1;
                 if v.len() > offset {
-                    if v.as_bytes()[offset] == ' ' as u8 {
+                    if &v[offset..(offset + 1)] == " " {
                         v.remove(offset);
                     }
                 }
