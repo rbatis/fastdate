@@ -207,6 +207,21 @@ fn test_from_str_zone() {
 }
 
 #[test]
+fn test_from_str_zone_add() {
+    let date1 = DateTime::from_str("2022-12-12T00:00:00 +08:00").unwrap();
+    assert_eq!(date1.offset(), 28800);
+    println!("{}", date1);
+}
+
+#[test]
+fn test_from_str_fail() {
+    let date1 = DateTime::from_str("2022");
+    assert_eq!(date1.is_err(),true);
+    let date1 = DateTime::from_str("");
+    assert_eq!(date1.is_err(),true);
+}
+
+#[test]
 fn test_parse_z() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000Z").unwrap();
     assert_eq!(date.to_string(), "2022-12-12T00:00:00Z");

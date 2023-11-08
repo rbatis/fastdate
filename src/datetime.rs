@@ -535,20 +535,32 @@ impl FromStr for DateTime {
         if v.len() > 10 && &v[10..11] != "T" {
             v.replace_range(10..11, "T");
         }
-        let bytes = v.as_bytes();
-        let mut have_offset = false;
+        let mut have_offset = None;
         if v.ends_with("Z") {
             v.pop();
             v.push_str("+00:00");
-            have_offset = true;
+            have_offset = Some(v.len() - 6);
         } else {
-            if let Some(b) = bytes.get(bytes.len() - 6) {
-                if *b == '+' as u8 || *b == '-' as u8 {
-                    have_offset = true;
+            if v.len() >= 6 {
+                let bytes = v.as_bytes();
+                if let Some(b) = bytes.get(bytes.len() - 6) {
+                    if *b == '+' as u8 || *b == '-' as u8 {
+                        have_offset = Some(bytes.len() - 6);
+                    }
                 }
             }
         }
-        if have_offset == false {
+        if let Some(mut offset) = have_offset {
+            if offset >= 1 {
+                offset = offset - 1;
+                if v.len() > offset {
+                    if v.as_bytes()[offset] == ' ' as u8 {
+                        v.remove(offset);
+                    }
+                }
+            }
+        }
+        if have_offset.is_none() {
             let of = UtcOffset::from_whole_seconds(offset_sec()).unwrap();
             let (h, m, _) = of.as_hms();
             if h >= 0 && m >= 0 {
