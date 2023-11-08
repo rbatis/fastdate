@@ -143,7 +143,8 @@ impl DateTime {
     }
 
     /// parse an string by format.
-    /// format str must be:
+    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
+    /// format str must be example:
     /// or time zone(UTC+Hour)
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+06:00").unwrap();
