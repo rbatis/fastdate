@@ -299,6 +299,28 @@ fn test_parse_format6() {
 }
 
 #[test]
+fn test_parse_format7() {
+    let date = DateTime::parse("hh:mm:ss.000000+08:00,YYYY-MM-DD","11:12:14.123456-08:00,2022-12-13").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456-08:00");
+}
+
+
+#[test]
+fn test_parse_format8() {
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+06:00");
+}
+
+#[test]
+fn test_parse_format9() {
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456-06:00").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456-06:00");
+}
+
+#[test]
 fn test_week() {
     let date = DateTime::from_str("2022-07-27 09:27:11.000000+08:00").unwrap();
     println!("{}", date);

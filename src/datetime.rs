@@ -144,6 +144,15 @@ impl DateTime {
 
     /// parse an string by format.
     /// format str must be:
+    /// or time zone(UTC+Hour)
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456-03:00").unwrap();
+    /// ```
+    /// or time zone(UTC)
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000Z", "2022-12-13 11:12:14.123456Z").unwrap();
+    /// ```
     /// parse local time
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000","2022-12-13 11:12:14.123456").unwrap();
@@ -160,6 +169,7 @@ impl DateTime {
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456+06:00").unwrap();
     /// ```
+    /// ```
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
         let mut len = 26;
@@ -172,9 +182,18 @@ impl DateTime {
         let mut idx_hour = 11;
         let mut idx_minute = 14;
         let mut idx_sec = 17;
-        let mut idx_micro = 20;
-        let mut v = 0;
+        let mut idx_micro = 19;
+        let mut idx_zone = 26;
+
+        let mut micro = false;
+        let mut zone = false;
+
+        let mut zone_finish = false;
+
+        let mut v = -1;
         for char_fmt in format_bytes {
+            v += 1;
+            let v = v as usize;
             if char_fmt == &('Y' as u8) && idx_year <= 3 {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong YYYY format!"));
@@ -198,7 +217,7 @@ impl DateTime {
             }
             if char_fmt == &('h' as u8) && idx_hour <= 12 {
                 if v >= bytes.len() {
-                    return Err(Error::from("wrong HH format!"));
+                    return Err(Error::from("wrong hh format!"));
                 }
                 buf[idx_hour] = bytes[v];
                 idx_hour += 1;
@@ -217,16 +236,32 @@ impl DateTime {
                 buf[idx_sec] = bytes[v];
                 idx_sec += 1;
             }
-            if char_fmt == &('0' as u8) && idx_micro <= 25 {
+            if micro == true || char_fmt == &('.' as u8) {
                 if v >= bytes.len() {
                     return Err(Error::from("wrong .000000 format!"));
                 }
+                micro = true;
                 buf[idx_micro] = bytes[v];
                 idx_micro += 1;
+                if idx_micro - 19 == 7 {
+                    micro = false;
+                }
             }
-            v += 1;
+            if char_fmt == &('+' as u8) || zone == true {
+                zone = true;
+                buf[idx_zone] = bytes[v];
+                idx_zone += 1;
+                len += 1;
+                if idx_zone - 26 == 6 {
+                    zone = false;
+                    zone_finish = true;
+                }
+            }
+            if char_fmt == &('Z' as u8) {
+                buf[idx_zone] = bytes[v];
+            }
         }
-        if arg.len() >= 6 {
+        if zone_finish == false && arg.len() >= 6 {
             let bytes_add_sub = bytes[arg.len() - 6];
             if bytes[arg.len() - 3] == b':' && (bytes_add_sub == b'+' || bytes_add_sub == b'-') {
                 let zone_data = &bytes[(bytes.len() - 6)..];
@@ -238,18 +273,13 @@ impl DateTime {
                 }
             }
         }
-        if bytes[bytes.len() - 1] == 'Z' as u8 {
+        if arg.len() > 26 && &arg[26..27] == "Z" {
+            buf[26] = 'Z' as u8;
             len += 1;
-            buf[len - 1] = 'Z' as u8;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
-        let inner = time1::OffsetDateTime::parse(str, &Rfc3339).map_err(|e| {
-            let info = format!("{} of '{}'", e, arg);
-            Error::from(info)
-        })?;
-        Ok(DateTime{
-            inner
-        })
+        let inner = DateTime::from_str(str)?;
+        Ok(inner)
     }
 
     /// get week_day

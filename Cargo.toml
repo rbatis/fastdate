@@ -1,6 +1,6 @@
 [package]
 name = "fastdate"
-version = "0.3.16"
+version = "0.3.17"
 edition = "2021"
 description = "Rust fast date carte"
 readme = "Readme.md"
