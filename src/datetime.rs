@@ -163,6 +163,7 @@ impl DateTime {
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let bytes = arg.as_bytes();
         let mut len = 26;
+        //this is RFC3339 datetime buffer
         let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000      ";
         let format_bytes = format.as_bytes();
         let mut idx_year = 0;
@@ -242,7 +243,13 @@ impl DateTime {
             buf[len - 1] = 'Z' as u8;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
-        DateTime::from_str(str)
+        let inner = time1::OffsetDateTime::parse(str, &Rfc3339).map_err(|e| {
+            let info = format!("{} of '{}'", e, arg);
+            Error::from(info)
+        })?;
+        Ok(DateTime{
+            inner
+        })
     }
 
     /// get week_day
