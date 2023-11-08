@@ -259,6 +259,7 @@ impl DateTime {
             }
             if char_fmt == &('Z' as u8) {
                 buf[idx_zone] = bytes[v];
+                zone_finish = true;
             }
         }
         if zone_finish == false && arg.len() >= 6 {
@@ -271,6 +272,7 @@ impl DateTime {
                     i += 1;
                     len += 1;
                 }
+                zone_finish = true;
             }
         }
         if arg.len() > 26 && &arg[26..27] == "Z" {
