@@ -271,8 +271,8 @@ impl DateTime {
                 len += 7;
             }
         }
-        if let Some(zone) = format.find("Z") {
-            buf[zone] = 'Z' as u8;
+        if let Some(_) = format.find("Z") {
+            buf[len] = 'Z' as u8;
             len +=1;
         }
         if let Some(zone) = format.find("+00:00") {
@@ -284,6 +284,7 @@ impl DateTime {
             len += 6;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
+        println!("str={}",str);
         let inner = DateTime::from_str(str)?;
         Ok(inner)
     }

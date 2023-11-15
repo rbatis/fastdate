@@ -1,24 +1,24 @@
-use fastdate::{offset_sec, Date, DateTime, DurationFrom, Time};
+use fastdate::{Date, DateTime, DurationFrom, Time};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 
 #[test]
 fn test_other_space() {
-    let d = DateTime::parse("YYYY-MM-DDThh_mm_ss.000000", "1234_12_13_11_12_13.123456").unwrap();
+    let d = DateTime::parse("YYYY-MM-DDThh_mm_ss.000000Z", "1234_12_13_11_12_13.123456").unwrap();
     println!("{}", d);
     assert_eq!(
-        "1234-12-13T11:12:13.123456+08:00".to_string(),
+        "1234-12-13T11:12:13.123456Z".to_string(),
         d.to_string()
     );
 }
 
 #[test]
 fn test_date() {
-    let d = DateTime::from_str("1234-12-13 11:12:13.123456").unwrap();
+    let d = DateTime::from_str("1234-12-13 11:12:13.123456Z").unwrap();
     println!("{}", d);
     assert_eq!(
         d.to_string(),
-        "1234-12-13T11:12:13.123456+08:00".to_string()
+        "1234-12-13T11:12:13.123456Z".to_string()
     );
 }
 
@@ -221,9 +221,9 @@ fn test_befor_after() {
 
 #[test]
 fn test_from_str_zone() {
-    let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
-    assert_eq!(date1.offset(), offset_sec());
+    let date1 = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
     println!("{}", date1);
+    assert_eq!(date1.offset(), 8*3600);
 }
 
 #[test]
@@ -278,23 +278,23 @@ fn test_time_sub_time() {
 
 #[test]
 fn test_parse_format() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456").unwrap();
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000Z", "2022-12-13 11:12:14.123456Z").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456Z");
 }
 
 #[test]
 fn test_parse_format2() {
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
+    let date = DateTime::parse("hh:mm:ss.000000Z,YYYY-MM-DD", "11:12:14.123456Z,2022-12-13").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456Z");
 }
 
 #[test]
 fn test_parse_format3() {
     let date = DateTime::parse("YYYYMMDD", "20231102").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(), "2023-11-02T00:00:00+08:00");
+    assert_eq!(&date.to_string()[0..19], "2023-11-02T00:00:00");
 }
 
 #[test]
@@ -318,9 +318,9 @@ fn test_parse_format5() {
 
 #[test]
 fn test_parse_format6() {
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
+    let date = DateTime::parse("hh:mm:ss.000000Z,YYYY-MM-DD", "11:12:14.123456Z,2022-12-13").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456Z");
 }
 
 #[test]
@@ -366,65 +366,65 @@ fn test_week() {
 
 #[test]
 fn test_nano() {
-    let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333").unwrap();
+    let date1 = DateTime::from_str("2019-04-28 00:00:00.023333333Z").unwrap();
     println!("{}", date1.to_string());
-    assert_eq!(date1.to_string(), "2019-04-28T00:00:00.023333333+08:00");
+    assert_eq!(date1.to_string(), "2019-04-28T00:00:00.023333333Z");
 }
 
 #[test]
 fn test_parse_date() {
-    let date = DateTime::from_str("2013-10-06").unwrap();
-    assert_eq!(date.to_string(), "2013-10-06T00:00:00+08:00");
+    let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap();
+    assert_eq!(date.to_string(), "2013-10-06T00:00:00Z");
 }
 
 #[test]
 fn test_ser_date() {
-    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926").unwrap();
-    date = date.set_offset(offset_sec());
+    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
+    date = date.set_offset(8*3600);
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
 }
 
 #[test]
 fn test_de_date() {
-    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926").unwrap();
-    date = date.set_offset(offset_sec());
+    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926Z").unwrap();
+    date = date.set_offset(28800);
     let js = serde_json::to_string(&date).unwrap();
-    assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
+    assert_eq!(js, "\"2023-10-14T00:57:41.123926+08:00\"");
     let new_date = serde_json::from_str::<DateTime>(&js).unwrap();
     assert_eq!(new_date.offset(), 28800);
 }
 
 #[test]
 fn test_add_minute() {
-    let date = DateTime::from_str("2013-10-06")
+    let date = DateTime::from_str("2013-10-06 00:00:00Z")
         .unwrap()
         .add(Duration::from_minute(1));
-    assert_eq!(date.to_string(), "2013-10-06T00:01:00+08:00");
+    assert_eq!(date.to_string(), "2013-10-06T00:01:00Z");
 }
 
 #[test]
 fn test_add_hour() {
-    let date = DateTime::from_str("2013-10-06")
+    let date = DateTime::from_str("2013-10-06T01:00:00Z")
         .unwrap()
         .add(Duration::from_hour(1));
-    assert_eq!(date.to_string(), "2013-10-06T01:00:00+08:00");
+    assert_eq!(date.to_string(), "2013-10-06T02:00:00Z");
 }
 
 #[test]
 fn test_add_day() {
-    let date = DateTime::from_str("2013-10-06")
+    let date = DateTime::from_str("2013-10-07T00:00:00Z")
         .unwrap()
         .add(Duration::from_day(1));
-    assert_eq!(date.to_string(), "2013-10-07T00:00:00+08:00");
+    assert_eq!(date.to_string(), "2013-10-08T00:00:00Z");
 }
 
 #[test]
 fn test_add_sub_sec() {
-    let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(1);
-    assert_eq!(date.to_string(), "2013-10-06T00:00:01+08:00");
-    let date = DateTime::from_str("2013-10-06").unwrap().add_sub_sec(-1);
-    assert_eq!(date.to_string(), "2013-10-05T23:59:59+08:00");
+    let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap().add_sub_sec(1);
+    assert_eq!(date.to_string(), "2013-10-06T00:00:01Z");
+    let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap().add_sub_sec(-1);
+    assert_eq!(date.to_string(), "2013-10-05T23:59:59Z");
 }
 
 #[test]
