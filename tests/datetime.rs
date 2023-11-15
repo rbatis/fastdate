@@ -300,7 +300,7 @@ fn test_parse_format3() {
 #[test]
 fn test_parse_format4() {
     let date =
-        DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z").unwrap();
+        DateTime::parse("YYYY-MM-DD hh:mm:ss.000000Z", "2022-12-13 11:12:14.123456Z").unwrap();
     println!("{}", date);
     assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456Z");
 }
@@ -308,7 +308,7 @@ fn test_parse_format4() {
 #[test]
 fn test_parse_format5() {
     let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000",
+        "YYYY-MM-DD hh:mm:ss.000000+00:00",
         "2022-12-13 11:12:14.123456+06:00",
     )
     .unwrap();
@@ -326,7 +326,7 @@ fn test_parse_format6() {
 #[test]
 fn test_parse_format7() {
     let date = DateTime::parse(
-        "hh:mm:ss.000000+08:00,YYYY-MM-DD",
+        "hh:mm:ss.000000+00:00,YYYY-MM-DD",
         "11:12:14.123456-08:00,2022-12-13",
     )
     .unwrap();

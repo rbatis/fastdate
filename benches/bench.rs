@@ -41,7 +41,7 @@ fn bench_date_from_str_iso_8601_time(b: &mut Bencher) {
 fn bench_date_parse_format(b: &mut Bencher) {
     b.iter(|| {
         std::hint::black_box({
-            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z")
+            DateTime::parse("YYYY-MM-DD hh:mm:ss.000000Z", "2022-12-13 11:12:14.123456Z")
                 .expect("TODO: panic message");
         });
     });

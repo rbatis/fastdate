@@ -8,8 +8,8 @@ use std::fmt::{Display, Formatter};
 use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use time1::format_description::well_known::Rfc3339;
 use time1::{Month, UtcOffset};
+use time1::format_description::well_known::Rfc3339;
 
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
@@ -197,121 +197,91 @@ impl DateTime {
     /// ```
     /// or time zone(UTC)
     /// ```rust
-    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000Z", "2022-12-13 11:12:14.123456Z").unwrap();
     /// ```
     /// or time zone(UTC+Hour)
     /// ```rust
-    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+08:00").unwrap();
     /// ```
     /// ```
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
-        let bytes = arg.as_bytes();
-        let mut len = 26;
+        let mut len = 19;
         //this is RFC3339 datetime buffer
-        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000      ";
-        let format_bytes = format.as_bytes();
-        let mut idx_year = 0;
-        let mut idx_mon = 5;
-        let mut idx_day = 8;
-        let mut idx_hour = 11;
-        let mut idx_minute = 14;
-        let mut idx_sec = 17;
-        let mut idx_micro = 19;
-        let mut idx_zone = 26;
-
-        let mut micro = false;
-        let mut zone = false;
-
-        let mut zone_finish = false;
-
-        let mut v = -1;
-        for char_fmt in format_bytes {
-            v += 1;
-            let v = v as usize;
-            if char_fmt == &('Y' as u8) && idx_year <= 3 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong YYYY format!"));
-                }
-                buf[idx_year] = bytes[v];
-                idx_year += 1;
-            }
-            if char_fmt == &('M' as u8) && idx_mon <= 6 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong MM format!"));
-                }
-                buf[idx_mon] = bytes[v];
-                idx_mon += 1;
-            }
-            if char_fmt == &('D' as u8) && idx_day <= 9 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong DD format!"));
-                }
-                buf[idx_day] = bytes[v];
-                idx_day += 1;
-            }
-            if char_fmt == &('h' as u8) && idx_hour <= 12 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong hh format!"));
-                }
-                buf[idx_hour] = bytes[v];
-                idx_hour += 1;
-            }
-            if char_fmt == &('m' as u8) && idx_minute <= 15 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong mm format!"));
-                }
-                buf[idx_minute] = bytes[v];
-                idx_minute += 1;
-            }
-            if char_fmt == &('s' as u8) && idx_sec <= 18 {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong ss format!"));
-                }
-                buf[idx_sec] = bytes[v];
-                idx_sec += 1;
-            }
-            if micro == true || char_fmt == &('.' as u8) {
-                if v >= bytes.len() {
-                    return Err(Error::from("wrong .000000 format!"));
-                }
-                micro = true;
-                buf[idx_micro] = bytes[v];
-                idx_micro += 1;
-                if idx_micro - 19 == 7 {
-                    micro = false;
-                }
-            }
-            if char_fmt == &('+' as u8) || zone == true {
-                zone = true;
-                buf[idx_zone] = bytes[v];
-                idx_zone += 1;
-                len += 1;
-                if idx_zone - 26 == 6 {
-                    zone = false;
-                    zone_finish = true;
-                }
-            }
-            if char_fmt == &('Z' as u8) {
-                buf[idx_zone] = bytes[v];
-                zone_finish = true;
+        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000+00:00";
+        if let Some(year) = format.find("YYYY") {
+            let mut index = 0;
+            for x in arg[year..(year + 4)].bytes() {
+                buf[index] = x;
+                index += 1;
             }
         }
-        if zone_finish == false && arg.len() >= 6 {
-            let bytes_add_sub = bytes[arg.len() - 6];
-            if bytes[arg.len() - 3] == b':' && (bytes_add_sub == b'+' || bytes_add_sub == b'-') {
-                let zone_data = &bytes[(bytes.len() - 6)..];
-                let mut i = bytes.len() - 6;
-                for x in zone_data {
-                    buf[i] = *x;
-                    i += 1;
-                    len += 1;
-                }
-                zone_finish = true;
+        if let Some(mon) = format.find("MM") {
+            let mut index = 5;
+            for x in arg[mon..(mon + 2)].bytes() {
+                buf[index] = x;
+                index += 1;
             }
         }
-        if arg.len() > 26 && &arg[26..27] == "Z" {
-            buf[26] = 'Z' as u8;
-            len += 1;
+        if let Some(day) = format.find("DD") {
+            let mut index = 8;
+            for x in arg[day..(day + 2)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+        }
+        if let Some(hour) = format.find("hh") {
+            let mut index = 11;
+            for x in arg[hour..(hour + 2)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+        }
+        if let Some(minute) = format.find("mm") {
+            let mut index = 14;
+            for x in arg[minute..(minute + 2)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+        }
+        if let Some(sec) = format.find("ss") {
+            let mut index = 17;
+            for x in arg[sec..(sec + 2)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+        }
+        let find_nano = false;
+        //todo better way parse '.000000000'
+        // if let Some(nano) = format.find(".000000000") {
+        //     let mut index = 19;
+        //     for x in arg[nano..(nano + 10)].bytes() {
+        //         buf[index] = x;
+        //         index += 1;
+        //     }
+        //     len += 10;
+        //     find_nano = true;
+        // }
+        if find_nano == false{
+            if let Some(micro) = format.find(".000000") {
+                let mut index = 19;
+                for x in arg[micro..(micro + 7)].bytes() {
+                    buf[index] = x;
+                    index += 1;
+                }
+                len += 7;
+            }
+        }
+        if let Some(zone) = format.find("Z") {
+            buf[zone] = 'Z' as u8;
+            len +=1;
+        }
+        if let Some(zone) = format.find("+00:00") {
+            let mut index = len;
+            for x in arg[zone..(zone + 6)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+            len += 6;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
         let inner = DateTime::from_str(str)?;
@@ -400,7 +370,7 @@ impl DateTime {
         Self {
             inner: time1::OffsetDateTime::from(s),
         }
-        .set_offset(offset)
+            .set_offset(offset)
     }
 
     /// stand "0000-00-00 00:00:00.000000000"
@@ -565,7 +535,7 @@ impl From<Date> for DateTime {
             "{:04}-{:02}-{:02} 00:00:00.000000000Z",
             arg.year, arg.mon, arg.day
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -584,7 +554,7 @@ impl From<Time> for DateTime {
             "0000-00-00 {:02}:{:02}:{:02}.{:09}Z",
             arg.hour, arg.minute, arg.sec, arg.nano
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -594,7 +564,7 @@ impl From<(Date, Time)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -605,7 +575,7 @@ impl From<(Date, Time, i32)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-        .unwrap();
+            .unwrap();
         datetime = datetime.set_offset(arg.2).add_sub_sec(-arg.2 as i64);
         datetime
     }
@@ -692,8 +662,8 @@ impl PartialOrd for DateTime {
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -701,8 +671,8 @@ impl Serialize for DateTime {
 
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
