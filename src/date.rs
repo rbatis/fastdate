@@ -74,16 +74,25 @@ impl Date {
 
     /// 1...31
     pub fn set_day(mut self, arg: u8) -> Self {
+        if arg <= 0 || arg > 31 {
+            return self;
+        }
         self.day = arg;
         self
     }
     /// 1...12
     pub fn set_mon(mut self, arg: u8) -> Self {
+        if arg <= 0 || arg > 12 {
+            return self;
+        }
         self.mon = arg;
         self
     }
     /// 0000...9999
     pub fn set_year(mut self, arg: i32) -> Self {
+        if arg < 0 || arg > 9999 {
+            return self;
+        }
         self.year = arg;
         self
     }
@@ -140,8 +149,8 @@ impl Display for Date {
 
 impl Serialize for Date {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -149,8 +158,8 @@ impl Serialize for Date {
 
 impl<'de> Deserialize<'de> for Date {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         Date::from_str(&String::deserialize(deserializer)?)
