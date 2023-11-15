@@ -391,6 +391,11 @@ impl DateTime {
         self.inner.offset().whole_seconds()
     }
 
+    ///offset_hms: hour,minute,sec
+    pub fn offset_hms(&self) -> (i8, i8, i8) {
+        self.inner.offset().as_hms()
+    }
+
     pub fn from_system_time(s: SystemTime, offset: i32) -> Self {
         Self {
             inner: time1::OffsetDateTime::from(s),
