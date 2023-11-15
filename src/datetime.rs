@@ -162,7 +162,7 @@ impl DateTime {
     ///
     /// ```
     pub fn format(&self, fmt: &str) -> String {
-        let (h, m, _) = self.inner.offset().as_hms();
+        let (h, m, _) = self.offset_hms();
         fmt.replacen("YYYY", &self.year().to_string(), 1)
             .replacen("MM", &self.mon().to_string(), 1)
             .replacen("DD", &self.day().to_string(), 1)
@@ -442,7 +442,7 @@ impl DateTime {
                 buf[len] = b'Z';
                 len += 1;
             } else {
-                let (h, m, s) = self.inner.offset().as_hms();
+                let (h, m, s) = self.offset_hms();
                 if offset > 0 {
                     buf[len] = b'+';
                     len += 1;
