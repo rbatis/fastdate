@@ -2,6 +2,8 @@
 
 <img style="width: 200px;height: 200px;" width="200" height="200" src="https://github.com/rbatis/rbatis/blob/master/logo.png?raw=true" />
 
+[![codecov](https://codecov.io/gh/rbatis/fastdate/graph/badge.svg?token=C97H2QBHAQ)](https://codecov.io/gh/rbatis/fastdate)
+
 fastdate of Any RFC3339Micro
 
 this date cartes is very fast(<= 50ns) including 
