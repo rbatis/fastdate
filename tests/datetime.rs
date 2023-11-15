@@ -263,9 +263,9 @@ fn test_parse_z_sub() {
 
 #[test]
 fn test_set_offset_sub() {
-    let mut date = DateTime::from_str("2022-12-12 09:00:00").unwrap();
+    let mut date = DateTime::from_str("2022-12-12 09:00:00Z").unwrap();
     date = date.set_offset(-9 * 3600);
-    assert_eq!(date.to_string(), "2022-12-11T16:00:00-09:00");
+    assert_eq!(date.to_string(), "2022-12-12T00:00:00-09:00");
 }
 
 #[test]
