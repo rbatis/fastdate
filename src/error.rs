@@ -28,13 +28,7 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-    fn description(&self) -> &str {
-        return match self {
-            Error::E(data) => data.as_str(),
-        };
-    }
-}
+impl std::error::Error for Error {}
 
 impl Default for Error {
     fn default() -> Self {

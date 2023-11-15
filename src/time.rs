@@ -41,11 +41,6 @@ impl Time {
             let h1 = get_digit_unchecked!(bytes, offset, "InvalidCharHour");
             let h2 = get_digit_unchecked!(bytes, offset + 1, "InvalidCharHour");
             hour = h1 * 10 + h2;
-
-            match bytes.get_unchecked(offset + 2) {
-                b':' => (),
-                _ => (), //return Err(Error::E("InvalidCharTimeSep".to_string())),
-            }
             let m1 = get_digit_unchecked!(bytes, offset + 3, "InvalidCharMinute");
             let m2 = get_digit_unchecked!(bytes, offset + 4, "InvalidCharMinute");
             minute = m1 * 10 + m2;
@@ -86,9 +81,6 @@ impl Time {
                         }
                     }
                     i += 1;
-                    if i > 9 {
-                        return Err(Error::E("SecondFractionTooLong".to_string()));
-                    }
                 }
                 if i == 0 {
                     return Err(Error::E("SecondFractionMissing".to_string()));
@@ -133,7 +125,7 @@ impl Time {
         self
     }
     /// 0...59
-    pub fn set_min(mut self, arg: u8) -> Self {
+    pub fn set_minute(mut self, arg: u8) -> Self {
         self.minute = arg;
         self
     }
@@ -157,7 +149,7 @@ impl Time {
     }
 
     /// minute
-    pub fn minute(&self) -> u8 {
+    pub fn get_minute(&self) -> u8 {
         self.minute
     }
 
@@ -239,8 +231,7 @@ impl FromStr for Time {
     /// from RFC3339Micro = "15:04:05.999999999"
     fn from_str(s: &str) -> Result<Time, Error> {
         //"00:00:00.000000";
-        let (t, _) = Time::parse_bytes_partial(s.as_bytes(), 0)?;
-        Ok(t)
+        Ok(Time::parse_bytes_partial(s.as_bytes(), 0)?.0)
     }
 }
 
@@ -281,5 +272,40 @@ impl From<DateTime> for Time {
             minute: arg.minute(),
             hour: arg.hour(),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::time::Time;
+
+    #[test]
+    fn test_time_empty3() {
+        let d = Time::parse_bytes_partial("111".as_bytes(), 100).unwrap();
+        assert_eq!(
+            d.0,
+            Time {
+                nano: 0,
+                sec: 0,
+                minute: 0,
+                hour: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn test_display_time() {
+        let d = Time {
+            nano: 123456,
+            sec: 0,
+            minute: 0,
+            hour: 8,
+        };
+        let mut buf: [u8; 18] = *b"00:00:00.000000000";
+        d.display_time(0, &mut buf);
+        assert_eq!(
+            "08:00:00.000123456",
+            String::from_utf8(buf.to_vec()).unwrap()
+        );
     }
 }

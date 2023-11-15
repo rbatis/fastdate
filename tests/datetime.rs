@@ -53,6 +53,14 @@ fn test_timestamp() {
     assert_eq!(timestamp, new_time.unix_timestamp());
 }
 
+#[test]
+fn test_timestamp_sub() {
+    let now = DateTime::from_str("1800-01-01 00:00:00Z").unwrap();
+    let timestamp = now.unix_timestamp();
+    let new_time = DateTime::from_timestamp(timestamp);
+    assert_eq!(timestamp, new_time.unix_timestamp());
+}
+
 // #[test]
 // fn test_timestamp_befor_epoch() {
 //     let before = -5259600000;//1969-11-01 03:00:00
@@ -77,6 +85,15 @@ fn test_timestamp_micros() {
     let now = DateTime::utc();
     let timestamp = now.unix_timestamp_nano();
     let new_time = DateTime::from_timestamp_nano(timestamp);
+    assert_eq!(now, new_time);
+}
+
+
+#[test]
+fn test_unix_timestamp_micros() {
+    let now = DateTime::from_str("2023-11-15 15:37:33.595407Z").unwrap();
+    let timestamp = now.unix_timestamp_micros();
+    let new_time = DateTime::from_timestamp_micros(timestamp);
     assert_eq!(now, new_time);
 }
 
@@ -255,6 +272,7 @@ fn test_parse_z_sub() {
     assert_eq!(date_offset.to_string(), "2022-12-12T00:00:00-09:00");
 }
 
+
 #[test]
 fn test_set_offset_sub() {
     let mut date = DateTime::from_str("2022-12-12 09:00:00Z").unwrap();
@@ -372,6 +390,12 @@ fn test_nano() {
 fn test_parse_date() {
     let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap();
     assert_eq!(date.to_string(), "2013-10-06T00:00:00Z");
+}
+
+#[test]
+fn test_parse_micro() {
+    let date = DateTime::from_str("2013-10-06 00:00:00.000001Z").unwrap();
+    assert_eq!(date.to_string(), "2013-10-06T00:00:00.000001Z");
 }
 
 #[test]
@@ -586,4 +610,42 @@ fn test_forma2t() {
     println!("dt={}", dt.to_string());
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
     assert_eq!(f, "2000-1-1/9/1/11.123456/+08:00");
+}
+
+#[test]
+fn test_offset_sec_max() {
+    let mut dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123456000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    dt = dt.set_offset(86399);
+    assert_eq!(dt.offset(), 86399);
+}
+
+#[test]
+fn test_offset_sec_min() {
+    let mut dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123456000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    dt = dt.set_offset(-86399);
+    assert_eq!(dt.offset(), -86399);
 }

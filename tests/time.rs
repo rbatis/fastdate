@@ -3,6 +3,79 @@ use std::str::FromStr;
 use std::time::Duration;
 
 #[test]
+fn test_time_empty() {
+    let d = Time::from_str("");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_empty2() {
+    let d = Time::from_str("111");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_hour_out() {
+    let d = Time::from_str("66:04:05.000000");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_minute_out() {
+    let d = Time::from_str("01:66:05.000000");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_sec_out() {
+    let d = Time::from_str("01:00:66.000000");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_nano_tolong() {
+    let d = Time::from_str("01:00:66.000000000001");
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_time_nano_miss() {
+    let d = Time::from_str("01:00:00.");
+    println!("{}", d.clone().err().unwrap());
+    assert_eq!(d.is_err(), true);
+}
+
+#[test]
+fn test_set_nano() {
+    let d = Time::from_str("01:00:00").unwrap().set_nano(1);
+    assert_eq!(d.get_nano(), 1);
+}
+
+#[test]
+fn test_set_micro() {
+    let d = Time::from_str("01:00:00").unwrap().set_micro(1);
+    assert_eq!(d.get_micro(), 1);
+}
+
+#[test]
+fn test_set_sec() {
+    let d = Time::from_str("01:00:00").unwrap().set_sec(1);
+    assert_eq!(d.get_sec(), 1);
+}
+
+#[test]
+fn test_set_minute() {
+    let d = Time::from_str("01:00:00").unwrap().set_minute(1);
+    assert_eq!(d.get_minute(), 1);
+}
+
+#[test]
+fn test_set_hour() {
+    let d = Time::from_str("01:00:00").unwrap().set_hour(1);
+    assert_eq!(d.get_hour(), 1);
+}
+
+#[test]
 fn test_display() {
     let d = Time {
         nano: 0,
@@ -11,6 +84,17 @@ fn test_display() {
         hour: 8,
     };
     assert_eq!("08:00:00", d.to_string());
+}
+
+#[test]
+fn test_display2() {
+    let d = Time {
+        nano: 123456,
+        sec: 0,
+        minute: 0,
+        hour: 8,
+    };
+    assert_eq!("08:00:00.000123456", format!("{}", d));
 }
 
 #[test]
@@ -123,10 +207,12 @@ fn test_display_time_nano_zero_no() {
 }
 
 #[test]
-fn test_ser_time() {
+fn test_ser_de() {
     let date = Time::from_str("14:01:58.175861").unwrap();
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!("\"14:01:58.175861\"", js);
+    let r:Time = serde_json::from_str(&js).unwrap();
+    assert_eq!(r,date);
 }
 
 #[test]
