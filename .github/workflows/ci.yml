@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test ${{ matrix.rust }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - nightly
+        os:
+          - ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install Rust (${{ matrix.rust }})
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+      - name: Run cargo tarpaulin
+        if: matrix.os == 'ubuntu-latest' && matrix.version == 'stable'
+        run: |
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out xml
+      - name: Upload coverage reports to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.version == 'stable'
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          file: cobertura.xml
