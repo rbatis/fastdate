@@ -10,5 +10,6 @@ Cargo.lock
 **/*.rs.bk
 
 *.lock
-./.idea
+/.idea
 *.iml
+/.vscode

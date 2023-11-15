@@ -52,7 +52,6 @@ fn test_from_str_day_out() {
     assert_eq!(d.is_err(), true);
 }
 
-
 #[test]
 fn test_set_day() {
     let d = Date::from_str("2024-02-01").unwrap().set_day(1);
@@ -105,7 +104,6 @@ fn test_from_str_2() {
     let d = Date::from_str("2022/12/13").unwrap();
     assert_eq!(d.to_string(), "2022-12-13");
 }
-
 
 #[test]
 fn test_date() {
