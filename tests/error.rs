@@ -1,4 +1,3 @@
-use std::fmt::{Debug, Display, Formatter};
 use fastdate::error::Error;
 
 #[test]

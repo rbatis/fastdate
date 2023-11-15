@@ -37,19 +37,9 @@ impl Date {
             let y4 = get_digit_unchecked!(bytes, 3, "InvalidCharYear") as u16;
             year = y1 * 1000 + y2 * 100 + y3 * 10 + y4;
 
-            match bytes.get_unchecked(4) {
-                b'-' => (),
-                _ => (), //return Err(Error::E("InvalidCharDateSep".to_string())),
-            }
-
             let m1 = get_digit_unchecked!(bytes, 5, "InvalidCharMonth");
             let m2 = get_digit_unchecked!(bytes, 6, "InvalidCharMonth");
             month = m1 * 10 + m2;
-
-            match bytes.get_unchecked(7) {
-                b'-' => (),
-                _ => (), //return Err(Error::E("InvalidCharDateSep".to_string())),
-            }
 
             let d1 = get_digit_unchecked!(bytes, 8, "InvalidCharDay");
             let d2 = get_digit_unchecked!(bytes, 9, "InvalidCharDay");

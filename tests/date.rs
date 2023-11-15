@@ -2,6 +2,25 @@ use fastdate::{Date, DateTime};
 use std::str::FromStr;
 
 #[test]
+fn test_date_empty() {
+    let d = Date::from_str("");
+    assert_eq!(d.is_err(),true);
+}
+
+#[test]
+fn test_from_str() {
+    let d = Date::from_str("2022-12-13").unwrap();
+    assert_eq!(d.to_string(),"2022-12-13");
+}
+
+#[test]
+fn test_from_str_2() {
+    let d = Date::from_str("2022/12/13").unwrap();
+    assert_eq!(d.to_string(),"2022-12-13");
+}
+
+
+#[test]
 fn test_date() {
     let d = Date::from_str("2022-12-13 11:12:13.123456").unwrap();
     println!("{}", d);
