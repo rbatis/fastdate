@@ -3,6 +3,7 @@
 pub extern crate time1;
 
 pub mod error;
+#[cfg(not(tarpaulin_include))]
 pub mod sys;
 
 mod date;
