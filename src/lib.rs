@@ -9,9 +9,9 @@ mod date;
 mod datetime;
 mod time;
 
-use std::time::Duration;
 pub use date::*;
 pub use datetime::*;
+use std::time::Duration;
 pub use time::*;
 
 // get a character from the bytes as as a decimal
@@ -35,7 +35,6 @@ macro_rules! get_digit_unchecked {
 }
 pub(crate) use get_digit_unchecked;
 
-
 pub trait DurationFrom {
     fn from_minute(minute: u64) -> Self;
     fn from_hour(hour: u64) -> Self;
@@ -56,4 +55,3 @@ impl DurationFrom for Duration {
         Duration::from_hour(day * 24)
     }
 }
-

@@ -2,7 +2,6 @@ use fastdate::Time;
 use std::str::FromStr;
 use std::time::Duration;
 
-
 #[test]
 fn test_display() {
     let d = Time {
@@ -13,7 +12,6 @@ fn test_display() {
     };
     assert_eq!("08:00:00", d.to_string());
 }
-
 
 #[test]
 fn test_date_12345678910() {
@@ -52,28 +50,28 @@ fn test_date_123456() {
 #[test]
 fn test_date_12345() {
     let d = Time::from_str("11:12:13.12345").unwrap();
-    println!("{}=>{:?}", d,d);
+    println!("{}=>{:?}", d, d);
     assert_eq!("11:12:13.12345".to_string(), d.to_string());
 }
 
 #[test]
 fn test_date_1234() {
     let d = Time::from_str("11:12:13.1234").unwrap();
-    println!("{}=>{:?}", d,d);
+    println!("{}=>{:?}", d, d);
     assert_eq!("11:12:13.1234".to_string(), d.to_string());
 }
 
 #[test]
 fn test_date_123() {
     let d = Time::from_str("11:12:13.123").unwrap();
-    println!("{}=>{:?}", d,d);
+    println!("{}=>{:?}", d, d);
     assert_eq!("11:12:13.123".to_string(), d.to_string());
 }
 
 #[test]
 fn test_date_12() {
     let d = Time::from_str("11:12:13.12").unwrap();
-    println!("{}=>{:?}", d,d);
+    println!("{}=>{:?}", d, d);
     assert_eq!("11:12:13.12".to_string(), d.to_string());
 }
 

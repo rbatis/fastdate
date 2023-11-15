@@ -8,8 +8,8 @@ use std::fmt::{Display, Formatter};
 use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use time1::{Month, UtcOffset};
 use time1::format_description::well_known::Rfc3339;
+use time1::{Month, UtcOffset};
 
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
@@ -53,7 +53,9 @@ impl DateTime {
         if offset_sec <= -86399 {
             offset_sec = -86399;
         }
-        self.inner = self.inner.to_offset(UtcOffset::from_whole_seconds(offset_sec).unwrap());
+        self.inner = self
+            .inner
+            .to_offset(UtcOffset::from_whole_seconds(offset_sec).unwrap());
         self
     }
 
@@ -87,7 +89,6 @@ impl DateTime {
     pub fn after(&self, other: &DateTime) -> bool {
         self > other
     }
-
 
     /// unix_timestamp sec
     pub fn unix_timestamp(&self) -> i64 {
@@ -140,6 +141,23 @@ impl DateTime {
         } else {
             Self::from_system_time(UNIX_EPOCH - Duration::from_nanos((-nano) as u64), 0)
         }
+    }
+
+    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
+    /// date.fmt("YYYY/MM/DD/hh/mm/ss/.000000/+00:00")
+    /// date.fmt("YYYY/MM/DD/hh/mm/ss")
+    pub fn format(&self, fmt: &str) -> String {
+        let (h, m, _) = self.inner.offset().as_hms();
+        fmt.replacen("YYYY", &self.year().to_string(), 1)
+            .replacen("MM", &self.mon().to_string(), 1)
+            .replacen("DD", &self.day().to_string(), 1)
+            .replacen("hh", &self.hour().to_string(), 1)
+            .replacen("mm", &self.minute().to_string(), 1)
+            .replacen("ss", &self.sec().to_string(), 1)
+            .replacen(".000000000", &format!(".{:09}", self.nano()), 1)
+            .replacen(".000000", &format!(".{:06}", self.micro()), 1)
+            .replacen("+00:00", &format!("+{:02}:{:02}", h, m), 1)
+            .to_string()
     }
 
     /// parse an string by format.
@@ -298,14 +316,12 @@ impl DateTime {
         wday as u8
     }
 
-
     pub fn nano(&self) -> u32 {
         self.inner.nanosecond()
     }
     pub fn ms(&self) -> u16 {
         self.inner.millisecond()
     }
-
 
     /// get micro secs
     pub fn micro(&self) -> u32 {
@@ -335,18 +351,18 @@ impl DateTime {
     /// get mon
     pub fn mon(&self) -> u8 {
         match self.inner.month() {
-            Month::January => { 1 }
-            Month::February => { 2 }
-            Month::March => { 3 }
-            Month::April => { 4 }
-            Month::May => { 5 }
-            Month::June => { 6 }
-            Month::July => { 7 }
-            Month::August => { 8 }
-            Month::September => { 9 }
-            Month::October => { 10 }
-            Month::November => { 11 }
-            Month::December => { 12 }
+            Month::January => 1,
+            Month::February => 2,
+            Month::March => 3,
+            Month::April => 4,
+            Month::May => 5,
+            Month::June => 6,
+            Month::July => 7,
+            Month::August => 8,
+            Month::September => 9,
+            Month::October => 10,
+            Month::November => 11,
+            Month::December => 12,
         }
     }
 
@@ -362,10 +378,10 @@ impl DateTime {
 
     pub fn from_system_time(s: SystemTime, offset: i32) -> Self {
         Self {
-            inner: time1::OffsetDateTime::from(s)
-        }.set_offset(offset)
+            inner: time1::OffsetDateTime::from(s),
+        }
+        .set_offset(offset)
     }
-
 
     /// stand "0000-00-00 00:00:00.000000000"
     pub fn display_stand(&self) -> String {
@@ -512,7 +528,6 @@ impl From<SystemTime> for DateTime {
     }
 }
 
-
 impl From<DateTime> for SystemTime {
     fn from(v: DateTime) -> SystemTime {
         let nano = v.unix_timestamp_nano();
@@ -526,33 +541,51 @@ impl From<DateTime> for SystemTime {
 
 impl From<Date> for DateTime {
     fn from(arg: Date) -> Self {
-        Self::from_str(&format!("{:04}-{:02}-{:02} 00:00:00.000000000Z", arg.year, arg.mon, arg.day)).unwrap()
+        Self::from_str(&format!(
+            "{:04}-{:02}-{:02} 00:00:00.000000000Z",
+            arg.year, arg.mon, arg.day
+        ))
+        .unwrap()
     }
 }
 
 /// from((Date{},offset_sec()))
 impl From<(Date, i32)> for DateTime {
     fn from(arg: (Date, i32)) -> Self {
-        Self::from(arg.0).set_offset(arg.1).add_sub_sec(-arg.1 as i64)
+        Self::from(arg.0)
+            .set_offset(arg.1)
+            .add_sub_sec(-arg.1 as i64)
     }
 }
 
 impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
-        Self::from_str(&format!("0000-00-00 {:02}:{:02}:{:02}.{:09}Z", arg.hour, arg.minute, arg.sec, arg.nano)).unwrap()
+        Self::from_str(&format!(
+            "0000-00-00 {:02}:{:02}:{:02}.{:09}Z",
+            arg.hour, arg.minute, arg.sec, arg.nano
+        ))
+        .unwrap()
     }
 }
 
 impl From<(Date, Time)> for DateTime {
     fn from(arg: (Date, Time)) -> Self {
-        Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap()
+        Self::from_str(&format!(
+            "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
+            arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
+        ))
+        .unwrap()
     }
 }
 
 ///from(Date{},Time{},offset_sec())
 impl From<(Date, Time, i32)> for DateTime {
     fn from(arg: (Date, Time, i32)) -> Self {
-        let mut datetime = Self::from_str(&format!("{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z", arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano)).unwrap();
+        let mut datetime = Self::from_str(&format!(
+            "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
+            arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
+        ))
+        .unwrap();
         datetime = datetime.set_offset(arg.2).add_sub_sec(-arg.2 as i64);
         datetime
     }
@@ -612,9 +645,7 @@ impl FromStr for DateTime {
             let info = format!("{} of '{}'", e, arg);
             Error::from(info)
         })?;
-        Ok(Self {
-            inner
-        })
+        Ok(Self { inner })
     }
 }
 
@@ -639,11 +670,10 @@ impl PartialOrd for DateTime {
     }
 }
 
-
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -651,8 +681,8 @@ impl Serialize for DateTime {
 
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;

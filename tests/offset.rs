@@ -1,5 +1,5 @@
+use fastdate::{offset_sec, DateTime};
 use std::time::Duration;
-use fastdate::{DateTime, offset_sec};
 
 #[test]
 fn test_offset_sec() {

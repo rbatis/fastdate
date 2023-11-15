@@ -1,4 +1,4 @@
-use fastdate::{Date, DateTime, DurationFrom, offset_sec, Time};
+use fastdate::{offset_sec, Date, DateTime, DurationFrom, Time};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 
@@ -6,14 +6,20 @@ use std::time::{Duration, SystemTime};
 fn test_other_space() {
     let d = DateTime::parse("YYYY-MM-DDThh_mm_ss.000000", "1234_12_13_11_12_13.123456").unwrap();
     println!("{}", d);
-    assert_eq!("1234-12-13T11:12:13.123456+08:00".to_string(), d.to_string());
+    assert_eq!(
+        "1234-12-13T11:12:13.123456+08:00".to_string(),
+        d.to_string()
+    );
 }
 
 #[test]
 fn test_date() {
     let d = DateTime::from_str("1234-12-13 11:12:13.123456").unwrap();
     println!("{}", d);
-    assert_eq!(d.to_string(), "1234-12-13T11:12:13.123456+08:00".to_string());
+    assert_eq!(
+        d.to_string(),
+        "1234-12-13T11:12:13.123456+08:00".to_string()
+    );
 }
 
 #[test]
@@ -98,31 +104,37 @@ fn test_timestamp_nano() {
 
 #[test]
 fn test_date_time() {
-    let new_time = DateTime::from((Date {
-        day: 12,
-        mon: 12,
-        year: 2023,
-    }, Time {
-        nano: 12,
-        sec: 12,
-        minute: 12,
-        hour: 12,
-    }));
+    let new_time = DateTime::from((
+        Date {
+            day: 12,
+            mon: 12,
+            year: 2023,
+        },
+        Time {
+            nano: 12,
+            sec: 12,
+            minute: 12,
+            hour: 12,
+        },
+    ));
     assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
 }
 
 #[test]
 fn test_set_offset() {
-    let new_time = DateTime::from((Date {
-        day: 12,
-        mon: 12,
-        year: 2023,
-    }, Time {
-        nano: 12,
-        sec: 12,
-        minute: 12,
-        hour: 12,
-    }));
+    let new_time = DateTime::from((
+        Date {
+            day: 12,
+            mon: 12,
+            year: 2023,
+        },
+        Time {
+            nano: 12,
+            sec: 12,
+            minute: 12,
+            hour: 12,
+        },
+    ));
     let timestamp_nano = new_time.unix_timestamp_nano();
     assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
     let new_time = new_time.set_offset(offset_sec());
@@ -132,18 +144,25 @@ fn test_set_offset() {
 
 #[test]
 fn test_set_offset2() {
-    let new_time = DateTime::from((Date {
-        day: 12,
-        mon: 12,
-        year: 2023,
-    }, Time {
-        nano: 12,
-        sec: 12,
-        minute: 12,
-        hour: 12,
-    }, 8*3600));
+    let new_time = DateTime::from((
+        Date {
+            day: 12,
+            mon: 12,
+            year: 2023,
+        },
+        Time {
+            nano: 12,
+            sec: 12,
+            minute: 12,
+            hour: 12,
+        },
+        8 * 3600,
+    ));
     println!("{}", new_time.display_stand());
-    assert_eq!(new_time.display(true), "2023-12-12T12:12:12.000000012+08:00");
+    assert_eq!(
+        new_time.display(true),
+        "2023-12-12T12:12:12.000000012+08:00"
+    );
 }
 
 #[test]
@@ -178,9 +197,10 @@ fn test_offset_zone2() {
         year: 2000,
     });
     println!("{}", epoch);
-    epoch = epoch.set_offset(8*3600).add_sub_sec(-8*3600);
+    epoch = epoch.set_offset(8 * 3600).add_sub_sec(-8 * 3600);
     println!("{}", epoch);
 }
+
 #[test]
 fn test_into() {
     let utc = DateTime::from_str("2022-12-12 00:00:00+08:00").unwrap();
@@ -216,9 +236,9 @@ fn test_from_str_zone_add() {
 #[test]
 fn test_from_str_fail() {
     let date1 = DateTime::from_str("2022");
-    assert_eq!(date1.is_err(),true);
+    assert_eq!(date1.is_err(), true);
     let date1 = DateTime::from_str("");
-    assert_eq!(date1.is_err(),true);
+    assert_eq!(date1.is_err(), true);
 }
 
 #[test]
@@ -260,64 +280,80 @@ fn test_time_sub_time() {
 fn test_parse_format() {
     let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
 }
 
 #[test]
 fn test_parse_format2() {
     let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
 }
 
 #[test]
 fn test_parse_format3() {
     let date = DateTime::parse("YYYYMMDD", "20231102").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2023-11-02T00:00:00+08:00");
+    assert_eq!(date.to_string(), "2023-11-02T00:00:00+08:00");
 }
 
 #[test]
 fn test_parse_format4() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z").unwrap();
+    let date =
+        DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456Z").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456Z");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456Z");
 }
 
 #[test]
 fn test_parse_format5() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    let date = DateTime::parse(
+        "YYYY-MM-DD hh:mm:ss.000000",
+        "2022-12-13 11:12:14.123456+06:00",
+    )
+    .unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+06:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+06:00");
 }
 
 #[test]
 fn test_parse_format6() {
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD", "11:12:14.123456,2022-12-13").unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+08:00");
 }
 
 #[test]
 fn test_parse_format7() {
-    let date = DateTime::parse("hh:mm:ss.000000+08:00,YYYY-MM-DD","11:12:14.123456-08:00,2022-12-13").unwrap();
+    let date = DateTime::parse(
+        "hh:mm:ss.000000+08:00,YYYY-MM-DD",
+        "11:12:14.123456-08:00,2022-12-13",
+    )
+    .unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456-08:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456-08:00");
 }
-
 
 #[test]
 fn test_parse_format8() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+06:00").unwrap();
+    let date = DateTime::parse(
+        "YYYY-MM-DD hh:mm:ss.000000+00:00",
+        "2022-12-13 11:12:14.123456+06:00",
+    )
+    .unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456+06:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456+06:00");
 }
 
 #[test]
 fn test_parse_format9() {
-    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456-06:00").unwrap();
+    let date = DateTime::parse(
+        "YYYY-MM-DD hh:mm:ss.000000+00:00",
+        "2022-12-13 11:12:14.123456-06:00",
+    )
+    .unwrap();
     println!("{}", date);
-    assert_eq!(date.to_string(),"2022-12-13T11:12:14.123456-06:00");
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456-06:00");
 }
 
 #[test]
@@ -334,7 +370,6 @@ fn test_nano() {
     println!("{}", date1.to_string());
     assert_eq!(date1.to_string(), "2019-04-28T00:00:00.023333333+08:00");
 }
-
 
 #[test]
 fn test_parse_date() {
@@ -362,19 +397,25 @@ fn test_de_date() {
 
 #[test]
 fn test_add_minute() {
-    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_minute(1));
+    let date = DateTime::from_str("2013-10-06")
+        .unwrap()
+        .add(Duration::from_minute(1));
     assert_eq!(date.to_string(), "2013-10-06T00:01:00+08:00");
 }
 
 #[test]
 fn test_add_hour() {
-    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_hour(1));
+    let date = DateTime::from_str("2013-10-06")
+        .unwrap()
+        .add(Duration::from_hour(1));
     assert_eq!(date.to_string(), "2013-10-06T01:00:00+08:00");
 }
 
 #[test]
 fn test_add_day() {
-    let date = DateTime::from_str("2013-10-06").unwrap().add(Duration::from_day(1));
+    let date = DateTime::from_str("2013-10-06")
+        .unwrap()
+        .add(Duration::from_day(1));
     assert_eq!(date.to_string(), "2013-10-07T00:00:00+08:00");
 }
 
@@ -389,7 +430,11 @@ fn test_add_sub_sec() {
 #[test]
 fn test_1958_unix() {
     let date = DateTime::from_str("1958-01-01T00:00:00Z").unwrap();
-    println!("s={:?},date={}", SystemTime::from(date.clone()), DateTime::from_system_time(SystemTime::from(date.clone()), 0));
+    println!(
+        "s={:?},date={}",
+        SystemTime::from(date.clone()),
+        DateTime::from_system_time(SystemTime::from(date.clone()), 0)
+    );
     assert_eq!(date.unix_timestamp(), -378691200);
 }
 
@@ -427,7 +472,7 @@ fn test_add() {
     });
     let us: u64 = 693484748000000;
     let v = epoch + Duration::from_micros(us as u64);
-    println!("{}", v);//2023-02-14 07:37:40
+    println!("{}", v); //2023-02-14 07:37:40
     assert_eq!(v.to_string(), "2021-12-22T10:39:08Z");
 }
 
@@ -444,51 +489,100 @@ fn test_display_date() {
 
 #[test]
 fn test_display_datetime() {
-    let epoch = fastdate::DateTime::from((Date {
-        day: 1,
-        mon: 1,
-        year: 2000,
-    }, Time {
-        nano: 1233,
-        sec: 11,
-        minute: 1,
-        hour: 1,
-    }));
+    let epoch = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 1233,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
     let v = epoch.display(false);
     assert_eq!(v, "2000-01-01T01:01:11.000001233");
 }
 
 #[test]
 fn test_display_stand() {
-    let epoch = fastdate::DateTime::from((Date {
-        day: 1,
-        mon: 1,
-        year: 2000,
-    }, Time {
-        nano: 1233,
-        sec: 11,
-        minute: 1,
-        hour: 1,
-    }));
+    let epoch = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 1233,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
     let v = epoch.display_stand();
     assert_eq!(v, "2000-01-01 01:01:11.000001233");
 }
 
 #[test]
 fn test_set_micro() {
-    let mut dt = fastdate::DateTime::from((Date {
-        day: 1,
-        mon: 1,
-        year: 2000,
-    }, Time {
-        nano: 1233,
-        sec: 11,
-        minute: 1,
-        hour: 1,
-    }));
+    let mut dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 1233,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
     dt = dt.set_nano(0);
     assert_eq!(dt.display_stand(), "2000-01-01 01:01:11");
 
     dt = dt.set_nano(1);
     assert_eq!(dt.display_stand(), "2000-01-01 01:01:11.000001");
+}
+
+#[test]
+fn test_format() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 1233,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    let f = dt.format("YYYY-MM-DD/hh/mm/ss");
+    assert_eq!(f, "2000-1-1/1/1/11");
+}
+
+#[test]
+fn test_forma2t() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123456000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ))
+    .set_offset(8 * 60 * 60);
+    println!("dt={}", dt.to_string());
+    let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
+    assert_eq!(f, "2000-1-1/9/1/11.123456/+08:00");
 }
