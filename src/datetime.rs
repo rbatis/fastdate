@@ -144,8 +144,23 @@ impl DateTime {
     }
 
     /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
-    /// date.fmt("YYYY/MM/DD/hh/mm/ss/.000000/+00:00")
-    /// date.fmt("YYYY/MM/DD/hh/mm/ss")
+    /// ```
+    /// let dt = fastdate::DateTime::from((
+    ///         fastdate::Date {
+    ///             day: 1,
+    ///             mon: 1,
+    ///             year: 2000,
+    ///         },
+    ///         fastdate::Time {
+    ///             nano: 123456000,
+    ///             sec: 11,
+    ///             minute: 1,
+    ///             hour: 1,
+    ///         })).set_offset(8 * 60 * 60);
+    ///   println!("{}",dt.format("YYYY/MM/DD/hh/mm/ss/.000000/+00:00"));
+    ///   println!("{}",dt.format("YYYY-MM-DD/hh/mm/ss"));
+    ///
+    /// ```
     pub fn format(&self, fmt: &str) -> String {
         let (h, m, _) = self.inner.offset().as_hms();
         fmt.replacen("YYYY", &self.year().to_string(), 1)
