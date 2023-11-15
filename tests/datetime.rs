@@ -137,7 +137,7 @@ fn test_set_offset() {
     ));
     let timestamp_nano = new_time.unix_timestamp_nano();
     assert_eq!(new_time.to_string(), "2023-12-12T12:12:12.000000012Z");
-    let new_time = new_time.set_offset(offset_sec());
+    let new_time = new_time.set_offset(8*3600);
     assert_eq!(new_time.to_string(), "2023-12-12T20:12:12.000000012+08:00");
     assert_eq!(new_time.unix_timestamp_nano(), timestamp_nano);
 }
