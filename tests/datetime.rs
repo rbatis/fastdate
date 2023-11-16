@@ -17,6 +17,13 @@ fn test_date() {
 }
 
 #[test]
+fn test_date2() {
+    let d = DateTime::from_str("1234-12-13 11:12:13.123456789Z").unwrap();
+    println!("{}", d);
+    assert_eq!(d.to_string(), "1234-12-13T11:12:13.123456789Z".to_string());
+}
+
+#[test]
 fn test_date_local() {
     let d = DateTime::now();
     println!("{}", d);
@@ -259,6 +266,12 @@ fn test_parse_z() {
 }
 
 #[test]
+fn test_parse_z_2() {
+    let date = DateTime::from_str("2022-12-12 00:00:00.123456789Z").unwrap();
+    assert_eq!(date.to_string(), "2022-12-12T00:00:00.123456789Z");
+}
+
+#[test]
 fn test_parse_z_add() {
     let date = DateTime::from_str("2022-12-12 00:00:00.000000+09:00").unwrap();
     let date_offset = date.clone();
@@ -369,6 +382,21 @@ fn test_parse_format9() {
     .unwrap();
     println!("{}", date);
     assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456-06:00");
+}
+
+#[test]
+fn test_parse_format10() {
+    let date =
+        DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000Z", "2022-12-13 11:12:14.123456789Z").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456789Z");
+}
+
+#[test]
+fn test_parse_format11() {
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 11:12:14.123456789+06:00").unwrap();
+    println!("{}", date);
+    assert_eq!(date.to_string(), "2022-12-13T11:12:14.123456789+06:00");
 }
 
 #[test]
