@@ -709,3 +709,184 @@ fn test_offset_sec_min() {
     dt = dt.set_offset(-86399);
     assert_eq!(dt.offset(), -86399);
 }
+
+
+#[test]
+fn test_get_nano() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123456000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.nano(), 123456000);
+}
+
+#[test]
+fn test_get_ms() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.ms(), 123u16);
+}
+
+#[test]
+fn test_get_micro() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.micro(), 123000);
+}
+
+#[test]
+fn test_get_sec() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.sec(), 11);
+}
+
+#[test]
+fn test_get_minute() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.minute(), 1);
+}
+
+#[test]
+fn test_get_hour() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.hour(), 1);
+}
+
+#[test]
+fn test_get_day() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.day(), 1);
+}
+
+#[test]
+fn test_get_mon() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.mon(), 1);
+}
+
+#[test]
+fn test_get_year() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.year(), 2000);
+}
+
+#[test]
+fn test_get_week() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123000000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    assert_eq!(dt.week_day(), 6u8);
+}
