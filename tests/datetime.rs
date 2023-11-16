@@ -88,7 +88,7 @@ fn test_timestamp_sub() {
 // }
 
 #[test]
-fn test_timestamp_micros() {
+fn test_from_timestamp_nano() {
     let now = DateTime::utc();
     let timestamp = now.unix_timestamp_nano();
     let new_time = DateTime::from_timestamp_nano(timestamp);
@@ -97,8 +97,24 @@ fn test_timestamp_micros() {
 
 
 #[test]
-fn test_unix_timestamp_micros() {
+fn test_from_timestamp_nano2() {
+    let now = DateTime::from_str("1600-11-15 15:37:33.595407Z").unwrap();
+    let timestamp = now.unix_timestamp_nano();
+    let new_time = DateTime::from_timestamp_nano(timestamp);
+    assert_eq!(now, new_time);
+}
+
+#[test]
+fn test_from_timestamp_micros() {
     let now = DateTime::from_str("2023-11-15 15:37:33.595407Z").unwrap();
+    let timestamp = now.unix_timestamp_micros();
+    let new_time = DateTime::from_timestamp_micros(timestamp);
+    assert_eq!(now, new_time);
+}
+
+#[test]
+fn test_from_timestamp_micros2() {
+    let now = DateTime::from_str("1600-11-15 15:37:33.595407Z").unwrap();
     let timestamp = now.unix_timestamp_micros();
     let new_time = DateTime::from_timestamp_micros(timestamp);
     assert_eq!(now, new_time);
