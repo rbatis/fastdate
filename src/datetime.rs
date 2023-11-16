@@ -9,7 +9,7 @@ use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use time1::format_description::well_known::Rfc3339;
-use time1::{UtcOffset};
+use time1::UtcOffset;
 
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
