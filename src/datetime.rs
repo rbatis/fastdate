@@ -260,6 +260,17 @@ impl DateTime {
             len += 10;
             find_nano = true;
         }
+        let mut find_nano = false;
+        //parse '.000000000'
+        if let Some(nano) = format.find(".000000000") {
+            let mut index = 19;
+            for x in arg[nano..(nano + 10)].bytes() {
+                buf[index] = x;
+                index += 1;
+            }
+            len += 10;
+            find_nano = true;
+        }
         if find_nano == false {
             if let Some(micro) = format.find(".000000") {
                 for mut index in 0..7 {
