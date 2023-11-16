@@ -211,8 +211,8 @@ fn test_ser_de() {
     let date = Time::from_str("14:01:58.175861").unwrap();
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!("\"14:01:58.175861\"", js);
-    let r:Time = serde_json::from_str(&js).unwrap();
-    assert_eq!(r,date);
+    let r: Time = serde_json::from_str(&js).unwrap();
+    assert_eq!(r, date);
 }
 
 #[test]

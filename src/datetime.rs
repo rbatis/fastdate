@@ -178,6 +178,11 @@ impl DateTime {
     /// parse an string by format.
     /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
     /// format str must be example:
+    /// parse nano
+    /// ```rust
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000Z", "2022-12-13 11:12:14.123456789Z").unwrap();
+    ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 11:12:14.123456789+06:00").unwrap();
+    /// ```
     /// or time zone(UTC+Hour)
     /// ```rust
     ///  fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000+00:00", "2022-12-13 11:12:14.123456+06:00").unwrap();
@@ -207,65 +212,58 @@ impl DateTime {
     pub fn parse(format: &str, arg: &str) -> Result<DateTime, Error> {
         let mut len = 19;
         //this is RFC3339 datetime buffer
-        let mut buf: [u8; 32] = *b"0000-00-00T00:00:00.000000+00:00";
+        let bytes = arg.as_bytes();
+        let mut buf: [u8; 35] = *b"0000-00-00T00:00:00.000000000+00:00";
         if let Some(year) = format.find("YYYY") {
-            let mut index = 0;
-            for x in arg[year..(year + 4)].bytes() {
-                buf[index] = x;
+            for mut index in 0..4 {
+                buf[index] = bytes[year + index];
                 index += 1;
             }
         }
         if let Some(mon) = format.find("MM") {
-            let mut index = 5;
-            for x in arg[mon..(mon + 2)].bytes() {
-                buf[index] = x;
+            for mut index in 0..2 {
+                buf[5 + index] = bytes[mon + index];
                 index += 1;
             }
         }
         if let Some(day) = format.find("DD") {
-            let mut index = 8;
-            for x in arg[day..(day + 2)].bytes() {
-                buf[index] = x;
+            for mut index in 0..2 {
+                buf[8 + index] = bytes[day + index];
                 index += 1;
             }
         }
         if let Some(hour) = format.find("hh") {
-            let mut index = 11;
-            for x in arg[hour..(hour + 2)].bytes() {
-                buf[index] = x;
+            for mut index in 0..2 {
+                buf[11 + index] = bytes[hour + index];
                 index += 1;
             }
         }
         if let Some(minute) = format.find("mm") {
-            let mut index = 14;
-            for x in arg[minute..(minute + 2)].bytes() {
-                buf[index] = x;
+            for mut index in 0..2 {
+                buf[14 + index] = bytes[minute + index];
                 index += 1;
             }
         }
         if let Some(sec) = format.find("ss") {
-            let mut index = 17;
-            for x in arg[sec..(sec + 2)].bytes() {
-                buf[index] = x;
+            for mut index in 0..2 {
+                buf[17 + index] = bytes[sec + index];
                 index += 1;
             }
         }
-        let find_nano = false;
-        //todo better way parse '.000000000'
-        // if let Some(nano) = format.find(".000000000") {
-        //     let mut index = 19;
-        //     for x in arg[nano..(nano + 10)].bytes() {
-        //         buf[index] = x;
-        //         index += 1;
-        //     }
-        //     len += 10;
-        //     find_nano = true;
-        // }
+        let mut find_nano = false;
+        //parse '.000000000'
+        if let Some(nano) = format.find(".000000000") {
+            for mut index in 0..10 {
+                buf[19 + index] = bytes[nano + index];
+                index += 1;
+            }
+            len += 10;
+            find_nano = true;
+        }
         if find_nano == false {
             if let Some(micro) = format.find(".000000") {
-                let mut index = 19;
-                for x in arg[micro..(micro + 7)].bytes() {
-                    buf[index] = x;
+                for mut index in 0..7 {
+                    buf[19 + index] = bytes[micro + index];
                     index += 1;
                 }
                 len += 7;
@@ -276,17 +274,14 @@ impl DateTime {
             len += 1;
         }
         if let Some(zone) = format.find("+00:00") {
-            let mut index = len;
-            for x in arg[zone..(zone + 6)].bytes() {
-                buf[index] = x;
-                index += 1;
+            for index in 0..6 {
+                let x = bytes.get(zone + index).ok_or(Error::from(""))?;
+                buf[len + index] = *x;
             }
             len += 6;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
-        println!("str={}", str);
-        let inner = DateTime::from_str(str)?;
-        Ok(inner)
+        DateTime::from_str(str)
     }
 
     /// get week_day
@@ -305,6 +300,7 @@ impl DateTime {
     pub fn nano(&self) -> u32 {
         self.inner.nanosecond()
     }
+
     pub fn ms(&self) -> u16 {
         self.inner.millisecond()
     }
