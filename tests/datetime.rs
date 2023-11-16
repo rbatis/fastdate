@@ -95,7 +95,6 @@ fn test_from_timestamp_nano() {
     assert_eq!(now, new_time);
 }
 
-
 #[test]
 fn test_from_timestamp_nano2() {
     let now = DateTime::from_str("1600-11-15 15:37:33.595407Z").unwrap();
@@ -300,7 +299,6 @@ fn test_parse_z_sub() {
     let date_offset = date.clone();
     assert_eq!(date_offset.to_string(), "2022-12-12T00:00:00-09:00");
 }
-
 
 #[test]
 fn test_set_offset_sub() {
@@ -709,7 +707,6 @@ fn test_offset_sec_min() {
     dt = dt.set_offset(-86399);
     assert_eq!(dt.offset(), -86399);
 }
-
 
 #[test]
 fn test_get_nano() {

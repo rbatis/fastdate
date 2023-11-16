@@ -9,7 +9,7 @@ use std::ops::{Add, Deref, Sub};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use time1::format_description::well_known::Rfc3339;
-use time1::{Month, UtcOffset};
+use time1::{UtcOffset};
 
 /// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
 pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
@@ -215,56 +215,52 @@ impl DateTime {
         let bytes = arg.as_bytes();
         let mut buf: [u8; 35] = *b"0000-00-00T00:00:00.000000000+00:00";
         if let Some(year) = format.find("YYYY") {
-            for mut index in 0..4 {
-                buf[index] = bytes[year + index];
-                index += 1;
+            for index in 0..4 {
+                buf[index] = *bytes.get(year + index).ok_or(Error::from("warn 'YYYY'"))?;
             }
         }
         if let Some(mon) = format.find("MM") {
-            for mut index in 0..2 {
-                buf[5 + index] = bytes[mon + index];
-                index += 1;
+            for index in 0..2 {
+                buf[5 + index] = *bytes.get(mon + index).ok_or(Error::from("warn 'MM'"))?;
             }
         }
         if let Some(day) = format.find("DD") {
-            for mut index in 0..2 {
-                buf[8 + index] = bytes[day + index];
-                index += 1;
+            for index in 0..2 {
+                buf[8 + index] = *bytes.get(day + index).ok_or(Error::from("warn 'DD'"))?;
             }
         }
         if let Some(hour) = format.find("hh") {
-            for mut index in 0..2 {
-                buf[11 + index] = bytes[hour + index];
-                index += 1;
+            for index in 0..2 {
+                buf[11 + index] = *bytes.get(hour + index).ok_or(Error::from("warn 'hh'"))?;
             }
         }
         if let Some(minute) = format.find("mm") {
-            for mut index in 0..2 {
-                buf[14 + index] = bytes[minute + index];
-                index += 1;
+            for index in 0..2 {
+                buf[14 + index] = *bytes.get(minute + index).ok_or(Error::from("warn 'mm'"))?;
             }
         }
         if let Some(sec) = format.find("ss") {
-            for mut index in 0..2 {
-                buf[17 + index] = bytes[sec + index];
-                index += 1;
+            for index in 0..2 {
+                buf[17 + index] = *bytes.get(sec + index).ok_or(Error::from("warn 'ss'"))?;
             }
         }
         let mut find_nano = false;
         //parse '.000000000'
         if let Some(nano) = format.find(".000000000") {
-            for mut index in 0..10 {
-                buf[19 + index] = bytes[nano + index];
-                index += 1;
+            for index in 0..10 {
+                buf[19 + index] = *bytes
+                    .get(nano + index)
+                    .ok_or(Error::from("warn '.000000000'"))?;
             }
             len += 10;
             find_nano = true;
         }
         if find_nano == false {
             if let Some(micro) = format.find(".000000") {
-                for mut index in 0..7 {
-                    buf[19 + index] = bytes[micro + index];
-                    index += 1;
+                for index in 0..7 {
+                    buf[19 + index] = *bytes
+                        .get(micro + index)
+                        .ok_or(Error::from("warn '.000000'"))?;
                 }
                 len += 7;
             }
@@ -275,7 +271,9 @@ impl DateTime {
         }
         if let Some(zone) = format.find("+00:00") {
             for index in 0..6 {
-                let x = bytes.get(zone + index).ok_or(Error::from(""))?;
+                let x = bytes
+                    .get(zone + index)
+                    .ok_or(Error::from("warn '+00:00'"))?;
                 buf[len + index] = *x;
             }
             len += 6;
