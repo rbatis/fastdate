@@ -451,6 +451,54 @@ impl DateTime {
         }
         self
     }
+
+    pub fn from_str_default(arg: &str, default_offset: i32) -> Result<DateTime, Error> {
+        let mut v = arg.to_string();
+        if v.len() == 10 {
+            v.push_str("T00:00:00.00");
+        }
+        if v.len() > 10 && &v[10..11] != "T" {
+            v.replace_range(10..11, "T");
+        }
+        let mut have_offset = None;
+        if v.ends_with("Z") {
+            v.pop();
+            v.push_str("+00:00");
+            have_offset = Some(v.len() - 6);
+        } else {
+            if v.len() >= 6 {
+                let index = v.len() - 6;
+                let b = &v[index..(index + 1)];
+                if b == "+" || b == "-" {
+                    have_offset = Some(index);
+                }
+            }
+        }
+        if let Some(mut offset) = have_offset {
+            if offset >= 1 {
+                offset = offset - 1;
+                if v.len() > offset {
+                    if &v[offset..(offset + 1)] == " " {
+                        v.remove(offset);
+                    }
+                }
+            }
+        }
+        if have_offset.is_none() {
+            let of = UtcOffset::from_whole_seconds(default_offset).unwrap();
+            let (h, m, _) = of.as_hms();
+            if h >= 0 && m >= 0 {
+                v.push_str(&format!("+{:02}:{:02}", h, m));
+            } else {
+                v.push_str(&format!("-{:02}:{:02}", h, m));
+            }
+        }
+        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| {
+            let info = format!("{} of '{}'", e, arg);
+            Error::from(info)
+        })?;
+        Ok(Self { inner })
+    }
 }
 
 impl Add<Duration> for DateTime {
@@ -533,7 +581,7 @@ impl From<(Date, i32)> for DateTime {
 impl From<Time> for DateTime {
     fn from(arg: Time) -> Self {
         Self::from_str(&format!(
-            "0000-00-00 {:02}:{:02}:{:02}.{:09}Z",
+            "0000-01-01 {:02}:{:02}:{:02}.{:09}Z",
             arg.hour, arg.minute, arg.sec, arg.nano
         ))
         .unwrap()
@@ -573,51 +621,7 @@ impl FromStr for DateTime {
     /// "2019-10-12T14:20:50.52+07:00"     (UTC+7)
     /// "2019-10-12T03:20:50.52-04:00"     (UTC-4)
     fn from_str(arg: &str) -> Result<DateTime, Error> {
-        let mut v = arg.to_string();
-        if v.len() == 10 {
-            v.push_str("T00:00:00.00");
-        }
-        if v.len() > 10 && &v[10..11] != "T" {
-            v.replace_range(10..11, "T");
-        }
-        let mut have_offset = None;
-        if v.ends_with("Z") {
-            v.pop();
-            v.push_str("+00:00");
-            have_offset = Some(v.len() - 6);
-        } else {
-            if v.len() >= 6 {
-                let index = v.len() - 6;
-                let b = &v[index..(index + 1)];
-                if b == "+" || b == "-" {
-                    have_offset = Some(index);
-                }
-            }
-        }
-        if let Some(mut offset) = have_offset {
-            if offset >= 1 {
-                offset = offset - 1;
-                if v.len() > offset {
-                    if &v[offset..(offset + 1)] == " " {
-                        v.remove(offset);
-                    }
-                }
-            }
-        }
-        if have_offset.is_none() {
-            let of = UtcOffset::from_whole_seconds(offset_sec()).unwrap();
-            let (h, m, _) = of.as_hms();
-            if h >= 0 && m >= 0 {
-                v.push_str(&format!("+{:02}:{:02}", h, m));
-            } else {
-                v.push_str(&format!("-{:02}:{:02}", h, m));
-            }
-        }
-        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| {
-            let info = format!("{} of '{}'", e, arg);
-            Error::from(info)
-        })?;
-        Ok(Self { inner })
+        return Self::from_str_default(arg, offset_sec());
     }
 }
 
