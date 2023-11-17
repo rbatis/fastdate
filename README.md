@@ -6,6 +6,14 @@
 
 fastdate of Any RFC3339Micro
 
+
+## way fastdate?
+* full test, Code testing coverage >= 99%
+* Powerful, easy to use
+* based on crate `time`
+
+
+
 this date cartes is very fast(<= 50ns) including 
 * offset_sec()
 * from_str("2022-12-13 11:12:14.123456")
@@ -33,17 +41,17 @@ this date cartes is very fast(<= 50ns) including
 
 ```log
 test bench_add                         ... bench:          14 ns/iter (+/- 0)
-test bench_date_display                ... bench:          42 ns/iter (+/- 0)
-test bench_date_from_str_iso_8601      ... bench:          90 ns/iter (+/- 1)
-test bench_date_from_str_iso_8601_time ... bench:          61 ns/iter (+/- 1)
-test bench_date_now_local              ... bench:          63 ns/iter (+/- 1)
-test bench_date_parse_format           ... bench:          83 ns/iter (+/- 1)
-test bench_date_utc                    ... bench:          48 ns/iter (+/- 0)
-test bench_datetime_from_str           ... bench:          90 ns/iter (+/- 3)
+test bench_date_display                ... bench:          49 ns/iter (+/- 2)
+test bench_date_from_str_iso_8601      ... bench:         129 ns/iter (+/- 6)
+test bench_date_from_str_iso_8601_time ... bench:          69 ns/iter (+/- 2)
+test bench_date_now_local              ... bench:          65 ns/iter (+/- 2)
+test bench_date_parse_format           ... bench:         282 ns/iter (+/- 11)
+test bench_date_utc                    ... bench:          49 ns/iter (+/- 2)
+test bench_datetime_from_str           ... bench:         130 ns/iter (+/- 10)
 test bench_eq                          ... bench:          10 ns/iter (+/- 0)
 test bench_from_timestamp_millis       ... bench:          23 ns/iter (+/- 0)
 test bench_get_micro                   ... bench:           0 ns/iter (+/- 0)
-test bench_set_offset                  ... bench:          13 ns/iter (+/- 0)
+test bench_set_offset                  ... bench:          12 ns/iter (+/- 0)
 test bench_timestamp                   ... bench:           2 ns/iter (+/- 0)
 ```
 
