@@ -488,9 +488,9 @@ impl DateTime {
             let of = UtcOffset::from_whole_seconds(default_offset).unwrap();
             let (h, m, _) = of.as_hms();
             if h >= 0 && m >= 0 {
-                v.push_str(&format!("+{:02}:{:02}", h, m));
+                v.push_str(&format!("+{:02}:{:02}", h.abs(), m.abs()));
             } else {
-                v.push_str(&format!("-{:02}:{:02}", h, m));
+                v.push_str(&format!("-{:02}:{:02}", h.abs(), m.abs()));
             }
         }
         let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| {
@@ -662,6 +662,7 @@ impl<'de> Deserialize<'de> for DateTime {
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
-        DateTime::from_str(&s).map_err(|e| D::Error::custom(e))
+        DateTime::from_str(&s)
+        .map_err(|e| D::Error::custom(e))
     }
 }

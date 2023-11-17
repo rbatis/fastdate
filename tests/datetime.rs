@@ -1,4 +1,5 @@
 use fastdate::{Date, DateTime, DurationFrom, Time, GLOBAL_OFFSET};
+use std::cmp::Ordering;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 
@@ -280,10 +281,31 @@ fn test_from_str_zone_sub() {
 }
 
 #[test]
-fn test_from_str_no_zone() {
+fn test_from_str_default_no_zone() {
     let date1 = DateTime::from_str_default("2022-12-12T00:00:00", 28800).unwrap();
-    assert_eq!(date1.offset(), 28800);
     println!("{}", date1);
+    assert_eq!(date1.offset(), 28800);
+}
+
+#[test]
+fn test_from_str_default_no_zone2() {
+    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", -(1 * 3600 + 60)).unwrap();
+    println!("{}", date1);
+    assert_eq!(date1.offset(), -3660);
+}
+
+#[test]
+fn test_from_str_default_no_zone_sec() {
+    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", 28800+1).unwrap();
+    println!("{}", date1);
+    assert_eq!(date1.offset(), 28800);
+}
+
+#[test]
+fn test_from_str_default_no_zone2_sec() {
+    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", -(1 * 3600 + 60+1)).unwrap();
+    println!("{}", date1);
+    assert_eq!(date1.offset(), -3660);
 }
 
 #[test]
@@ -555,6 +577,21 @@ fn test_ser_date() {
 
 #[test]
 fn test_de_date() {
+    let date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
+    let js = serde_json::to_string(&date).unwrap();
+    let new_date:DateTime=serde_json::from_str(&js).unwrap();
+    assert_eq!(new_date,date);
+}
+
+#[test]
+fn test_de_date_fail() {
+    let js = serde_json::to_string(&"2023-1-13 16:57:41.123926+08:00").unwrap();
+    let new_date:Result<DateTime, serde_json::Error>=serde_json::from_str(&js);
+    assert_eq!(new_date.is_err(),true);
+}
+
+#[test]
+fn test_de_date_offset() {
     let mut date = DateTime::from_str("2023-10-13 16:57:41.123926Z").unwrap();
     date = date.set_offset(28800);
     let js = serde_json::to_string(&date).unwrap();
@@ -621,6 +658,14 @@ fn test_add_duration_ref() {
 fn test_sub_duration_ref() {
     let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap() - &Duration::from_minute(1);
     assert_eq!(date.to_string(), "2013-10-05T23:59:00Z");
+}
+
+
+#[test]
+fn test_cmd() {
+    let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap();
+    let date2 = DateTime::from_str("2013-10-07 00:00:00Z").unwrap();
+    assert_eq!(date2.cmp(&date),Ordering::Greater);
 }
 
 #[test]
