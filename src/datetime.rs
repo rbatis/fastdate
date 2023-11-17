@@ -216,32 +216,32 @@ impl DateTime {
         let mut buf: [u8; 35] = *b"0000-00-00T00:00:00.000000000+00:00";
         if let Some(year) = format.find("YYYY") {
             for index in 0..4 {
-                buf[index] = *bytes.get(year + index).ok_or(Error::from("warn 'YYYY'"))?;
+                buf[index] = *bytes.get(year + index).ok_or_else(||Error::from("warn 'YYYY'"))?;
             }
         }
         if let Some(mon) = format.find("MM") {
             for index in 0..2 {
-                buf[5 + index] = *bytes.get(mon + index).ok_or(Error::from("warn 'MM'"))?;
+                buf[5 + index] = *bytes.get(mon + index).ok_or_else(||Error::from("warn 'MM'"))?;
             }
         }
         if let Some(day) = format.find("DD") {
             for index in 0..2 {
-                buf[8 + index] = *bytes.get(day + index).ok_or(Error::from("warn 'DD'"))?;
+                buf[8 + index] = *bytes.get(day + index).ok_or_else(||Error::from("warn 'DD'"))?;
             }
         }
         if let Some(hour) = format.find("hh") {
             for index in 0..2 {
-                buf[11 + index] = *bytes.get(hour + index).ok_or(Error::from("warn 'hh'"))?;
+                buf[11 + index] = *bytes.get(hour + index).ok_or_else(||Error::from("warn 'hh'"))?;
             }
         }
         if let Some(minute) = format.find("mm") {
             for index in 0..2 {
-                buf[14 + index] = *bytes.get(minute + index).ok_or(Error::from("warn 'mm'"))?;
+                buf[14 + index] = *bytes.get(minute + index).ok_or_else(||Error::from("warn 'mm'"))?;
             }
         }
         if let Some(sec) = format.find("ss") {
             for index in 0..2 {
-                buf[17 + index] = *bytes.get(sec + index).ok_or(Error::from("warn 'ss'"))?;
+                buf[17 + index] = *bytes.get(sec + index).ok_or_else(||Error::from("warn 'ss'"))?;
             }
         }
         let mut find_nano = false;
@@ -250,7 +250,7 @@ impl DateTime {
             for index in 0..10 {
                 buf[19 + index] = *bytes
                     .get(nano + index)
-                    .ok_or(Error::from("warn '.000000000'"))?;
+                    .ok_or_else(||Error::from("warn '.000000000'"))?;
             }
             len += 10;
             find_nano = true;
@@ -260,7 +260,7 @@ impl DateTime {
                 for index in 0..7 {
                     buf[19 + index] = *bytes
                         .get(micro + index)
-                        .ok_or(Error::from("warn '.000000'"))?;
+                        .ok_or_else(||Error::from("warn '.000000'"))?;
                 }
                 len += 7;
             }
@@ -273,7 +273,7 @@ impl DateTime {
             for index in 0..6 {
                 let x = bytes
                     .get(zone + index)
-                    .ok_or(Error::from("warn '+00:00'"))?;
+                    .ok_or_else(||Error::from("warn '+00:00'"))?;
                 buf[len + index] = *x;
             }
             len += 6;
