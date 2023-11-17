@@ -316,9 +316,8 @@ impl DateTime {
             len += 1;
         }
         let str = std::str::from_utf8(&buf[..len]).unwrap_or_default();
-        let inner = time1::OffsetDateTime::parse(str, &Rfc3339).map_err(|e| {
-            Error::from(format!("{} of '{}'", e, arg))
-        })?;
+        let inner = time1::OffsetDateTime::parse(str, &Rfc3339)
+            .map_err(|e| Error::from(format!("{} of '{}'", e, arg)))?;
         Ok(Self { inner })
     }
 
@@ -533,10 +532,8 @@ impl DateTime {
                 v.push_str(&format!("-{:02}:{:02}", h.abs(), m.abs()));
             }
         }
-        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339).map_err(|e| {
-            let info = format!("{} of '{}'", e, arg);
-            Error::from(info)
-        })?;
+        let inner = time1::OffsetDateTime::parse(&v, &Rfc3339)
+            .map_err(|e| Error::from(format!("{} of '{}'", e, arg)))?;
         Ok(Self { inner })
     }
 }

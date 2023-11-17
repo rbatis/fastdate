@@ -464,56 +464,38 @@ fn test_parse_format11() {
 
 #[test]
 fn test_parse_format_year_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "202",
-    );
-    println!("{:?}",date);
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "202");
+    println!("{:?}", date);
     assert_eq!(date.is_err(), true);
 }
 
 #[test]
 fn test_parse_format_mon_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-1",
-    );
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-1");
     assert_eq!(date.is_err(), true);
 }
 
 #[test]
 fn test_parse_format_day_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-3",
-    );
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-3");
     assert_eq!(date.is_err(), true);
 }
 
 #[test]
 fn test_parse_format_hour_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 1",
-    );
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 1");
     assert_eq!(date.is_err(), true);
 }
 
 #[test]
 fn test_parse_format_minute_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 12:1",
-    );
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 12:1");
     assert_eq!(date.is_err(), true);
 }
 
 #[test]
 fn test_parse_format_sec_fail() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 12:12:1",
-    );
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 12:12:1");
     assert_eq!(date.is_err(), true);
 }
 
@@ -528,11 +510,8 @@ fn test_parse_format_nano_fail() {
 
 #[test]
 fn test_parse_format_no_zone() {
-    let date = DateTime::parse(
-        "YYYY-MM-DD hh:mm:ss.000000",
-        "2022-12-13 12:12:12.000001",
-    ).unwrap();
-    println!("{}",date);
+    let date = DateTime::parse("YYYY-MM-DD hh:mm:ss.000000", "2022-12-13 12:12:12.000001").unwrap();
+    println!("{}", date);
     assert_eq!(&date.to_string()[0..26], "2022-12-13T12:12:12.000001");
 }
 
@@ -542,8 +521,8 @@ fn test_parse_format_no_zone_toolong() {
         "YYYY-MM-DD hh:mm:ss  .000000000",
         "2022-12-13 12:12:12  .000000001",
     );
-    println!("{:?}",date);
-    assert_eq!(date.is_ok(),true);
+    println!("{:?}", date);
+    assert_eq!(date.is_ok(), true);
 }
 
 #[test]
