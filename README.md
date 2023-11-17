@@ -72,6 +72,25 @@ fn main(){
     DateTime::now() + Duration::from_secs(1);
     // sub
     DateTime::now() - Duration::from_secs(1);
+    //parse
+    fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000Z", "2022-12-13 11:12:14.123456789Z").unwrap();
+    fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 11:12:14.123456789+06:00").unwrap();
+    DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
+    //format
+     let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 1233,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ));
+    let str:String = dt.format("YYYY-MM-DD/hh/mm/ss");
     //befor,after
     let date1 = DateTime::from_str("2022-12-12 00:00:00").unwrap();
     let date2 = DateTime::from_str("2022-12-12 01:00:00").unwrap();
@@ -82,8 +101,6 @@ fn main(){
     //from str time zone
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456+08:00");
     let datetime=DateTime::from_str("1234-12-13 11:12:13.123456Z");
-    //parse by format str
-    let date = DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
     //to_string()
     let s = datetime.to_string();//1234-12-13 11:12:13.123456
     //unix_timestamp
