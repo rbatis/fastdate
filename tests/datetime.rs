@@ -344,7 +344,7 @@ fn test_parse_z_sub() {
 
 #[test]
 fn test_parse_s() {
-    let date = DateTime::parse("YYYY/MM/DD/hh:mm:ss","2022/12/12/00:00:00").unwrap();
+    let date = DateTime::parse("YYYY/MM/DD/hh:mm:ss", "2022/12/12/00:00:00").unwrap();
     assert_eq!(&date.to_string()[..19], "2022-12-12T00:00:00");
 }
 
@@ -874,7 +874,7 @@ fn test_format() {
 }
 
 #[test]
-fn test_forma2t() {
+fn test_format2() {
     let dt = fastdate::DateTime::from((
         Date {
             day: 1,
@@ -892,6 +892,27 @@ fn test_forma2t() {
     println!("dt={}", dt.to_string());
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
     assert_eq!(f, "2000-1-1/9/1/11.123456/+08:00");
+}
+
+#[test]
+fn test_format3() {
+    let dt = fastdate::DateTime::from((
+        Date {
+            day: 1,
+            mon: 1,
+            year: 2000,
+        },
+        Time {
+            nano: 123456000,
+            sec: 11,
+            minute: 1,
+            hour: 1,
+        },
+    ))
+    .set_offset(-8 * 60 * 60);
+    println!("dt={}", dt.to_string());
+    let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
+    assert_eq!(f, "1999-12-31/17/1/11.123456/-08:00");
 }
 
 #[test]

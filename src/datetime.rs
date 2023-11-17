@@ -73,7 +73,7 @@ impl DateTime {
 
     ///add/sub sec
     pub fn add_sub_sec(self, sec: i64) -> Self {
-        if sec > 0 {
+        if sec >= 0 {
             self.add(Duration::from_secs(sec as u64))
         } else {
             self.sub(Duration::from_secs((-sec) as u64))
@@ -112,7 +112,7 @@ impl DateTime {
 
     ///from timestamp sec
     pub fn from_timestamp(sec: i64) -> DateTime {
-        if sec > 0 {
+        if sec >= 0 {
             Self::from_system_time(UNIX_EPOCH + Duration::from_secs(sec as u64), 0)
         } else {
             Self::from_system_time(UNIX_EPOCH - Duration::from_secs((-sec) as u64), 0)
@@ -120,7 +120,7 @@ impl DateTime {
     }
     ///from timestamp micros
     pub fn from_timestamp_micros(micros: i64) -> DateTime {
-        if micros > 0 {
+        if micros >= 0 {
             Self::from_system_time(UNIX_EPOCH + Duration::from_micros(micros as u64), 0)
         } else {
             Self::from_system_time(UNIX_EPOCH - Duration::from_micros((-micros) as u64), 0)
@@ -128,7 +128,7 @@ impl DateTime {
     }
     ///from timestamp millis
     pub fn from_timestamp_millis(ms: i64) -> DateTime {
-        if ms > 0 {
+        if ms >= 0 {
             Self::from_system_time(UNIX_EPOCH + Duration::from_millis(ms as u64), 0)
         } else {
             Self::from_system_time(UNIX_EPOCH - Duration::from_millis((-ms) as u64), 0)
@@ -136,7 +136,7 @@ impl DateTime {
     }
     ///from timestamp nano
     pub fn from_timestamp_nano(nano: i128) -> DateTime {
-        if nano > 0 {
+        if nano >= 0 {
             Self::from_system_time(UNIX_EPOCH + Duration::from_nanos(nano as u64), 0)
         } else {
             Self::from_system_time(UNIX_EPOCH - Duration::from_nanos((-nano) as u64), 0)
@@ -162,7 +162,16 @@ impl DateTime {
     ///
     /// ```
     pub fn format(&self, fmt: &str) -> String {
-        let (h, m, _) = self.offset_hms();
+        let (mut h, mut m, _) = self.offset_hms();
+        let offset = self.offset();
+        let add_sub;
+        if offset > 0 {
+            add_sub = '+';
+        } else {
+            add_sub = '-';
+            h = h.abs();
+            m = m.abs();
+        }
         fmt.replacen("YYYY", &self.year().to_string(), 1)
             .replacen("MM", &self.mon().to_string(), 1)
             .replacen("DD", &self.day().to_string(), 1)
@@ -171,7 +180,7 @@ impl DateTime {
             .replacen("ss", &self.sec().to_string(), 1)
             .replacen(".000000000", &format!(".{:09}", self.nano()), 1)
             .replacen(".000000", &format!(".{:06}", self.micro()), 1)
-            .replacen("+00:00", &format!("+{:02}:{:02}", h, m), 1)
+            .replacen("+00:00", &format!("{}{:02}:{:02}", add_sub, h, m), 1)
             .to_string()
     }
 
@@ -297,7 +306,7 @@ impl DateTime {
             let offset_sec = offset_sec();
             let of = UtcOffset::from_whole_seconds(offset_sec).unwrap();
             let (h, m, _) = of.as_hms();
-            if offset_sec > 0 {
+            if offset_sec >= 0 {
                 buf[len] = b'+';
                 len += 1;
             } else {
@@ -434,7 +443,7 @@ impl DateTime {
                 len += 1;
             } else {
                 let (h, m, s) = self.offset_hms();
-                if offset > 0 {
+                if offset >= 0 {
                     buf[len] = b'+';
                     len += 1;
                     buf[len] = b'0' + (h as u8 / 10);
