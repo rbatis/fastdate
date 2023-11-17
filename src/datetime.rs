@@ -655,6 +655,7 @@ impl Serialize for DateTime {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
