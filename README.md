@@ -72,11 +72,11 @@ fn main(){
     DateTime::now() + Duration::from_secs(1);
     // sub
     DateTime::now() - Duration::from_secs(1);
-    //parse
+    //parse allow token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00","Z"]
     fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000Z", "2022-12-13 11:12:14.123456789Z").unwrap();
     fastdate::DateTime::parse("YYYY-MM-DD hh:mm:ss.000000000+00:00", "2022-12-13 11:12:14.123456789+06:00").unwrap();
     DateTime::parse("hh:mm:ss.000000,YYYY-MM-DD","11:12:14.123456,2022-12-13").unwrap();
-    //format
+    //format allow token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00","Z"]
      let dt = fastdate::DateTime::from((
         Date {
             day: 1,

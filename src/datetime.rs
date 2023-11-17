@@ -185,7 +185,7 @@ impl DateTime {
     }
 
     /// parse an string by format.
-    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
+    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00","Z"]
     /// format str must be example:
     /// parse nano
     /// ```rust
