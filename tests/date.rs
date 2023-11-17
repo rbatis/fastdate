@@ -102,8 +102,8 @@ fn test_ser_de() {
 #[test]
 fn test_de_map_error() {
     let data = serde_json::Value::String("202-02-01".to_string());
-    let new_d:Result<Date, serde_json::Error> = serde_json::from_value(data);
-    assert_eq!(new_d.is_err(),true);
+    let new_d: Result<Date, serde_json::Error> = serde_json::from_value(data);
+    assert_eq!(new_d.is_err(), true);
 }
 
 #[test]

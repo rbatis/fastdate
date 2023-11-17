@@ -1,4 +1,4 @@
-use fastdate::{Date, DateTime, DurationFrom, Time, GLOBAL_OFFSET};
+use fastdate::{Date, DateTime, DurationFrom, Time};
 use std::cmp::Ordering;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
@@ -296,14 +296,14 @@ fn test_from_str_default_no_zone2() {
 
 #[test]
 fn test_from_str_default_no_zone_sec() {
-    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", 28800+1).unwrap();
+    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", 28800 + 1).unwrap();
     println!("{}", date1);
     assert_eq!(date1.offset(), 28800);
 }
 
 #[test]
 fn test_from_str_default_no_zone2_sec() {
-    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", -(1 * 3600 + 60+1)).unwrap();
+    let date1 = DateTime::from_str_default("2022-12-12T00:00:00", -(1 * 3600 + 60 + 1)).unwrap();
     println!("{}", date1);
     assert_eq!(date1.offset(), -3660);
 }
@@ -466,8 +466,9 @@ fn test_parse_format11() {
 fn test_parse_format_year_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "202-12-13 11:12:14.123456789+06:00",
+        "202",
     );
+    println!("{:?}",date);
     assert_eq!(date.is_err(), true);
 }
 
@@ -475,7 +476,7 @@ fn test_parse_format_year_fail() {
 fn test_parse_format_mon_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-1-13 11:12:14.123456789+06:00",
+        "2022-1",
     );
     assert_eq!(date.is_err(), true);
 }
@@ -484,7 +485,7 @@ fn test_parse_format_mon_fail() {
 fn test_parse_format_day_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-3 11:12:14.123456789+06:00",
+        "2022-12-3",
     );
     assert_eq!(date.is_err(), true);
 }
@@ -493,7 +494,7 @@ fn test_parse_format_day_fail() {
 fn test_parse_format_hour_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 1:12:14.123456789+06:00",
+        "2022-12-13 1",
     );
     assert_eq!(date.is_err(), true);
 }
@@ -502,7 +503,7 @@ fn test_parse_format_hour_fail() {
 fn test_parse_format_minute_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 12:1:14.123456789+06:00",
+        "2022-12-13 12:1",
     );
     assert_eq!(date.is_err(), true);
 }
@@ -511,7 +512,7 @@ fn test_parse_format_minute_fail() {
 fn test_parse_format_sec_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 12:12:1.123456789+06:00",
+        "2022-12-13 12:12:1",
     );
     assert_eq!(date.is_err(), true);
 }
@@ -520,9 +521,29 @@ fn test_parse_format_sec_fail() {
 fn test_parse_format_nano_fail() {
     let date = DateTime::parse(
         "YYYY-MM-DD hh:mm:ss.000000000+00:00",
-        "2022-12-13 12:12:12.1+06:00",
+        "2022-12-13 12:12:12.1",
     );
     assert_eq!(date.is_err(), true);
+}
+
+#[test]
+fn test_parse_format_no_zone() {
+    let date = DateTime::parse(
+        "YYYY-MM-DD hh:mm:ss.000000",
+        "2022-12-13 12:12:12.000001",
+    ).unwrap();
+    println!("{}",date);
+    assert_eq!(&date.to_string()[0..26], "2022-12-13T12:12:12.000001");
+}
+
+#[test]
+fn test_parse_format_no_zone_toolong() {
+    let date = DateTime::parse(
+        "YYYY-MM-DD hh:mm:ss  .000000000",
+        "2022-12-13 12:12:12  .000000001",
+    );
+    println!("{:?}",date);
+    assert_eq!(date.is_ok(),true);
 }
 
 #[test]
@@ -579,15 +600,15 @@ fn test_ser_date() {
 fn test_de_date() {
     let date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
     let js = serde_json::to_string(&date).unwrap();
-    let new_date:DateTime=serde_json::from_str(&js).unwrap();
-    assert_eq!(new_date,date);
+    let new_date: DateTime = serde_json::from_str(&js).unwrap();
+    assert_eq!(new_date, date);
 }
 
 #[test]
 fn test_de_date_fail() {
     let js = serde_json::to_string(&"2023-1-13 16:57:41.123926+08:00").unwrap();
-    let new_date:Result<DateTime, serde_json::Error>=serde_json::from_str(&js);
-    assert_eq!(new_date.is_err(),true);
+    let new_date: Result<DateTime, serde_json::Error> = serde_json::from_str(&js);
+    assert_eq!(new_date.is_err(), true);
 }
 
 #[test]
@@ -660,12 +681,11 @@ fn test_sub_duration_ref() {
     assert_eq!(date.to_string(), "2013-10-05T23:59:00Z");
 }
 
-
 #[test]
 fn test_cmd() {
     let date = DateTime::from_str("2013-10-06 00:00:00Z").unwrap();
     let date2 = DateTime::from_str("2013-10-07 00:00:00Z").unwrap();
-    assert_eq!(date2.cmp(&date),Ordering::Greater);
+    assert_eq!(date2.cmp(&date), Ordering::Greater);
 }
 
 #[test]
