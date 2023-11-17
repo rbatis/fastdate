@@ -12,8 +12,6 @@ fastdate of Any RFC3339Micro
 * Powerful, easy to use
 * based on crate `time`
 
-
-
 this date cartes is very fast(<= 50ns) including 
 * offset_sec()
 * from_str("2022-12-13 11:12:14.123456")
@@ -55,18 +53,14 @@ test bench_set_offset                  ... bench:          12 ns/iter (+/- 0)
 test bench_timestamp                   ... bench:           2 ns/iter (+/- 0)
 ```
 
-* it can from_str for any RFC3339,iso_8601
-for example:
-```log
-1234_12_13_11_12_13.123456
-1234-12-13T11:12:13
-1234-12-13 11:12:13.123456
-1234-12-13T11:12:13.123456
-1234-12-13T11:12:13.123456Z
-1234-12-13 11:12:13.123456+09:00
+* how use?
+
+#### add to Cargo.tom dep
+```toml
+fastdate = "0.3.24"
 ```
 
-* how use?
+#### use code
 ```rust
 use fastdate::DateTime;
 fn main(){
