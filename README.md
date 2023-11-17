@@ -57,7 +57,7 @@ test bench_timestamp                   ... bench:           2 ns/iter (+/- 0)
 
 #### add to Cargo.tom dep
 ```toml
-fastdate = "0.3.24"
+fastdate = "0.3"
 ```
 
 #### use code
