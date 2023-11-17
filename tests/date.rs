@@ -100,6 +100,13 @@ fn test_ser_de() {
 }
 
 #[test]
+fn test_de_map_error() {
+    let data = serde_json::Value::String("202-02-01".to_string());
+    let new_d:Result<Date, serde_json::Error> = serde_json::from_value(data);
+    assert_eq!(new_d.is_err(),true);
+}
+
+#[test]
 fn test_from_str_2() {
     let d = Date::from_str("2022/12/13").unwrap();
     assert_eq!(d.to_string(), "2022-12-13");
