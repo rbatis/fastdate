@@ -143,7 +143,7 @@ impl DateTime {
         }
     }
 
-    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000","+00:00"]
+    /// format support token = ["YYYY","MM","DD","hh","mm","ss",".000000",".000000000","+00:00"]
     /// ```
     /// let dt = fastdate::DateTime::from((
     ///         fastdate::Date {
