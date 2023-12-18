@@ -167,19 +167,25 @@ impl DateTime {
         let offset = self.offset();
         let add_sub = if offset >= 0 { '+' } else { '-' };
         let mut result = String::with_capacity(fmt.len());
-        let mut chars = fmt.chars();
-        while let Some(c) = chars.next() {
-            result.push(c);
+        let chars = fmt.as_bytes();
+        let mut index = 0;
+        let mut iter = chars.iter();
+        while let Some(c) = iter.next() {
+            result.push(*c as char);
             if result.ends_with(".000000000") {
                 for _ in 0..".000000000".len() {
                     result.pop();
                 }
                 write!(result, ".{:09}", self.nano()).unwrap()
             } else if result.ends_with(".000000") {
+                if (index + 3) < fmt.len() && chars[index + 1] == '0' as u8 && chars[index + 2] == '0' as u8 && chars[index + 3] == '0' as u8 {
+                    index += 1;
+                    continue;
+                }
                 for _ in 0..".000000".len() {
                     result.pop();
                 }
-                write!(result, ".{:06}", self.nano() / 1000).unwrap()
+                write!(result, ".{:06}", self.nano() / 1000).unwrap();
             } else if result.ends_with("+00:00") {
                 for _ in 0.."+00:00".len() {
                     result.pop();
@@ -218,6 +224,7 @@ impl DateTime {
                 }
                 write!(result, "{:02}", self.sec()).unwrap();
             }
+            index += 1;
         }
         result
     }

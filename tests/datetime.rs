@@ -863,7 +863,7 @@ fn test_format() {
             year: 2000,
         },
         Time {
-            nano: 123456000,
+            nano: 123456789,
             sec: 11,
             minute: 1,
             hour: 1,
@@ -872,7 +872,7 @@ fn test_format() {
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000");
     assert_eq!(f, "2000-01-01/01/01/11.123456");
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000000");
-    assert_eq!(f, "2000-01-01/01/01/11.123456000");
+    assert_eq!(f, "2000-01-01/01/01/11.123456789");
 }
 
 #[test]
