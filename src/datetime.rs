@@ -162,26 +162,64 @@ impl DateTime {
     ///
     /// ```
     pub fn format(&self, fmt: &str) -> String {
+        use std::fmt::Write;
         let (mut h, mut m, _) = self.offset_hms();
         let offset = self.offset();
-        let add_sub;
-        if offset > 0 {
-            add_sub = '+';
-        } else {
-            add_sub = '-';
-            h = h.abs();
-            m = m.abs();
+        let add_sub = if offset >= 0 { '+' } else { '-' };
+        let mut result = String::with_capacity(fmt.len());
+        let mut chars = fmt.chars();
+        while let Some(c) = chars.next() {
+            result.push(c);
+            if result.ends_with(".000000000") {
+                for _ in 0..".000000000".len() {
+                    result.pop();
+                }
+                write!(result, ".{:09}", self.nano()).unwrap()
+            } else if result.ends_with(".000000") {
+                for _ in 0..".000000".len() {
+                    result.pop();
+                }
+                write!(result, ".{:06}", self.nano() / 1000).unwrap()
+            } else if result.ends_with("+00:00") {
+                for _ in 0.."+00:00".len() {
+                    result.pop();
+                }
+                h = h.abs();
+                m = m.abs();
+                write!(result, "{}{:02}:{:02}", add_sub, h, m).unwrap();
+            } else if result.ends_with("YYYY") {
+                for _ in 0.."YYYY".len() {
+                    result.pop();
+                }
+                write!(result, "{:04}", self.year()).unwrap()
+            } else if result.ends_with("MM") {
+                for _ in 0.."MM".len() {
+                    result.pop();
+                }
+                result.write_fmt(format_args!("{:02}", self.mon())).unwrap()
+            } else if result.ends_with("DD") {
+                for _ in 0.."DD".len() {
+                    result.pop();
+                }
+                write!(result, "{:02}", self.day()).unwrap()
+            } else if result.ends_with("hh") {
+                for _ in 0.."hh".len() {
+                    result.pop();
+                }
+                write!(result, "{:02}", self.hour()).unwrap()
+            } else if result.ends_with("mm") {
+                for _ in 0.."mm".len() {
+                    result.pop();
+                }
+                write!(result, "{:02}", self.minute()).unwrap();
+            } else if result.ends_with("ss") {
+                for _ in 0.."ss".len() {
+                    result.pop();
+                }
+                write!(result, "{:02}", self.sec()).unwrap();
+            }
         }
-        fmt.replacen("YYYY", &self.year().to_string(), 1)
-            .replacen("MM", &self.mon().to_string(), 1)
-            .replacen("DD", &self.day().to_string(), 1)
-            .replacen("hh", &self.hour().to_string(), 1)
-            .replacen("mm", &self.minute().to_string(), 1)
-            .replacen("ss", &self.sec().to_string(), 1)
-            .replacen(".000000000", &format!(".{:09}", self.nano()), 1)
-            .replacen(".000000", &format!(".{:06}", self.micro()), 1)
-            .replacen("+00:00", &format!("{}{:02}:{:02}", add_sub, h, m), 1)
-            .to_string()
+        result
     }
 
     /// parse an string by format.
@@ -400,7 +438,7 @@ impl DateTime {
         Self {
             inner: time1::OffsetDateTime::from(s),
         }
-        .set_offset(offset)
+            .set_offset(offset)
     }
 
     /// stand "0000-00-00 00:00:00.000000000"
@@ -611,7 +649,7 @@ impl From<Date> for DateTime {
             "{:04}-{:02}-{:02} 00:00:00.000000000Z",
             arg.year, arg.mon, arg.day
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -630,7 +668,7 @@ impl From<Time> for DateTime {
             "0000-01-01 {:02}:{:02}:{:02}.{:09}Z",
             arg.hour, arg.minute, arg.sec, arg.nano
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -640,7 +678,7 @@ impl From<(Date, Time)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-        .unwrap()
+            .unwrap()
     }
 }
 
@@ -651,7 +689,7 @@ impl From<(Date, Time, i32)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-        .unwrap();
+            .unwrap();
         datetime = datetime.set_offset(arg.2).add_sub_sec(-arg.2 as i64);
         datetime
     }
@@ -694,8 +732,8 @@ impl PartialOrd for DateTime {
 
 impl Serialize for DateTime {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         serializer.serialize_str(&self.to_string())
     }
@@ -704,8 +742,8 @@ impl Serialize for DateTime {
 #[cfg(not(tarpaulin_include))]
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;

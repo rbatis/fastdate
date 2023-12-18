@@ -870,9 +870,9 @@ fn test_format() {
         },
     ));
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000");
-    assert_eq!(f, "2000-1-1/1/1/11.123456");
+    assert_eq!(f, "2000-01-01/01/01/11.123456");
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000000");
-    assert_eq!(f, "2000-1-1/1/1/11.123456000");
+    assert_eq!(f, "2000-01-01/01/01/11.123456000");
 }
 
 #[test]
@@ -893,7 +893,7 @@ fn test_format2() {
     .set_offset(8 * 60 * 60);
     println!("dt={}", dt.to_string());
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
-    assert_eq!(f, "2000-1-1/9/1/11.123456/+08:00");
+    assert_eq!(f, "2000-01-01/09/01/11.123456/+08:00");
 }
 
 #[test]
@@ -914,7 +914,7 @@ fn test_format3() {
     .set_offset(-8 * 60 * 60);
     println!("dt={}", dt.to_string());
     let f = dt.format("YYYY-MM-DD/hh/mm/ss.000000/+00:00");
-    assert_eq!(f, "1999-12-31/17/1/11.123456/-08:00");
+    assert_eq!(f, "1999-12-31/17/01/11.123456/-08:00");
 }
 
 #[test]
