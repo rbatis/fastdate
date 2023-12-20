@@ -18,7 +18,8 @@ this date cartes is very fast(<= 50ns) including
 * now()
 * utc()
 * week_day()
-* to_string()/format!()
+* to_string()
+* format("YYYY-MM-DD hh:mm:ss.000000")
 * eq()/==
 * add()/sub()
 * set_offset()
