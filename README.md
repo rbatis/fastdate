@@ -20,8 +20,8 @@ this date cartes is very fast(<= 50ns) including
 * week_day()
 * to_string()
 * format("YYYY-MM-DD hh:mm:ss.000000")
-* eq()/==
-* add()/sub()
+* eq(),==
+* add(),sub()
 * set_offset()
 * parse("YYYY-MM-DD,hh:mm:ss.000000","2022-12-13,11:12:14.123456")
 * unix_timestamp()
