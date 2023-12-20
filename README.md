@@ -19,11 +19,11 @@ this date cartes is very fast(<= 50ns) including
 * utc()
 * week_day()
 * to_string()
-* format("YYYY-MM-DD hh:mm:ss.000000")
 * eq(),==
 * add(),sub()
-* set_offset()
+* format("YYYY-MM-DD hh:mm:ss.000000")
 * parse("YYYY-MM-DD,hh:mm:ss.000000","2022-12-13,11:12:14.123456")
+* set_offset()
 * unix_timestamp()
 * unix_timestamp_millis()
 * unix_timestamp_nano()
