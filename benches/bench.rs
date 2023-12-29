@@ -142,7 +142,7 @@ fn bench_from_timestamp_millis(b: &mut Bencher) {
 //181 ns/iter (+/- 2)
 #[bench]
 fn bench_format(b: &mut Bencher) {
-    let dt=DateTime::from_str("1997-12-13T11:12:13.123456+09:00").unwrap();
+    let dt = DateTime::from_str("1997-12-13T11:12:13.123456+09:00").unwrap();
     b.iter(|| {
         std::hint::black_box({
             dt.format("YYYY-MM-DD/hh/mm/ss.000000");
