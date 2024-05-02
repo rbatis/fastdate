@@ -157,6 +157,9 @@ impl DateTime {
     ///             minute: 1,
     ///             hour: 1,
     ///         })).set_offset(8 * 60 * 60);
+    ///   println!("{}",dt.format("YYYY-MM-DD hh:mm:ss"));
+    ///   println!("{}",dt.format("YYYY-MM-DD hh:mm:ss.000000"));
+    ///   println!("{}",dt.format("YYYY-MM-DD hh:mm:ss.000000+00:00"));
     ///   println!("{}",dt.format("YYYY/MM/DD/hh/mm/ss/.000000/+00:00"));
     ///   println!("{}",dt.format("YYYY-MM-DD/hh/mm/ss"));
     ///
