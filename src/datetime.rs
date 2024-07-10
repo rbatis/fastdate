@@ -553,7 +553,13 @@ impl DateTime {
     }
 
     pub fn from_str_default(arg: &str, default_offset: i32) -> Result<DateTime, Error> {
-        let mut v = arg.to_string();
+        let mut v = {
+            let mut v = String::with_capacity(arg.len() + 6);
+            for x in arg.chars() {
+                v.push(x);
+            }
+            v
+        };
         if v.len() == 10 {
             v.push_str("T00:00:00.00");
         }
