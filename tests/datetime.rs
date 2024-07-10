@@ -349,6 +349,12 @@ fn test_parse_s() {
 }
 
 #[test]
+fn test_parse_no_00() {
+    let date = DateTime::from_str("2024-07-26 09:03:48+00").unwrap();
+    assert_eq!(date.to_string(), "2024-07-26T09:03:48Z");
+}
+
+#[test]
 fn test_set_offset_sub() {
     let mut date = DateTime::from_str("2022-12-12 09:00:00Z").unwrap();
     date = date.set_offset(-9 * 3600);
