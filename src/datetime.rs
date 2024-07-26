@@ -5,18 +5,26 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, Deref, Sub};
+use std::ops::{Add, Sub};
 use std::str::FromStr;
+use std::sync::atomic::{AtomicI32, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use time1::format_description::well_known::Rfc3339;
 use time1::UtcOffset;
 
-/// Obtain the offset of Utc time and Local time in seconds, using Lazy only once to improve performance
-pub static GLOBAL_OFFSET: Lazy<i32> = Lazy::new(|| Timespec::now().local().tm_utcoff);
+static GLOBAL_OFFSET: AtomicI32 = AtomicI32::new(-9999);
 
 /// offset with utc 0.zone
 pub fn offset_sec() -> i32 {
-    GLOBAL_OFFSET.deref().clone()
+    if GLOBAL_OFFSET.load(Ordering::Relaxed) == -9999 {
+        GLOBAL_OFFSET.store(Timespec::now().local().tm_utcoff, Ordering::SeqCst);
+    }
+    GLOBAL_OFFSET.load(Ordering::Relaxed)
+}
+
+/// set GLOBAL_OFFSET
+pub fn set_offset_sec(sec:i32) {
+    GLOBAL_OFFSET.store(sec, Ordering::SeqCst);
 }
 
 /// Log timestamp type.
@@ -37,8 +45,7 @@ impl DateTime {
     }
     ///local zone time
     pub fn now() -> Self {
-        let offset = GLOBAL_OFFSET.deref().clone();
-        Self::from_system_time(SystemTime::now(), 0).set_offset(offset)
+        Self::from_system_time(SystemTime::now(), 0).set_offset(offset_sec())
     }
 
     /// set offset
