@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::sys::Timespec;
 use crate::{Date, Time};
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp;
 use std::fmt::{Display, Formatter};
