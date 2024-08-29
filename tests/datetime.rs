@@ -587,6 +587,16 @@ fn test_ser_date() {
     assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
 }
 
+
+#[test]
+fn test_offset_href(){
+    //5*3600 +  3600/2
+    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
+    date = date.set_offset(5*3600 +  3600/2);
+    let js = serde_json::to_string(&date).unwrap();
+    assert_eq!(js, "\"2023-10-13T14:27:41.123926+05:30\"");
+}
+
 #[test]
 fn test_de_date() {
     let date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();

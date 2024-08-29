@@ -22,7 +22,7 @@ pub fn offset_sec() -> i32 {
 }
 
 /// set GLOBAL_OFFSET
-pub fn set_offset_sec(sec:i32) {
+pub fn set_offset_sec(sec: i32) {
     GLOBAL_OFFSET.store(sec, Ordering::SeqCst);
 }
 
@@ -508,14 +508,14 @@ impl DateTime {
                     len += 1;
                     buf[len] = b'0' + (h as u8 % 10);
                     len += 1;
-                    buf[len] = b':' + (m as u8 / 10);
+                    buf[len] = b':';
                     len += 1;
                     buf[len] = b'0' + (m as u8 / 10);
                     len += 1;
                     buf[len] = b'0' + (m as u8 % 10);
                     len += 1;
                     if s != 0 {
-                        buf[len] = b':' + (s as u8 / 10);
+                        buf[len] = b':';
                         len += 1;
                         buf[len] = b'0' + (s as u8 / 10);
                         len += 1;
@@ -529,14 +529,14 @@ impl DateTime {
                     len += 1;
                     buf[len] = b'0' + (-h as u8 % 10);
                     len += 1;
-                    buf[len] = b':' + (-m as u8 / 10);
+                    buf[len] = b':';
                     len += 1;
                     buf[len] = b'0' + (-m as u8 / 10);
                     len += 1;
                     buf[len] = b'0' + (-m as u8 % 10);
                     len += 1;
                     if s != 0 {
-                        buf[len] = b':' + (-s as u8 / 10);
+                        buf[len] = b':';
                         len += 1;
                         buf[len] = b'0' + (-s as u8 / 10);
                         len += 1;
