@@ -581,8 +581,7 @@ fn test_parse_micro() {
 
 #[test]
 fn test_ser_date() {
-    let mut date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
-    date = date.set_offset(8 * 3600);
+    let date = DateTime::from_str("2023-10-13 16:57:41.123926+08:00").unwrap();
     let js = serde_json::to_string(&date).unwrap();
     assert_eq!(js, "\"2023-10-13T16:57:41.123926+08:00\"");
 }
