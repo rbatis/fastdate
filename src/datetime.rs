@@ -11,11 +11,12 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use time1::format_description::well_known::Rfc3339;
 use time1::UtcOffset;
 
-static GLOBAL_OFFSET: AtomicI32 = AtomicI32::new(-9999);
+
+static GLOBAL_OFFSET: AtomicI32 = AtomicI32::new(-99999);
 
 /// offset with utc 0.zone
 pub fn offset_sec() -> i32 {
-    if GLOBAL_OFFSET.load(Ordering::Relaxed) == -9999 {
+    if GLOBAL_OFFSET.load(Ordering::Relaxed) == -99999 {
         GLOBAL_OFFSET.store(Timespec::now().local().tm_utcoff, Ordering::SeqCst);
     }
     GLOBAL_OFFSET.load(Ordering::Relaxed)
