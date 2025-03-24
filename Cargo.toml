@@ -10,7 +10,7 @@ repository = "https://github.com/rbatis/fastdate"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 serde = "1"
-time1 = { version = "0.3.20", package = "time",features = ["formatting","parsing","serde"] }
+time1 = { version = "0.3.41", package = "time",features = ["formatting","parsing","serde"] }
 [dev-dependencies]
 serde_json = "1"
 
