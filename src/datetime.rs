@@ -61,13 +61,13 @@ impl DateTime {
     }
 
     /// add Duration
-    pub fn add_duration(mut self, d: Duration) -> Self {
+    pub fn add(mut self, d: Duration) -> Self {
         self.inner = self.inner.add(d);
         self
     }
 
     /// sub Duration
-    pub fn sub_duration(mut self, d: Duration) -> Self {
+    pub fn sub(mut self, d: Duration) -> Self {
         self.inner = self.inner.sub(d);
         self
     }
@@ -75,9 +75,9 @@ impl DateTime {
     ///add/sub sec
     pub fn add_sub_sec(self, sec: i64) -> Self {
         if sec >= 0 {
-            self.add_duration(Duration::from_secs(sec as u64))
+            self.add(Duration::from_secs(sec as u64))
         } else {
-            self.sub_duration(Duration::from_secs((-sec) as u64))
+            self.sub(Duration::from_secs((-sec) as u64))
         }
     }
 
@@ -547,8 +547,8 @@ impl DateTime {
     pub fn set_nano(mut self, nano: u32) -> Self {
         let v = self.nano();
         if nano != v {
-            self = self.sub_duration(Duration::from_nanos(v as u64));
-            self = self.add_duration(Duration::from_micros(nano as u64));
+            self = self.sub(Duration::from_nanos(v as u64));
+            self = self.add(Duration::from_micros(nano as u64));
         }
         self
     }
@@ -616,7 +616,7 @@ impl Add<Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: Duration) -> Self::Output {
-        self.add_duration(rhs)
+        self.add(rhs)
     }
 }
 
@@ -624,7 +624,7 @@ impl Sub<Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: Duration) -> Self::Output {
-        self.sub_duration(rhs)
+        self.sub(rhs)
     }
 }
 
@@ -632,7 +632,7 @@ impl Add<&Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: &Duration) -> Self::Output {
-        self.add_duration(*rhs)
+        self.add(*rhs)
     }
 }
 
@@ -640,7 +640,7 @@ impl Sub<&Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: &Duration) -> Self::Output {
-        self.sub_duration(*rhs)
+        self.sub(*rhs)
     }
 }
 
