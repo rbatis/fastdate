@@ -69,11 +69,7 @@ fn system_time_to_tm(sys: &SYSTEMTIME, tm: &mut Tm) {
 
     fn yday(year: i32, month: i32, day: i32) -> i32 {
         let leap = if month > 2 {
-            if year % 4 == 0 {
-                1
-            } else {
-                2
-            }
+            if year % 4 == 0 { 1 } else { 2 }
         } else {
             0
         };

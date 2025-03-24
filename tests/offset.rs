@@ -1,4 +1,4 @@
-use fastdate::{offset_sec, DateTime};
+use fastdate::{DateTime, offset_sec};
 use std::time::Duration;
 
 #[test]

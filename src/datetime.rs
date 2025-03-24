@@ -8,9 +8,8 @@ use std::ops::{Add, Sub};
 use std::str::FromStr;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use time1::format_description::well_known::Rfc3339;
 use time1::UtcOffset;
-
+use time1::format_description::well_known::Rfc3339;
 
 static GLOBAL_OFFSET: AtomicI32 = AtomicI32::new(-99999);
 
@@ -454,7 +453,7 @@ impl DateTime {
         Self {
             inner: time1::OffsetDateTime::from(s),
         }
-            .set_offset(offset)
+        .set_offset(offset)
     }
 
     /// stand "0000-00-00 00:00:00.000000000"
@@ -677,7 +676,7 @@ impl From<Date> for DateTime {
             "{:04}-{:02}-{:02} 00:00:00.000000000Z",
             arg.year, arg.mon, arg.day
         ))
-            .unwrap()
+        .unwrap()
     }
 }
 
@@ -696,7 +695,7 @@ impl From<Time> for DateTime {
             "0000-01-01 {:02}:{:02}:{:02}.{:09}Z",
             arg.hour, arg.minute, arg.sec, arg.nano
         ))
-            .unwrap()
+        .unwrap()
     }
 }
 
@@ -706,7 +705,7 @@ impl From<(Date, Time)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-            .unwrap()
+        .unwrap()
     }
 }
 
@@ -717,7 +716,7 @@ impl From<(Date, Time, i32)> for DateTime {
             "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09}Z",
             arg.0.year, arg.0.mon, arg.0.day, arg.1.hour, arg.1.minute, arg.1.sec, arg.1.nano
         ))
-            .unwrap();
+        .unwrap();
         datetime = datetime.set_offset(arg.2).add_sub_sec(-arg.2 as i64);
         datetime
     }
@@ -766,7 +765,6 @@ impl Serialize for DateTime {
         serializer.serialize_str(&self.to_string())
     }
 }
-
 
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

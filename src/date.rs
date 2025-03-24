@@ -1,4 +1,4 @@
-use crate::{get_digit_unchecked, DateTime};
+use crate::{DateTime, get_digit_unchecked};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
