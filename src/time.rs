@@ -70,7 +70,7 @@ impl Time {
                 let mut i: usize = 0;
                 loop {
                     match bytes.get(offset + length + i) {
-                        Some(c) if (b'0'..=b'9').contains(c) => {
+                        Some(c) if c.is_ascii_digit() => {
                             if i >= 9 {
                                 return Err(Error::E("SecondFractionTooLong".to_string()));
                             }
@@ -90,19 +90,19 @@ impl Time {
             let mut i = 0;
             for idx in 0..number_buf.len() {
                 let item = number_buf[idx];
-                if item != ' ' as u8 {
+                if item != b' ' {
                     //is number
-                    let v = (item - '0' as u8) as u32;
-                    nano = nano + v * 10_u32.pow(8 - i);
+                    let v = (item - b'0') as u32;
+                    nano += v * 10_u32.pow(8 - i);
                     i += 1;
                 }
             }
             (second, nano)
         };
         let t = Self {
-            nano: nano,
+            nano,
             sec: second,
-            minute: minute,
+            minute,
             hour,
         };
         Ok((t, length))
@@ -160,12 +160,12 @@ impl Time {
 
     /// display time and return len
     pub fn display_time(&self, start: usize, buf: &mut [u8]) -> usize {
-        buf[start + 0] = b'0' + (self.hour / 10) as u8;
-        buf[start + 1] = b'0' + (self.hour % 10) as u8;
-        buf[start + 3] = b'0' + (self.minute / 10) as u8;
-        buf[start + 4] = b'0' + (self.minute % 10) as u8;
-        buf[start + 6] = b'0' + (self.sec / 10) as u8;
-        buf[start + 7] = b'0' + (self.sec % 10) as u8;
+        buf[start] = b'0' + (self.hour / 10);
+        buf[start + 1] = b'0' + (self.hour % 10);
+        buf[start + 3] = b'0' + (self.minute / 10);
+        buf[start + 4] = b'0' + (self.minute % 10);
+        buf[start + 6] = b'0' + (self.sec / 10);
+        buf[start + 7] = b'0' + (self.sec % 10);
         let mut real_len = start + 1 + 8 + 8 + 1;
         buf[start + 8] = b'.';
         buf[start + 9] = b'0' + (self.nano / 100000000 % 10) as u8;
@@ -178,7 +178,7 @@ impl Time {
         buf[start + 16] = b'0' + (self.nano / 10 % 10) as u8;
         buf[start + 17] = b'0' + (self.nano % 10) as u8;
         if self.nano == 0 {
-            real_len = real_len - 10;
+            real_len -= 10;
         } else {
             let current = real_len;
             let mut last_zero = false;
@@ -187,7 +187,7 @@ impl Time {
                 if buf[i] == b'0' {
                     last_zero = true;
                 }
-                if last_zero == true && buf[i] == b'0' {
+                if last_zero && buf[i] == b'0' {
                     real_len -= 1;
                 } else {
                     break;
@@ -209,9 +209,9 @@ impl From<Duration> for Time {
             - Duration::from_secs(sec as u64);
         Self {
             nano: micros.as_nanos() as u32,
-            sec: sec,
+            sec,
             minute: min,
-            hour: hour,
+            hour,
         }
     }
 }

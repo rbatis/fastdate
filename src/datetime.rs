@@ -179,8 +179,8 @@ impl DateTime {
         let mut result = String::with_capacity(fmt.len());
         let chars = fmt.as_bytes();
         let mut index = 0;
-        let mut iter = chars.iter();
-        while let Some(c) = iter.next() {
+        let iter = chars.iter();
+        for c in iter {
             result.push(*c as char);
             if result.ends_with(".000000000") {
                 for _ in 0..".000000000".len() {
@@ -189,9 +189,9 @@ impl DateTime {
                 write!(result, ".{:09}", self.nano()).unwrap()
             } else if result.ends_with(".000000") {
                 if (index + 3) < fmt.len()
-                    && chars[index + 1] == '0' as u8
-                    && chars[index + 2] == '0' as u8
-                    && chars[index + 3] == '0' as u8
+                    && chars[index + 1] == b'0'
+                    && chars[index + 2] == b'0'
+                    && chars[index + 3] == b'0'
                 {
                     index += 1;
                     continue;
@@ -335,7 +335,7 @@ impl DateTime {
             len += 10;
             find_nano = true;
         }
-        if find_nano == false {
+        if !find_nano {
             if let Some(micro) = format.find(".000000") {
                 for index in 0..7 {
                     buf[19 + index] = *bytes
@@ -346,8 +346,8 @@ impl DateTime {
             }
         }
         let mut have_offset = false;
-        if let Some(_) = format.find("Z") {
-            buf[len] = 'Z' as u8;
+        if format.contains("Z") {
+            buf[len] = b'Z';
             len += 1;
             have_offset = true;
         }
@@ -361,7 +361,7 @@ impl DateTime {
             len += 6;
             have_offset = true;
         }
-        if have_offset == false {
+        if !have_offset {
             let offset_sec = offset_sec();
             let of = UtcOffset::from_whole_seconds(offset_sec).unwrap();
             let (h, m, _) = of.as_hms();
@@ -394,7 +394,7 @@ impl DateTime {
         let secs_since_epoch = self.unix_timestamp();
         /* 2000-03-01 (mod 400 year, immediately after feb29 */
         const LEAPOCH: i64 = 11017;
-        let days = (secs_since_epoch / 86400) as i64 - LEAPOCH;
+        let days = (secs_since_epoch / 86400) - LEAPOCH;
         let mut wday = (3 + days) % 7;
         if wday <= 0 {
             wday += 7
@@ -597,11 +597,9 @@ impl DateTime {
         }
         if let Some(mut offset) = have_offset {
             if offset >= 1 {
-                offset = offset - 1;
-                if v.len() > offset {
-                    if &v[offset..(offset + 1)] == " " {
-                        v.remove(offset);
-                    }
+                offset -= 1;
+                if v.len() > offset && &v[offset..(offset + 1)] == " " {
+                    v.remove(offset);
                 }
             }
         }
@@ -640,7 +638,7 @@ impl Add<&Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: &Duration) -> Self::Output {
-        self.add(rhs.clone())
+        self.add(*rhs)
     }
 }
 
@@ -648,7 +646,7 @@ impl Sub<&Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: &Duration) -> Self::Output {
-        self.sub(rhs.clone())
+        self.sub(*rhs)
     }
 }
 
@@ -740,7 +738,7 @@ impl FromStr for DateTime {
     /// "2019-10-12T14:20:50.52+07:00"     (UTC+7)
     /// "2019-10-12T03:20:50.52-04:00"     (UTC-4)
     fn from_str(arg: &str) -> Result<DateTime, Error> {
-        return Self::from_str_default(arg, offset_sec());
+        Self::from_str_default(arg, offset_sec())
     }
 }
 
@@ -782,6 +780,6 @@ impl<'de> Deserialize<'de> for DateTime {
     {
         use serde::de::Error;
         let s = String::deserialize(deserializer)?;
-        DateTime::from_str(&s).map_err(|e| D::Error::custom(e))
+        DateTime::from_str(&s).map_err(D::Error::custom)
     }
 }

@@ -99,7 +99,7 @@ pub fn time_to_local_tm(sec: i64, tm: &mut Tm) {
         let mut local = mem::zeroed();
         call!(FileTimeToSystemTime(&ft, &mut utc));
         call!(SystemTimeToTzSpecificLocalTime(
-            0 as *const _,
+            std::ptr::null(),
             &mut utc,
             &mut local
         ));
@@ -137,7 +137,7 @@ pub fn local_tm_to_time(tm: &Tm) -> i64 {
         let mut utc = mem::zeroed();
         let mut sys_time = tm_to_system_time(tm);
         call!(TzSpecificLocalTimeToSystemTime(
-            0 as *mut _,
+            std::ptr::null_mut(),
             &mut sys_time,
             &mut utc
         ));

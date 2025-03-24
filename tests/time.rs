@@ -5,44 +5,44 @@ use std::time::Duration;
 #[test]
 fn test_time_empty() {
     let d = Time::from_str("");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_empty2() {
     let d = Time::from_str("111");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_hour_out() {
     let d = Time::from_str("66:04:05.000000");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_minute_out() {
     let d = Time::from_str("01:66:05.000000");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_sec_out() {
     let d = Time::from_str("01:00:66.000000");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_nano_tolong() {
     let d = Time::from_str("01:00:66.000000000001");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_time_nano_miss() {
     let d = Time::from_str("01:00:00.");
     println!("{}", d.clone().err().unwrap());
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn test_from_micros() {
 #[test]
 fn test_from_time() {
     let d = Duration::from(Time {
-        nano: 1 * 1000,
+        nano: 1000,
         sec: 1,
         minute: 1,
         hour: 1,
