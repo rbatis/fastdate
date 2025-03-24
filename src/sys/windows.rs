@@ -69,11 +69,7 @@ fn system_time_to_tm(sys: &SYSTEMTIME, tm: &mut Tm) {
 
     fn yday(year: i32, month: i32, day: i32) -> i32 {
         let leap = if month > 2 {
-            if year % 4 == 0 {
-                1
-            } else {
-                2
-            }
+            if year % 4 == 0 { 1 } else { 2 }
         } else {
             0
         };
@@ -99,7 +95,7 @@ pub fn time_to_local_tm(sec: i64, tm: &mut Tm) {
         let mut local = mem::zeroed();
         call!(FileTimeToSystemTime(&ft, &mut utc));
         call!(SystemTimeToTzSpecificLocalTime(
-            0 as *const _,
+            std::ptr::null(),
             &mut utc,
             &mut local
         ));
@@ -137,7 +133,7 @@ pub fn local_tm_to_time(tm: &Tm) -> i64 {
         let mut utc = mem::zeroed();
         let mut sys_time = tm_to_system_time(tm);
         call!(TzSpecificLocalTimeToSystemTime(
-            0 as *mut _,
+            std::ptr::null_mut(),
             &mut sys_time,
             &mut utc
         ));

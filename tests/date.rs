@@ -4,7 +4,7 @@ use std::str::FromStr;
 #[test]
 fn test_date_empty() {
     let d = Date::from_str("");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
@@ -37,19 +37,19 @@ fn test_from_str_run() {
 #[test]
 fn test_from_str_mon_out() {
     let d = Date::from_str("2024-14-13");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_from_str_day_zero() {
     let d = Date::from_str("2024-14-0");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
 fn test_from_str_day_out() {
     let d = Date::from_str("2024-02-40");
-    assert_eq!(d.is_err(), true);
+    assert!(d.is_err());
 }
 
 #[test]
@@ -103,7 +103,7 @@ fn test_ser_de() {
 fn test_de_map_error() {
     let data = serde_json::Value::String("202-02-01".to_string());
     let new_d: Result<Date, serde_json::Error> = serde_json::from_value(data);
-    assert_eq!(new_d.is_err(), true);
+    assert!(new_d.is_err());
 }
 
 #[test]

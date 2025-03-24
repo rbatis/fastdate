@@ -117,6 +117,6 @@ fn main(){
     //from unix_timestamp_nano
     let datetime = DateTime::from_timestamp_nano(timestamp);
     //sum Greenwich Mean Time (GMT) from datetime
-    let time_gmt = DateTime::now().sub(Duration::from_secs(offset_sec() as u64));
+    let time_gmt = DateTime::now().sub_duration(Duration::from_secs(offset_sec() as u64));
 }
 ```

@@ -109,7 +109,7 @@ impl Tm {
             _ => inner::local_tm_to_time(self),
         };
         Timespec {
-            sec: sec,
+            sec,
             nsec: self.tm_nsec,
         }
     }
