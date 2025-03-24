@@ -88,8 +88,7 @@ impl Time {
                 length += i;
             }
             let mut i = 0;
-            for idx in 0..number_buf.len() {
-                let item = number_buf[idx];
+            for &item in number_buf.iter() {
                 if item != b' ' {
                     //is number
                     let v = (item - b'0') as u32;

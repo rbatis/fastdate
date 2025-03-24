@@ -74,7 +74,7 @@ impl Date {
 
     /// 1...31
     pub fn set_day(mut self, arg: u8) -> Self {
-        if arg <= 0 || arg > 31 {
+        if arg == 0 || arg > 31 {
             return self;
         }
         self.day = arg;
@@ -82,7 +82,7 @@ impl Date {
     }
     /// 1...12
     pub fn set_mon(mut self, arg: u8) -> Self {
-        if arg <= 0 || arg > 12 {
+        if arg == 0 || arg > 12 {
             return self;
         }
         self.mon = arg;

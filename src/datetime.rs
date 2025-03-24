@@ -54,12 +54,7 @@ impl DateTime {
     /// dt = dt.set_offset(fastdate::offset_sec());
     /// ```
     pub fn set_offset(mut self, mut offset_sec: i32) -> DateTime {
-        if offset_sec >= 86399 {
-            offset_sec = 86399;
-        }
-        if offset_sec <= -86399 {
-            offset_sec = -86399;
-        }
+        offset_sec = offset_sec.clamp(-86399, 86399);
         self.inner = self
             .inner
             .to_offset(UtcOffset::from_whole_seconds(offset_sec).unwrap());
@@ -67,13 +62,13 @@ impl DateTime {
     }
 
     /// add Duration
-    pub fn add(mut self, d: Duration) -> Self {
+    pub fn add_duration(mut self, d: Duration) -> Self {
         self.inner = self.inner.add(d);
         self
     }
 
     /// sub Duration
-    pub fn sub(mut self, d: Duration) -> Self {
+    pub fn sub_duration(mut self, d: Duration) -> Self {
         self.inner = self.inner.sub(d);
         self
     }
@@ -81,9 +76,9 @@ impl DateTime {
     ///add/sub sec
     pub fn add_sub_sec(self, sec: i64) -> Self {
         if sec >= 0 {
-            self.add(Duration::from_secs(sec as u64))
+            self.add_duration(Duration::from_secs(sec as u64))
         } else {
-            self.sub(Duration::from_secs((-sec) as u64))
+            self.sub_duration(Duration::from_secs((-sec) as u64))
         }
     }
 
@@ -283,42 +278,42 @@ impl DateTime {
         let bytes = arg.as_bytes();
         let mut buf: [u8; 35] = *b"0000-00-00T00:00:00.000000000+00:00";
         if let Some(year) = format.find("YYYY") {
-            for index in 0..4 {
+            for (index, _) in (0..4).enumerate() {
                 buf[index] = *bytes
                     .get(year + index)
                     .ok_or_else(|| Error::from("warn 'YYYY'"))?;
             }
         }
         if let Some(mon) = format.find("MM") {
-            for index in 0..2 {
+            for (index, _) in (0..2).enumerate() {
                 buf[5 + index] = *bytes
                     .get(mon + index)
                     .ok_or_else(|| Error::from("warn 'MM'"))?;
             }
         }
         if let Some(day) = format.find("DD") {
-            for index in 0..2 {
+            for (index, _) in (0..2).enumerate() {
                 buf[8 + index] = *bytes
                     .get(day + index)
                     .ok_or_else(|| Error::from("warn 'DD'"))?;
             }
         }
         if let Some(hour) = format.find("hh") {
-            for index in 0..2 {
+            for (index, _) in (0..2).enumerate() {
                 buf[11 + index] = *bytes
                     .get(hour + index)
                     .ok_or_else(|| Error::from("warn 'hh'"))?;
             }
         }
         if let Some(minute) = format.find("mm") {
-            for index in 0..2 {
+            for (index, _) in (0..2).enumerate() {
                 buf[14 + index] = *bytes
                     .get(minute + index)
                     .ok_or_else(|| Error::from("warn 'mm'"))?;
             }
         }
         if let Some(sec) = format.find("ss") {
-            for index in 0..2 {
+            for (index, _) in (0..2).enumerate() {
                 buf[17 + index] = *bytes
                     .get(sec + index)
                     .ok_or_else(|| Error::from("warn 'ss'"))?;
@@ -553,8 +548,8 @@ impl DateTime {
     pub fn set_nano(mut self, nano: u32) -> Self {
         let v = self.nano();
         if nano != v {
-            self = self.sub(Duration::from_nanos(v as u64));
-            self = self.add(Duration::from_micros(nano as u64));
+            self = self.sub_duration(Duration::from_nanos(v as u64));
+            self = self.add_duration(Duration::from_micros(nano as u64));
         }
         self
     }
@@ -622,7 +617,7 @@ impl Add<Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: Duration) -> Self::Output {
-        self.add(rhs)
+        self.add_duration(rhs)
     }
 }
 
@@ -630,7 +625,7 @@ impl Sub<Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: Duration) -> Self::Output {
-        self.sub(rhs)
+        self.sub_duration(rhs)
     }
 }
 
@@ -638,7 +633,7 @@ impl Add<&Duration> for DateTime {
     type Output = DateTime;
 
     fn add(self, rhs: &Duration) -> Self::Output {
-        self.add(*rhs)
+        self.add_duration(*rhs)
     }
 }
 
@@ -646,7 +641,7 @@ impl Sub<&Duration> for DateTime {
     type Output = DateTime;
 
     fn sub(self, rhs: &Duration) -> Self::Output {
-        self.sub(*rhs)
+        self.sub_duration(*rhs)
     }
 }
 
@@ -772,7 +767,7 @@ impl Serialize for DateTime {
     }
 }
 
-#[cfg(not(tarpaulin_include))]
+
 impl<'de> Deserialize<'de> for DateTime {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

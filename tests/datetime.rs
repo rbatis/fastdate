@@ -42,7 +42,7 @@ fn test_date_utc_add() {
     let d = DateTime::now();
     let added = d.clone() + Duration::from_secs(1);
     println!("{},{}", d, added);
-    assert_eq!(d.add(Duration::from_secs(1)), added);
+    assert_eq!(d.add_duration(Duration::from_secs(1)), added);
 }
 
 #[test]
@@ -624,7 +624,7 @@ fn test_de_date_offset() {
 fn test_add_minute() {
     let date = DateTime::from_str("2013-10-06 00:00:00Z")
         .unwrap()
-        .add(Duration::from_minute(1));
+        .add_duration(Duration::from_minute(1));
     assert_eq!(date.to_string(), "2013-10-06T00:01:00Z");
 }
 
@@ -632,7 +632,7 @@ fn test_add_minute() {
 fn test_add_hour() {
     let date = DateTime::from_str("2013-10-06T01:00:00Z")
         .unwrap()
-        .add(Duration::from_hour(1));
+        .add_duration(Duration::from_hour(1));
     assert_eq!(date.to_string(), "2013-10-06T02:00:00Z");
 }
 
@@ -640,7 +640,7 @@ fn test_add_hour() {
 fn test_add_day() {
     let date = DateTime::from_str("2013-10-07T00:00:00Z")
         .unwrap()
-        .add(Duration::from_day(1));
+        .add_duration(Duration::from_day(1));
     assert_eq!(date.to_string(), "2013-10-08T00:00:00Z");
 }
 
