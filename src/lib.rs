@@ -19,7 +19,7 @@ pub use time::*;
 macro_rules! get_digit {
     ($bytes:ident, $index:expr, $error:expr) => {
         match $bytes.get($index) {
-            Some(c) if (b'0'..=b'9').contains(&c) => c - b'0',
+            Some(c) if (b'0'..=b'9').contains(c) => c - b'0',
             _ => return Err(Error::E($error.to_string())),
         }
     };
@@ -29,7 +29,7 @@ pub(crate) use get_digit;
 macro_rules! get_digit_unchecked {
     ($bytes:ident, $index:expr, $error:expr) => {
         match $bytes.get_unchecked($index) {
-            c if (b'0'..=b'9').contains(&c) => c - b'0',
+            c if (b'0'..=b'9').contains(c) => c - b'0',
             _ => return Err(Error::E($error.to_string())),
         }
     };

@@ -21,7 +21,7 @@ impl From<std::string::String> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
-            Error::E(ref err) => {
+            Error::E( err) => {
                 write!(f, "{}", err)
             }
         };
