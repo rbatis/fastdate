@@ -713,6 +713,19 @@ fn test_from_date_offset() {
 }
 
 #[test]
+fn test_from_date() {
+    let dt = DateTime::from(
+        Date {
+            year: 0000,
+            day: 1,
+            mon: 1,
+        }
+    );
+    assert_eq!(dt.to_string(), "0000-01-01T00:00:00Z");
+}
+
+
+#[test]
 fn test_from_time_offset() {
     let dt = DateTime::from(Time {
         hour: 0,
